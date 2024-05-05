@@ -1,5 +1,10 @@
 import z from 'zod';
 
+export interface DefaultSupplyProps {
+  category: string;
+  name: string;
+}
+
 const ShelterSchema = z.object({
   id: z.string(),
   name: z.string(),

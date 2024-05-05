@@ -1,0 +1,92 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccessLevel {
+  User
+  Staff
+}
+
+model User {
+  id          String      @id @default(uuid())
+  name        String
+  lastName    String
+  login       String      @unique
+  password    String
+  phone       String      @unique
+  accessLevel AccessLevel @default(value: User)
+  createdAt   String      @map("created_at") @db.VarChar(32)
+  updatedAt   String?     @map("updated_at") @db.VarChar(32)
+
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String  @id @default(uuid())
+  userId    String  @map("user_id")
+  ip        String?
+  userAgent String? @map("user_agent")
+  active    Boolean @default(value: true)
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("sessions")
+}
+
+enum SupplyStatus {
+  UnderControl
+  Remaining
+  Needing
+  Urgent
+}
+
+model SupplyCategory {
+  id        String  @id @default(uuid())
+  name      String
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
+
+  supplies Supply[]
+
+  @@map("category_supplies")
+}
+
+model Supply {
+  id               String       @id @default(uuid())
+  shelterId        String       @map("shelter_id")
+  supplyCategoryId String       @map("supply_category_id")
+  name             String
+  status           SupplyStatus @default(value: UnderControl)
+  createdAt        String       @map("created_at") @db.VarChar(32)
+  updatedAt        String?      @map("updated_at") @db.VarChar(32)
+
+  supplyCategory SupplyCategory @relation(fields: [supplyCategoryId], references: [id])
+  shelter        Shelter        @relation(fields: [shelterId], references: [id])
+
+  @@map("supplies")
+}
+
+model Shelter {
+  id              String   @id @default(uuid())
+  pix             String   @unique
+  address         String
+  petFriendly     Boolean? @map("pet_friendly")
+  shelteredPeople Int?     @map("sheltered_people")
+  capacity        Int?
+  contact         String
+  createdAt       String   @map("created_at") @db.VarChar(32)
+  updatedAt       String?  @map("updated_at") @db.VarChar(32)
+
+  supplies Supply[]
+
+  @@map("shelters")
+}

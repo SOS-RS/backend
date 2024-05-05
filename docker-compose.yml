@@ -1,0 +1,14 @@
+services:
+  sos-rs-api:
+    container_name: sos-rs-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    tty: true
+    ports:
+      - '4000:4000'
+    command: >
+      sh -c "npx prisma generate &&
+      npx prisma migrate deploy &&
+      npm run build && npm run start:prod"

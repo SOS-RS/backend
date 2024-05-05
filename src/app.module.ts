@@ -8,6 +8,7 @@ import { ServerResponseInterceptor } from './interceptors';
 import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { UsersModule } from './users/users.module';
 import { SessionsModule } from './sessions/sessions.module';
+import { SupplyCategoriesModule } from './supply-categories/supply-categories.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SessionsModule } from './sessions/sessions.module';
     SessionsModule,
     ShelterModule,
     SupplyModule,
+    SupplyCategoriesModule,
   ],
   controllers: [],
   providers: [

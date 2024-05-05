@@ -2,6 +2,7 @@ import z from 'zod';
 
 const ShelterSchema = z.object({
   id: z.string(),
+  name: z.string(),
   pix: z.string(),
   address: z.string(),
   petFriendly: z.boolean().nullable().optional(),

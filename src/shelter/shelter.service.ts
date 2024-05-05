@@ -33,7 +33,7 @@ export class ShelterService {
       },
       data: {
         ...payload,
-        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
   }
@@ -46,18 +46,19 @@ export class ShelterService {
       },
       data: {
         ...payload,
-        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
   }
 
-  async getAll(props: SeachQueryProps) {
+  async index(props: SeachQueryProps) {
     const { handleSearch } = props;
     return await handleSearch<Prisma.ShelterSelect<DefaultArgs>>(
       this.prismaService.shelter,
       {
         select: {
           id: true,
+          name: true,
           pix: true,
           address: true,
           capacity: true,

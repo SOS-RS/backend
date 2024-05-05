@@ -7,13 +7,6 @@ export enum SupplyStatus {
   Urgent = 'Urgent',
 }
 
-const SupplyCategorySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  createdAt: z.string(),
-  updatedAt: z.string().nullable().optional(),
-});
-
 const SupplySchema = z.object({
   id: z.string(),
   shelterId: z.string(),

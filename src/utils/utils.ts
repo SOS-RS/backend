@@ -26,6 +26,15 @@ function removeNotNumbers(input: string): string {
   return input.replace(/[^0-9]/g, '');
 }
 
+function capitalize(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .split(' ')
+    .map((t) => t[0].toUpperCase() + t.slice(1))
+    .join(' ');
+}
+
 function getSessionData(token?: string): { userId: string; sessionId: string } {
   try {
     if (token) {
@@ -131,4 +140,5 @@ export {
   deepMerge,
   parseStringToObject,
   getSearchWhere,
+  capitalize,
 };

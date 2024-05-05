@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -14,6 +15,7 @@ import { ShelterService } from './shelter.service';
 import { ServerResponse } from '../utils';
 import { SearchQuery } from '../decorators';
 import { SeachQueryProps } from '@/decorators/search-query/types';
+import { StaffGuard } from '@/guards/staff.guard';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -25,7 +27,7 @@ export class ShelterController {
   @Get('')
   async index(@SearchQuery() searchQueryParams: SeachQueryProps) {
     try {
-      const data = await this.shelterService.getAll(searchQueryParams);
+      const data = await this.shelterService.index(searchQueryParams);
       return new ServerResponse(200, 'Successfully get shelters', data);
     } catch (err: any) {
       this.logger.error(`Failed to get shelters: ${err}`);
@@ -34,12 +36,13 @@ export class ShelterController {
   }
 
   @Post('')
+  @UseGuards(StaffGuard)
   async store(@Body() body) {
     try {
       const data = await this.shelterService.store(body);
       return new ServerResponse(200, 'Successfully created shelter', data);
     } catch (err: any) {
-      this.logger.error(`Failed to get all users: ${err}`);
+      this.logger.error(`Failed to create shelter: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }
@@ -56,12 +59,13 @@ export class ShelterController {
   }
 
   @Put(':id/admin')
+  @UseGuards(StaffGuard)
   async fullUpdate(@Param('id') id: string, @Body() body) {
     try {
       const data = await this.shelterService.fullUpdate(id, body);
       return new ServerResponse(200, 'Successfully updated shelter', data);
     } catch (err: any) {
-      this.logger.error(`Failed update shelter: ${err}`);
+      this.logger.error(`Failed to update shelter: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }

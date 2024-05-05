@@ -78,12 +78,12 @@ model Supply {
 model Shelter {
   id              String   @id @default(uuid())
   name            String   @unique
-  pix             String   @unique
+  pix             String?  @unique
   address         String
   petFriendly     Boolean? @map("pet_friendly")
   shelteredPeople Int?     @map("sheltered_people")
   capacity        Int?
-  contact         String
+  contact         String?
   createdAt       String   @map("created_at") @db.VarChar(32)
   updatedAt       String?  @map("updated_at") @db.VarChar(32)
 

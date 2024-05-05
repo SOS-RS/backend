@@ -3,12 +3,12 @@ import z from 'zod';
 const ShelterSchema = z.object({
   id: z.string(),
   name: z.string(),
-  pix: z.string(),
+  pix: z.string().nullable().optional(),
   address: z.string(),
   petFriendly: z.boolean().nullable().optional(),
   shelteredPeople: z.number().nullable().optional(),
   capacity: z.number().nullable().optional(),
-  contact: z.string(),
+  contact: z.string().nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
 });

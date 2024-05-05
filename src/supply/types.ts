@@ -28,4 +28,10 @@ const CreateSupplySchema = SupplySchema.omit({
   updatedAt: true,
 });
 
-export { SupplySchema, CreateSupplySchema };
+const UpdateSupplySchema = SupplySchema.pick({
+  name: true,
+  supplyCategoryId: true,
+  status: true,
+}).partial();
+
+export { SupplySchema, CreateSupplySchema, UpdateSupplySchema };

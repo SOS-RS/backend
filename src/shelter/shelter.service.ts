@@ -132,6 +132,12 @@ export class ShelterService {
           shelteredPeople: true,
           createdAt: true,
           updatedAt: true,
+          supplies: {
+            take: 7,
+            orderBy: {
+              updatedAt: 'desc',
+            },
+          },
         },
       },
     );

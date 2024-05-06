@@ -9,6 +9,7 @@ import { LoggingMiddleware } from './middlewares/logging.middleware';
 import { UsersModule } from './users/users.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { SupplyCategoriesModule } from './supply-categories/supply-categories.module';
+import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SupplyCategoriesModule } from './supply-categories/supply-categories.mo
     ShelterModule,
     SupplyModule,
     SupplyCategoriesModule,
+    ShelterManagersModule,
   ],
   controllers: [],
   providers: [

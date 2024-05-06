@@ -23,7 +23,8 @@ model User {
   createdAt   String      @map("created_at") @db.VarChar(32)
   updatedAt   String?     @map("updated_at") @db.VarChar(32)
 
-  sessions Session[]
+  sessions        Session[]
+  shelterManagers ShelterManagers[]
 
   @@map("users")
 }
@@ -81,7 +82,21 @@ model Shelter {
   createdAt       String   @map("created_at") @db.VarChar(32)
   updatedAt       String?  @map("updated_at") @db.VarChar(32)
 
-  supplies Supply[]
+  supplies        Supply[]
+  shelterManagers ShelterManagers[]
 
   @@map("shelters")
+}
+
+model ShelterManagers {
+  shelterId String  @map("shelter_id")
+  userId    String  @map("user_id")
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
+
+  user    User    @relation(fields: [userId], references: [id])
+  shelter Shelter @relation(fields: [shelterId], references: [id])
+
+  @@id([shelterId, userId])
+  @@map("shelter_managers")
 }

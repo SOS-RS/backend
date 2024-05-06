@@ -179,7 +179,7 @@ export class ShelterService {
                 gte: SupplyPriority.Needing,
               },
             },
-            take: 7,
+            take: 10,
             select: {
               name: true,
               priority: true,

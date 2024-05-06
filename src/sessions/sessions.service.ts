@@ -54,6 +54,7 @@ export class SessionsService {
         id,
       },
       select: {
+        id: true,
         name: true,
         login: true,
         phone: true,

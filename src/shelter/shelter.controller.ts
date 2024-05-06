@@ -35,6 +35,17 @@ export class ShelterController {
     }
   }
 
+  @Get(':id')
+  async show(@Param('id') id: string) {
+    try {
+      const data = await this.shelterService.show(id);
+      return new ServerResponse(200, 'Successfully get shelter', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get shelter: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
   @Post('')
   @UseGuards(StaffGuard)
   async store(@Body() body) {

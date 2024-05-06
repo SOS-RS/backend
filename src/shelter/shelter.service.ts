@@ -117,6 +117,44 @@ export class ShelterService {
     });
   }
 
+  async show(id: string) {
+    const data = await this.prismaService.shelter.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        pix: true,
+        shelteredPeople: true,
+        capacity: true,
+        contact: true,
+        petFriendly: true,
+        prioritySum: true,
+        supplies: {
+          select: {
+            id: true,
+            name: true,
+            priority: true,
+            supplyCategory: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return data;
+  }
+
   async index(props: SeachQueryProps) {
     const { handleSearch } = props;
 

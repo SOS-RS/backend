@@ -1,9 +1,9 @@
+import { z } from 'zod';
 import { Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { z } from 'zod';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
@@ -11,6 +11,7 @@ import {
 } from './types';
 import { SeachQueryProps } from '@/decorators/search-query/types';
 import { defaultSupplies } from './default';
+import { SupplyStatus } from '../supply/types';
 
 @Injectable()
 export class ShelterService {
@@ -133,6 +134,9 @@ export class ShelterService {
           createdAt: true,
           updatedAt: true,
           supplies: {
+            where: {
+              status: SupplyStatus.Urgent,
+            },
             take: 7,
             orderBy: {
               updatedAt: 'desc',

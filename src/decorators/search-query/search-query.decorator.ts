@@ -49,7 +49,7 @@ function handleSearch<T = any>(props: SeachQueryPropsWithoutSearch) {
 
     const results = await model.findMany(query);
 
-    return { count, results };
+    return { page, perPage, count, results };
   };
 }
 

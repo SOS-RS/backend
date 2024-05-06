@@ -14,6 +14,10 @@ const SearchSchema = z.object({
     z.boolean().default(false),
   ),
   include: z.string().optional(),
+  or: z.preprocess(
+    (v) => (v ?? 'false') === 'true',
+    z.boolean().default(false),
+  ),
 });
 
 const SearchResponseSchema = z.object({

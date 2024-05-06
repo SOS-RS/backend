@@ -92,7 +92,7 @@ function parseStringToObject(path: string, value: any) {
   return currentObj;
 }
 
-function getSearchWhere(search: string) {
+function getSearchWhere(search: string, or?: boolean) {
   const where = {};
   if (search !== '') {
     const terms = search.split(',');
@@ -130,7 +130,14 @@ function getSearchWhere(search: string) {
     }, {});
     Object.assign(where, parsed);
   }
-  return where;
+  if (or) {
+    return {
+      OR: Object.entries(where).reduce(
+        (prev, [key, value]) => [...prev, { [key]: value }],
+        [] as any[],
+      ),
+    };
+  } else return where;
 }
 
 export {

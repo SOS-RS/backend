@@ -19,12 +19,13 @@ function handleSearch<T = any>(props: SeachQueryPropsWithoutSearch) {
       perPage,
       search,
       include = '',
+      or,
     } = props;
     const { afterWhere, beforeWhere } = hooks ?? {};
     const where = {};
 
     if (beforeWhere) Object.assign(where, beforeWhere(where));
-    Object.assign(where, getSearchWhere(search));
+    Object.assign(where, getSearchWhere(search, or));
     if (afterWhere) Object.assign(where, afterWhere(where));
 
     const count = await model.count({ where });
@@ -65,6 +66,7 @@ export const SearchQuery = createParamDecorator(
       order: query.order,
       download: query.download,
       include: query.include,
+      or: query.or,
     });
 
     return {

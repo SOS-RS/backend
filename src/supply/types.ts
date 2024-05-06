@@ -1,10 +1,10 @@
 import z from 'zod';
 
-export enum SupplyStatus {
-  UnderControl = 'UnderControl',
-  Remaining = 'Remaining',
-  Needing = 'Needing',
-  Urgent = 'Urgent',
+enum SupplyPriority {
+  UnderControl = 0,
+  Remaining = 1,
+  Needing = 10,
+  Urgent = 100,
 }
 
 const SupplySchema = z.object({
@@ -12,11 +12,11 @@ const SupplySchema = z.object({
   shelterId: z.string(),
   supplyCategoryId: z.string(),
   name: z.string(),
-  status: z.enum([
-    SupplyStatus.UnderControl,
-    SupplyStatus.Remaining,
-    SupplyStatus.Needing,
-    SupplyStatus.Urgent,
+  priority: z.union([
+    z.literal(SupplyPriority.UnderControl),
+    z.literal(SupplyPriority.Remaining),
+    z.literal(SupplyPriority.Needing),
+    z.literal(SupplyPriority.Urgent),
   ]),
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
@@ -31,7 +31,7 @@ const CreateSupplySchema = SupplySchema.omit({
 const UpdateSupplySchema = SupplySchema.pick({
   name: true,
   supplyCategoryId: true,
-  status: true,
+  priority: true,
 }).partial();
 
-export { SupplySchema, CreateSupplySchema, UpdateSupplySchema };
+export { SupplySchema, CreateSupplySchema, UpdateSupplySchema, SupplyPriority };

@@ -42,13 +42,6 @@ model Session {
   @@map("sessions")
 }
 
-enum SupplyStatus {
-  UnderControl
-  Remaining
-  Needing
-  Urgent
-}
-
 model SupplyCategory {
   id        String  @id @default(uuid())
   name      String  @unique
@@ -61,13 +54,13 @@ model SupplyCategory {
 }
 
 model Supply {
-  id               String       @id @default(uuid())
-  shelterId        String       @map("shelter_id")
-  supplyCategoryId String       @map("supply_category_id")
+  id               String  @id @default(uuid())
+  shelterId        String  @map("shelter_id")
+  supplyCategoryId String  @map("supply_category_id")
   name             String
-  status           SupplyStatus @default(value: UnderControl)
-  createdAt        String       @map("created_at") @db.VarChar(32)
-  updatedAt        String?      @map("updated_at") @db.VarChar(32)
+  priority         Int     @default(value: 0)
+  createdAt        String  @map("created_at") @db.VarChar(32)
+  updatedAt        String? @map("updated_at") @db.VarChar(32)
 
   supplyCategory SupplyCategory @relation(fields: [supplyCategoryId], references: [id])
   shelter        Shelter        @relation(fields: [shelterId], references: [id])
@@ -84,6 +77,7 @@ model Shelter {
   shelteredPeople Int?     @map("sheltered_people")
   capacity        Int?
   contact         String?
+  prioritySum     Int      @default(value: 0) @map("priority_sum")
   createdAt       String   @map("created_at") @db.VarChar(32)
   updatedAt       String?  @map("updated_at") @db.VarChar(32)
 

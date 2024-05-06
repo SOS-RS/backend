@@ -8,24 +8,65 @@ import { CreateSupplySchema, UpdateSupplySchema } from './types';
 export class SupplyService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  private async handleUpdateShelterSum(
+    shelterId: string,
+    oldPriority: number,
+    newPriority: number,
+  ) {
+    await this.prismaService.shelter.update({
+      where: {
+        id: shelterId,
+      },
+      data: {
+        prioritySum: {
+          increment: newPriority - oldPriority,
+        },
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  }
+
   async store(body: z.infer<typeof CreateSupplySchema>) {
-    const payload = CreateSupplySchema.parse(body);
+    const { priority, shelterId, ...rest } = CreateSupplySchema.parse(body);
+    await this.handleUpdateShelterSum(shelterId, 0, priority);
     await this.prismaService.supply.create({
       data: {
-        ...payload,
+        shelterId,
+        priority,
+        ...rest,
         createdAt: new Date().toISOString(),
       },
     });
   }
 
   async update(id: string, body: z.infer<typeof UpdateSupplySchema>) {
-    const payload = UpdateSupplySchema.parse(body);
+    const { priority, ...rest } = UpdateSupplySchema.parse(body);
+
+    if (priority !== null && priority !== undefined) {
+      const supply = await this.prismaService.supply.findFirst({
+        where: {
+          id,
+        },
+        select: {
+          shelterId: true,
+          priority: true,
+        },
+      });
+      if (supply)
+        await this.handleUpdateShelterSum(
+          supply.shelterId,
+          supply.priority,
+          priority,
+        );
+    }
+
     await this.prismaService.supply.update({
       where: {
         id,
       },
       data: {
-        ...payload,
+        priority,
+        ...rest,
         updatedAt: new Date().toISOString(),
       },
     });
@@ -39,7 +80,7 @@ export class SupplyService {
       select: {
         id: true,
         name: true,
-        status: true,
+        priority: true,
         supplyCategory: {
           select: {
             id: true,

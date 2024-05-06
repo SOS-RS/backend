@@ -11,7 +11,7 @@ import {
 } from './types';
 import { SeachQueryProps } from '@/decorators/search-query/types';
 import { defaultSupplies } from './default';
-import { SupplyStatus } from '../supply/types';
+import { SupplyPriority } from 'src/supply/types';
 
 @Injectable()
 export class ShelterService {
@@ -119,6 +119,7 @@ export class ShelterService {
 
   async index(props: SeachQueryProps) {
     const { handleSearch } = props;
+
     return await handleSearch<Prisma.ShelterSelect<DefaultArgs>>(
       this.prismaService.shelter,
       {
@@ -131,15 +132,22 @@ export class ShelterService {
           contact: true,
           petFriendly: true,
           shelteredPeople: true,
+          prioritySum: true,
           createdAt: true,
           updatedAt: true,
           supplies: {
             where: {
-              status: SupplyStatus.Urgent,
+              priority: {
+                gte: SupplyPriority.Needing,
+              },
             },
             take: 7,
+            select: {
+              name: true,
+              priority: true,
+            },
             orderBy: {
-              updatedAt: 'desc',
+              priority: 'desc',
             },
           },
         },

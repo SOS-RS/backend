@@ -1,5 +1,7 @@
 import z from 'zod';
 
+import { capitalize } from '../utils';
+
 export interface DefaultSupplyProps {
   category: string;
   name: string;
@@ -7,9 +9,9 @@ export interface DefaultSupplyProps {
 
 const ShelterSchema = z.object({
   id: z.string(),
-  name: z.string(),
+  name: z.string().transform(capitalize),
   pix: z.string().nullable().optional(),
-  address: z.string(),
+  address: z.string().transform(capitalize),
   petFriendly: z.boolean().nullable().optional(),
   shelteredPeople: z.number().nullable().optional(),
   capacity: z.number().nullable().optional(),

@@ -13,6 +13,11 @@ O sistema backend é projetado para ser robusto e escalável, garantindo que pos
 - **MongoDB**: Banco de dados NoSQL para armazenar dados de forma eficiente.
 - **JWT**: Para autenticação segura via tokens.
 
+## Backlog
+
+- [ ] **Importar abrigos**: Importar a lista de abrigos e suas necessidades em csv para facilitar integração com outros sistemas.
+- [ ] **Criar sistema de notificação**: Notificar em algum canal (whatsapp, discord, telegram) sobre atualizações.
+
 ## API Endpoints
 
 ### Usuários

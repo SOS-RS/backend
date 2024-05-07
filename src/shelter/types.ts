@@ -14,6 +14,8 @@ const ShelterSchema = z.object({
   address: z.string().transform(capitalize),
   petFriendly: z.boolean().nullable().optional(),
   shelteredPeople: z.number().nullable().optional(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
   capacity: z.number().nullable().optional(),
   contact: z.string().nullable().optional(),
   createdAt: z.string(),

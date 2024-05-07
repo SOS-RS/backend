@@ -132,6 +132,8 @@ export class ShelterService {
         contact: true,
         petFriendly: true,
         prioritySum: true,
+        latitude: true,
+        longitude: true,
         supplies: {
           select: {
             id: true,
@@ -171,6 +173,8 @@ export class ShelterService {
           petFriendly: true,
           shelteredPeople: true,
           prioritySum: true,
+          latitude: true,
+          longitude: true,
           createdAt: true,
           updatedAt: true,
           supplies: {

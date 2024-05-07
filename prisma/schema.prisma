@@ -54,6 +54,20 @@ model SupplyCategory {
   @@map("category_supplies")
 }
 
+model ShelterSupply {
+  shelterId String  @map("shelter_id")
+  supplyId  String  @map("supply_id")
+  priority  Int
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
+
+  shelter Shelter @relation(fields: [shelterId], references: [id])
+  supply  Supply  @relation(fields: [supplyId], references: [id])
+
+  @@id([shelterId, supplyId])
+  @@map("shelter_supplies")
+}
+
 model Supply {
   id               String  @id @default(uuid())
   shelterId        String  @map("shelter_id")
@@ -63,8 +77,9 @@ model Supply {
   createdAt        String  @map("created_at") @db.VarChar(32)
   updatedAt        String? @map("updated_at") @db.VarChar(32)
 
-  supplyCategory SupplyCategory @relation(fields: [supplyCategoryId], references: [id])
-  shelter        Shelter        @relation(fields: [shelterId], references: [id])
+  supplyCategory  SupplyCategory  @relation(fields: [supplyCategoryId], references: [id])
+  shelter         Shelter         @relation(fields: [shelterId], references: [id])
+  shelterSupplies ShelterSupply[]
 
   @@map("supplies")
 }
@@ -84,6 +99,7 @@ model Shelter {
 
   supplies        Supply[]
   shelterManagers ShelterManagers[]
+  shelterSupplies ShelterSupply[]
 
   @@map("shelters")
 }

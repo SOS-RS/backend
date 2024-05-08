@@ -100,11 +100,24 @@ function getSearchWhere(search: string, or?: boolean) {
       terms.reduce((prev, current) => {
         const [key, condition, value] = current.split(':');
         const isBoolean = ['true', 'false'].includes(value);
-        const mode =
+        let mode =
           isBoolean || ['in', 'notIn'].includes(condition)
             ? undefined
             : 'insensitive';
-        const parsedValue = isBoolean ? value === 'true' : value;
+        let parsedValue: string | boolean | { supply: { name: string } } =
+          value;
+
+        if (isBoolean) {
+          parsedValue = value === 'true';
+        }
+
+        // shelterSupplies.some.foo
+        if (key === 'shelterSupplies') {
+          parsedValue = {
+            supply: { name: value },
+          };
+          mode = undefined;
+        }
 
         return {
           ...prev,

@@ -93,6 +93,7 @@ model Shelter {
   prioritySum     Int      @default(value: 0) @map("priority_sum")
   latitude        Float?
   longitude       Float?
+  verified        Boolean  @default(value: false)
   createdAt       String   @map("created_at") @db.VarChar(32)
   updatedAt       String?  @map("updated_at") @db.VarChar(32)
 

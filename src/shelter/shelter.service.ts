@@ -70,6 +70,7 @@ export class ShelterService {
         prioritySum: true,
         latitude: true,
         longitude: true,
+        verified: true,
         shelterSupplies: {
           select: {
             priority: true,
@@ -114,6 +115,7 @@ export class ShelterService {
           petFriendly: true,
           shelteredPeople: true,
           prioritySum: true,
+          verified: true,
           latitude: true,
           longitude: true,
           createdAt: true,

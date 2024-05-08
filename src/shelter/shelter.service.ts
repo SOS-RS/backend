@@ -174,12 +174,6 @@ export class ShelterService {
           createdAt: true,
           updatedAt: true,
           supplies: {
-            where: {
-              priority: {
-                gte: SupplyPriority.Needing,
-              },
-            },
-            take: 10,
             select: {
               name: true,
               priority: true,

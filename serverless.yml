@@ -1,0 +1,35 @@
+service: sosrs
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs18.x
+  logRetentionInDays: 7
+  versionFunctions: false
+
+  httpApi:
+    cors: true
+    metrics: true
+
+# Copied from:
+#   https://www.prisma.io/docs/orm/prisma-client/deployment/serverless/deploy-to-aws-lambda#deploy-only-the-required-files
+package:
+  patterns:
+    - '!node_modules/.prisma/client/libquery_engine-*'
+    - 'node_modules/.prisma/client/libquery_engine-rhel-*'
+    - '!node_modules/prisma/libquery_engine-*'
+    - '!node_modules/@prisma/engines/**'
+    - '!node_modules/.cache/prisma/**'
+
+functions:
+  backend:
+    timeout: 10
+    memorySize: 256
+    handler: dist/lambda.handler
+    events:
+      - httpApi:
+          method: any
+          path: '/{proxy+}'
+    environment:
+      DATABASE_URL: postgresql://postgres@localhost:5432/postgres

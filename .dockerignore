@@ -1,0 +1,10 @@
+.git
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv
+node_modules
+.serverless
+*.db

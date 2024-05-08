@@ -1,10 +1,17 @@
 import z from 'zod';
 
+import { SupplyPriority } from '../supply/types';
+
 const ShelterSupplySchema = z.object({
   id: z.string(),
   shelterId: z.string(),
   supplyId: z.string(),
-  priority: z.number(),
+  priority: z.union([
+    z.literal(SupplyPriority.UnderControl),
+    z.literal(SupplyPriority.Remaining),
+    z.literal(SupplyPriority.Needing),
+    z.literal(SupplyPriority.Urgent),
+  ]),
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
 });
@@ -18,6 +25,12 @@ const CreateShelterSupplySchema = ShelterSupplySchema.pick({
 const UpdateShelterSupplySchema = z.object({
   data: z
     .object({
+      priority: z.union([
+        z.literal(SupplyPriority.UnderControl),
+        z.literal(SupplyPriority.Remaining),
+        z.literal(SupplyPriority.Needing),
+        z.literal(SupplyPriority.Urgent),
+      ]),
       shelterId: z.string(),
       supplyId: z.string(),
     })

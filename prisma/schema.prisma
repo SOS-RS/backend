@@ -57,7 +57,7 @@ model SupplyCategory {
 model ShelterSupply {
   shelterId String  @map("shelter_id")
   supplyId  String  @map("supply_id")
-  priority  Int
+  priority  Int     @default(value: 0)
   createdAt String  @map("created_at") @db.VarChar(32)
   updatedAt String? @map("updated_at") @db.VarChar(32)
 
@@ -72,7 +72,6 @@ model Supply {
   id               String  @id @default(uuid())
   supplyCategoryId String  @map("supply_category_id")
   name             String
-  priority         Int     @default(value: 0)
   createdAt        String  @map("created_at") @db.VarChar(32)
   updatedAt        String? @map("updated_at") @db.VarChar(32)
 

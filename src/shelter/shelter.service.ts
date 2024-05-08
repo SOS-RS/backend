@@ -72,11 +72,12 @@ export class ShelterService {
         longitude: true,
         shelterSupplies: {
           select: {
+            priority: true,
             supply: {
               select: {
                 id: true,
                 name: true,
-                priority: true,
+
                 supplyCategory: {
                   select: {
                     id: true,
@@ -125,10 +126,10 @@ export class ShelterService {
             },
             take: 10,
             select: {
+              priority: true,
               supply: {
                 select: {
                   name: true,
-                  priority: true,
                 },
               },
             },

@@ -1,4 +1,5 @@
 import z from 'zod';
+import { capitalize } from '../utils';
 
 enum SupplyPriority {
   UnderControl = 0,
@@ -10,13 +11,7 @@ enum SupplyPriority {
 const SupplySchema = z.object({
   id: z.string(),
   supplyCategoryId: z.string(),
-  name: z.string(),
-  priority: z.union([
-    z.literal(SupplyPriority.UnderControl),
-    z.literal(SupplyPriority.Remaining),
-    z.literal(SupplyPriority.Needing),
-    z.literal(SupplyPriority.Urgent),
-  ]),
+  name: z.string().transform(capitalize),
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
 });
@@ -30,7 +25,6 @@ const CreateSupplySchema = SupplySchema.omit({
 const UpdateSupplySchema = SupplySchema.pick({
   name: true,
   supplyCategoryId: true,
-  priority: true,
 }).partial();
 
 export { SupplySchema, CreateSupplySchema, UpdateSupplySchema, SupplyPriority };

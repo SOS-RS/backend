@@ -8,45 +8,24 @@ import { CreateSupplySchema, UpdateSupplySchema } from './types';
 export class SupplyService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  private async handleUpdateShelterSum(
-    shelterId: string,
-    oldPriority: number,
-    newPriority: number,
-  ) {
-    await this.prismaService.shelter.update({
-      where: {
-        id: shelterId,
-      },
-      data: {
-        prioritySum: {
-          increment: newPriority - oldPriority,
-        },
-        updatedAt: new Date().toISOString(),
-      },
-    });
-  }
-
   async store(body: z.infer<typeof CreateSupplySchema>) {
-    const { priority, ...rest } = CreateSupplySchema.parse(body);
-    await this.prismaService.supply.create({
+    const payload = CreateSupplySchema.parse(body);
+    return await this.prismaService.supply.create({
       data: {
-        priority,
-        ...rest,
+        ...payload,
         createdAt: new Date().toISOString(),
       },
     });
   }
 
   async update(id: string, body: z.infer<typeof UpdateSupplySchema>) {
-    const { priority, ...rest } = UpdateSupplySchema.parse(body);
-
+    const payload = UpdateSupplySchema.parse(body);
     await this.prismaService.supply.update({
       where: {
         id,
       },
       data: {
-        priority,
-        ...rest,
+        ...payload,
         updatedAt: new Date().toISOString(),
       },
     });
@@ -57,7 +36,6 @@ export class SupplyService {
       select: {
         id: true,
         name: true,
-        priority: true,
         supplyCategory: {
           select: {
             id: true,

@@ -9,7 +9,6 @@ enum SupplyPriority {
 
 const SupplySchema = z.object({
   id: z.string(),
-  shelterId: z.string(),
   supplyCategoryId: z.string(),
   name: z.string(),
   priority: z.union([

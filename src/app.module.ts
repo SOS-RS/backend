@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { SupplyCategoriesModule } from './supply-categories/supply-categories.module';
 import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
+import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ShelterManagersModule } from './shelter-managers/shelter-managers.modul
     SupplyModule,
     SupplyCategoriesModule,
     ShelterManagersModule,
+    ShelterSupplyModule,
   ],
   controllers: [],
   providers: [

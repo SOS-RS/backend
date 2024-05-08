@@ -20,10 +20,10 @@ export class SupplyController {
 
   constructor(private readonly supplyServices: SupplyService) {}
 
-  @Get(':shelterId')
-  async index(@Param('shelterId') shelterId: string) {
+  @Get('')
+  async index() {
     try {
-      const data = await this.supplyServices.index(shelterId);
+      const data = await this.supplyServices.index();
       return new ServerResponse(200, 'Successfully get supplies', data);
     } catch (err: any) {
       this.logger.error(`Failed to get supplies: ${err}`);

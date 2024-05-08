@@ -27,11 +27,9 @@ export class SupplyService {
   }
 
   async store(body: z.infer<typeof CreateSupplySchema>) {
-    const { priority, shelterId, ...rest } = CreateSupplySchema.parse(body);
-    await this.handleUpdateShelterSum(shelterId, 0, priority);
+    const { priority, ...rest } = CreateSupplySchema.parse(body);
     await this.prismaService.supply.create({
       data: {
-        shelterId,
         priority,
         ...rest,
         createdAt: new Date().toISOString(),
@@ -41,24 +39,6 @@ export class SupplyService {
 
   async update(id: string, body: z.infer<typeof UpdateSupplySchema>) {
     const { priority, ...rest } = UpdateSupplySchema.parse(body);
-
-    if (priority !== null && priority !== undefined) {
-      const supply = await this.prismaService.supply.findFirst({
-        where: {
-          id,
-        },
-        select: {
-          shelterId: true,
-          priority: true,
-        },
-      });
-      if (supply)
-        await this.handleUpdateShelterSum(
-          supply.shelterId,
-          supply.priority,
-          priority,
-        );
-    }
 
     await this.prismaService.supply.update({
       where: {
@@ -72,11 +52,8 @@ export class SupplyService {
     });
   }
 
-  async index(id: string) {
+  async index() {
     const data = await this.prismaService.supply.findMany({
-      where: {
-        shelterId: id,
-      },
       select: {
         id: true,
         name: true,
@@ -85,10 +62,12 @@ export class SupplyService {
           select: {
             id: true,
             name: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
-        createdAt: true,
         updatedAt: true,
+        createdAt: true,
       },
     });
     return data;

@@ -70,7 +70,6 @@ model ShelterSupply {
 
 model Supply {
   id               String  @id @default(uuid())
-  shelterId        String  @map("shelter_id")
   supplyCategoryId String  @map("supply_category_id")
   name             String
   priority         Int     @default(value: 0)
@@ -78,7 +77,6 @@ model Supply {
   updatedAt        String? @map("updated_at") @db.VarChar(32)
 
   supplyCategory  SupplyCategory  @relation(fields: [supplyCategoryId], references: [id])
-  shelter         Shelter         @relation(fields: [shelterId], references: [id])
   shelterSupplies ShelterSupply[]
 
   @@map("supplies")
@@ -99,7 +97,6 @@ model Shelter {
   createdAt       String   @map("created_at") @db.VarChar(32)
   updatedAt       String?  @map("updated_at") @db.VarChar(32)
 
-  supplies        Supply[]
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
 

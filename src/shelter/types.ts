@@ -22,6 +22,33 @@ const ShelterSchema = z.object({
   updatedAt: z.string().nullable().optional(),
 });
 
+const ComplexSearchSchema = z.object({
+  search: z.preprocess((v) => v ?? '', z.string()),
+  status: z.array(z.number()).nullable().optional(),
+  perPage: z.preprocess(
+    (v) => +((v ?? '20') as string),
+    z.number().min(1).max(100),
+  ),
+  filterAvailableShelter: z.preprocess(
+    (v) => (v === 'true' ? true : false),
+    z.boolean(),
+  ),
+  filterUnavailableShelter: z.preprocess(
+    (v) => (v === 'true' ? true : false),
+    z.boolean(),
+  ),
+  waitingShelterAvailability: z.preprocess(
+    (v) => (v === 'true' ? true : false),
+    z.boolean(),
+  ),
+  page: z.preprocess((v) => +((v ?? '1') as string), z.number().min(1)),
+  supplyCategories: z.array(z.string()).nullable().optional(),
+  supplies: z.array(z.string()).nullable().optional(),
+  priority: z.string().nullable().optional(),
+  order: z.string(),
+  orderBy: z.string().nullable().optional(),
+});
+
 const CreateShelterSchema = ShelterSchema.omit({
   id: true,
   createdAt: true,
@@ -44,4 +71,5 @@ export {
   CreateShelterSchema,
   UpdateShelterSchema,
   FullUpdateShelterSchema,
+  ComplexSearchSchema,
 };

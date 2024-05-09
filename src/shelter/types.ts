@@ -18,6 +18,7 @@ const ShelterSchema = z.object({
   longitude: z.number().nullable().optional(),
   capacity: z.number().nullable().optional(),
   contact: z.string().nullable().optional(),
+  verified: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
 });

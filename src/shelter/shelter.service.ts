@@ -120,22 +120,22 @@ export class ShelterService {
           createdAt: true,
           updatedAt: true,
           shelterSupplies: {
-            where: {
-              priority: {
-                gte: SupplyPriority.Needing,
-              },
-            },
-            take: 10,
             select: {
               priority: true,
               supply: {
                 select: {
+                  id: true,
                   name: true,
+                  supplyCategory: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                  createdAt: true,
+                  updatedAt: true,
                 },
               },
-            },
-            orderBy: {
-              priority: 'desc',
             },
           },
         },

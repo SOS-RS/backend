@@ -29,18 +29,9 @@ export class ShelterSupplyJob {
         AND: [
           { priority: SupplyPriority.Urgent },
           {
-            OR: [
-              {
-                createdAt: {
-                  lte: expiryDate,
-                },
-              },
-              {
-                updatedAt: {
-                  lte: expiryDate,
-                },
-              },
-            ],
+            createdAt: {
+              lte: expiryDate,
+            },
           },
         ],
       },

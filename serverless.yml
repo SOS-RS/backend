@@ -32,4 +32,4 @@ functions:
           method: any
           path: '/{proxy+}'
     environment:
-      DATABASE_URL: postgresql://postgres@localhost:5432/postgres
+      DATABASE_URL: ${ssm:SOSRS_DATABASE_URL}

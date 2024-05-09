@@ -249,9 +249,7 @@ export class ShelterService {
 
     if (payload?.supplies && payload?.supplies.length !== 0) {
       shelterSuppliesFilter.shelterSupplies.some['supplyId'] = {
-        supplyId: {
-          in: payload.supplies,
-        },
+        in: payload.supplies,
       };
     }
 

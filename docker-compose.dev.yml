@@ -1,0 +1,30 @@
+services:
+  sos-rs-api:
+    restart: unless-stopped
+    user: "${UID}:${GID}"
+    command: >
+      sh -c "npm install && tail -f /dev/null"
+    volumes:
+      - .:/usr/app
+    environment:
+      TZ: America/Sao_Paulo
+      NODE_ENV: development
+      DATABASE_URL: postgres://postgres:sos_rs@database:5432/postgres
+      HOST: ::0.0.0.0
+      PORT: 4000
+      DB_HOST: database
+      DB_USER: postgres
+      DB_PASSWORD: sos_rs
+      DB_DATABASE_NAME: postgres
+      SECRET_KEY: secret
+
+  database:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: sos_rs
+    volumes:
+      - database:/var/lib/postgresql/data
+
+volumes:
+  database:

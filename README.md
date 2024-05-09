@@ -54,15 +54,29 @@ O sistema backend é projetado para ser robusto e escalável, garantindo que pos
    ```bash
    cd projeto-enchentes-backend
    ```
-3. Instale as dependências:
+3. Inicie o ambiente Docker Compose (Isso irá instalar as dependências):
    ```bash
-   npm install
+   npm run docker:start
    ```
-4. Inicie o servidor:
+4. Acesse o bash do container:
    ```bash
-   npm start
+   npm run docker:shell
    ```
+4. Rode as migrations para criar as tabelas no banco de dados:
+   ```bash
+   npx prisma migrate dev
+   ```
+5. Inicie o servidor:
+   ```bash
+   npm run dev
+   ```
+
    A API estará acessível via `http://localhost:4000`.
+
+Para parar o ambiente Docker Compose, execute o seguinte comando no host:
+```bash
+npm run docker:stop
+```
 
 ## Contribuição
 

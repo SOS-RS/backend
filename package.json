@@ -6,6 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "docker:start": "UID=$(id -u) GID=$(id -g) docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d",
+    "docker:stop": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml down",
+    "docker:shell": "docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec sos-rs-api bash",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

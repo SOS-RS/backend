@@ -12,7 +12,7 @@ provider:
     cors: true
     metrics: true
 
-# Copied from:
+# Adapted from:
 #   https://www.prisma.io/docs/orm/prisma-client/deployment/serverless/deploy-to-aws-lambda#deploy-only-the-required-files
 package:
   patterns:

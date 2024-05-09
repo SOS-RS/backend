@@ -4,7 +4,7 @@ import { capitalize } from '../utils';
 
 export interface DefaultSupplyProps {
   category: string;
-  name: string;
+  supply: string;
 }
 
 const ShelterSchema = z.object({
@@ -14,6 +14,8 @@ const ShelterSchema = z.object({
   address: z.string().transform(capitalize),
   petFriendly: z.boolean().nullable().optional(),
   shelteredPeople: z.number().nullable().optional(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
   capacity: z.number().nullable().optional(),
   contact: z.string().nullable().optional(),
   createdAt: z.string(),
@@ -28,7 +30,6 @@ const CreateShelterSchema = ShelterSchema.omit({
 
 const UpdateShelterSchema = ShelterSchema.pick({
   petFriendly: true,
-  capacity: true,
   shelteredPeople: true,
 }).partial();
 

@@ -16,6 +16,7 @@ import { ServerResponse } from '../utils';
 import { SearchQuery } from '../decorators';
 import { SeachQueryProps } from '@/decorators/search-query/types';
 import { StaffGuard } from '@/guards/staff.guard';
+import { UserGuard } from '@/guards/user.guard';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -47,7 +48,7 @@ export class ShelterController {
   }
 
   @Post('')
-  @UseGuards(StaffGuard)
+  @UseGuards(UserGuard)
   async store(@Body() body) {
     try {
       const data = await this.shelterService.store(body);

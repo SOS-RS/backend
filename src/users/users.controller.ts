@@ -24,6 +24,7 @@ export class UsersController {
   constructor(private readonly userServices: UsersService) {}
 
   @Post('')
+  @UseGuards(StaffGuard)
   async store(@Body() body) {
     try {
       await this.userServices.store(body);

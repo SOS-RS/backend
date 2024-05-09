@@ -54,17 +54,29 @@ model SupplyCategory {
   @@map("category_supplies")
 }
 
+model ShelterSupply {
+  shelterId String  @map("shelter_id")
+  supplyId  String  @map("supply_id")
+  priority  Int     @default(value: 0)
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
+
+  shelter Shelter @relation(fields: [shelterId], references: [id])
+  supply  Supply  @relation(fields: [supplyId], references: [id])
+
+  @@id([shelterId, supplyId])
+  @@map("shelter_supplies")
+}
+
 model Supply {
   id               String  @id @default(uuid())
-  shelterId        String  @map("shelter_id")
   supplyCategoryId String  @map("supply_category_id")
   name             String
-  priority         Int     @default(value: 0)
   createdAt        String  @map("created_at") @db.VarChar(32)
   updatedAt        String? @map("updated_at") @db.VarChar(32)
 
-  supplyCategory SupplyCategory @relation(fields: [supplyCategoryId], references: [id])
-  shelter        Shelter        @relation(fields: [shelterId], references: [id])
+  supplyCategory  SupplyCategory  @relation(fields: [supplyCategoryId], references: [id])
+  shelterSupplies ShelterSupply[]
 
   @@map("supplies")
 }
@@ -79,11 +91,14 @@ model Shelter {
   capacity        Int?
   contact         String?
   prioritySum     Int      @default(value: 0) @map("priority_sum")
+  latitude        Float?
+  longitude       Float?
+  verified        Boolean  @default(value: false)
   createdAt       String   @map("created_at") @db.VarChar(32)
   updatedAt       String?  @map("updated_at") @db.VarChar(32)
 
-  supplies        Supply[]
   shelterManagers ShelterManagers[]
+  shelterSupplies ShelterSupply[]
 
   @@map("shelters")
 }

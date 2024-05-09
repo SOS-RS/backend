@@ -114,3 +114,12 @@ model ShelterManagers {
   @@id([shelterId, userId])
   @@map("shelter_managers")
 }
+
+model ItemUpdatesLog {
+  id    String @id @default(uuid())
+  naome String
+
+  createdAt String @map("created_at") @db.VarChar(32)
+
+  @@map("item_updates_log")
+}

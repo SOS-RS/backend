@@ -222,8 +222,8 @@ export class ShelterService {
       AND: [
         {
           OR: [
-            { address: { contains: payload.search } },
-            { name: { contains: payload.search } },
+            { address: { contains: payload.search, mode: 'insensitive' } },
+            { name: { contains: payload.search, mode: 'insensitive' } },
           ],
         },
       ],

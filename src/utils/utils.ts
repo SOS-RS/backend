@@ -140,6 +140,15 @@ function getSearchWhere(search: string, or?: boolean) {
   } else return where;
 }
 
+function getDifferenceInHours(startDate: Date, endDate: Date) {
+  const timeDiff = endDate.getTime() - startDate.getTime();
+  return getHours(timeDiff);
+}
+
+function getHours(date: number) {
+  return date / (1000 * 60 * 60);
+}
+
 export {
   ServerResponse,
   removeNotNumbers,
@@ -148,4 +157,5 @@ export {
   parseStringToObject,
   getSearchWhere,
   capitalize,
+  getDifferenceInHours,
 };

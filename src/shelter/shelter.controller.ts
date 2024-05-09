@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -29,6 +30,17 @@ export class ShelterController {
   async index(@SearchQuery() searchQueryParams: SeachQueryProps) {
     try {
       const data = await this.shelterService.index(searchQueryParams);
+      return new ServerResponse(200, 'Successfully get shelters', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get shelters: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
+  @Get('/search')
+  async search(@Query() complexSearchQueryParams) {
+    try {
+      const data = await this.shelterService.search(complexSearchQueryParams);
       return new ServerResponse(200, 'Successfully get shelters', data);
     } catch (err: any) {
       this.logger.error(`Failed to get shelters: ${err}`);

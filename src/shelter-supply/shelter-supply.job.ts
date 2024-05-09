@@ -24,7 +24,7 @@ export class ShelterSupplyJob {
       -priorityExpiryInterval,
     ).toString();
 
-    const outatedSupplies = await this.prismaService.shelterSupply.findMany({
+    const outdatedSupplies = await this.prismaService.shelterSupply.findMany({
       where: {
         AND: [
           { priority: SupplyPriority.Urgent },
@@ -50,7 +50,7 @@ export class ShelterSupplyJob {
       },
     });
 
-    outatedSupplies.forEach(async (s) => {
+    outdatedSupplies.forEach(async (s) => {
       const { shelterId, supplyId } = s;
       await this.shelterSupplyService.update({
         data: {

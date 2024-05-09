@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: sos-rs-api
+    image: node:18.18
+    restart: always
+    tty: true
+    depends_on:
+      - db
+    ports:
+      - '4000:4000'
+    volumes:
+      - .:/usr/app
+      - /usr/app/node_modules
+    working_dir: '/usr/app'
+    environment:
+      - DB_HOST=sos-rs-db
+      - DB_PORT=5432
+      - DB_DATABASE_NAME=sos_rs
+      - DB_USER=root
+      - DB_PASSWORD=root
+    command: >
+      sh -c "npm install &&
+      npx prisma generate &&
+      npx prisma migrate dev &&
+      npm run start"
+  db:
+    container_name: sos-rs-db
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=root

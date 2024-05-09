@@ -33,6 +33,10 @@ export class SupplyService {
 
   async index() {
     const data = await this.prismaService.supply.findMany({
+      distinct: ['name', 'supplyCategoryId'],
+      orderBy: {
+        name: 'desc',
+      },
       select: {
         id: true,
         name: true,
@@ -40,14 +44,13 @@ export class SupplyService {
           select: {
             id: true,
             name: true,
-            createdAt: true,
-            updatedAt: true,
           },
         },
-        updatedAt: true,
         createdAt: true,
+        updatedAt: true,
       },
     });
+
     return data;
   }
 }

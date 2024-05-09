@@ -19,12 +19,12 @@ package:
     - '!node_modules/.prisma/client/libquery_engine-*'
     - 'node_modules/.prisma/client/libquery_engine-rhel-*'
     - '!node_modules/prisma/libquery_engine-*'
-    - '!node_modules/@prisma/engines/**'
+    - 'node_modules/@prisma/engines/**'
     - '!node_modules/.cache/prisma/**'
 
 functions:
   backend:
-    timeout: 10
+    timeout: 30
     memorySize: 256
     handler: dist/lambda.handler
     events:
@@ -33,3 +33,4 @@ functions:
           path: '/{proxy+}'
     environment:
       DATABASE_URL: ${ssm:SOSRS_DATABASE_URL}
+      PRISMA_CLI_BINARY_TARGETS: native,rhel-openssl-1.0.x

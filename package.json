@@ -29,6 +29,7 @@
     "@nestjs/platform-fastify": "^10.3.8",
     "@nestjs/swagger": "^7.3.1",
     "@prisma/client": "^5.13.0",
+    "@prisma/migrate": "^5.13.0",
     "@vendia/serverless-express": "^4.12.6",
     "bcrypt": "^5.1.1",
     "date-fns": "^3.6.0",

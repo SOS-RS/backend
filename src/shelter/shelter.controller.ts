@@ -15,7 +15,6 @@ import { ShelterService } from './shelter.service';
 import { ServerResponse } from '../utils';
 import { SearchQuery } from '../decorators';
 import { SeachQueryProps } from '@/decorators/search-query/types';
-import { StaffGuard } from '@/guards/staff.guard';
 import { UserGuard } from '@/guards/user.guard';
 
 @ApiTags('Abrigos')
@@ -71,7 +70,7 @@ export class ShelterController {
   }
 
   @Put(':id/admin')
-  @UseGuards(StaffGuard)
+  @UseGuards(UserGuard)
   async fullUpdate(@Param('id') id: string, @Body() body) {
     try {
       const data = await this.shelterService.fullUpdate(id, body);

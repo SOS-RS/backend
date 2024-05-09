@@ -216,7 +216,7 @@ export class ShelterService {
   }
 
   private mountWhereFilter(payload: z.infer<typeof ComplexSearchSchema>) {
-    return {
+    const filter: any = {
       AND: [
         {
           OR: [
@@ -224,31 +224,42 @@ export class ShelterService {
             { name: { contains: payload.search } },
           ],
         },
-        {
-          shelterSupplies: {
-            some: {
-              priority: payload.priority
-                ? parseInt(payload.priority)
-                : undefined,
-              supply: {
-                supplyCategoryId: {
-                  in:
-                    payload?.supplyCategories?.length !== 0
-                      ? payload.supplyCategories!
-                      : undefined,
-                },
-              },
-              supplyId: {
-                in:
-                  payload?.supplies?.length !== 0
-                    ? payload.supplies!
-                    : undefined,
-              },
-            },
-          },
-        },
       ],
     };
+
+    const shelterSuppliesFilter = {
+      shelterSupplies: {
+        some: {},
+      },
+    };
+
+    if (payload.priority) {
+      shelterSuppliesFilter.shelterSupplies.some['priority'] = parseInt(
+        payload.priority,
+      );
+    }
+
+    if (payload?.supplyCategories && payload?.supplyCategories.length !== 0) {
+      shelterSuppliesFilter.shelterSupplies.some['supply'] = {
+        supplyCategoryId: {
+          in: payload.supplyCategories,
+        },
+      };
+    }
+
+    if (payload?.supplies && payload?.supplies.length !== 0) {
+      shelterSuppliesFilter.shelterSupplies.some['supplyId'] = {
+        supplyId: {
+          in: payload.supplies,
+        },
+      };
+    }
+
+    if (Object.keys(shelterSuppliesFilter.shelterSupplies.some).length !== 0) {
+      filter['AND'].push(shelterSuppliesFilter);
+    }
+
+    return filter;
   }
 
   private addShelterStatusFilter(payload: z.infer<typeof ComplexSearchSchema>) {

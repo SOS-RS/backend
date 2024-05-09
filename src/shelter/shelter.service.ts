@@ -1,20 +1,24 @@
-import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+import { z } from 'zod';
 
+import { SeachQueryProps } from '@/decorators/search-query/types';
 import { PrismaService } from '../prisma/prisma.service';
+import { ShelterSupplyService } from '../shelter-supply/shelter-supply.service';
+import { SupplyPriority } from '../supply/types';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types';
-import { SeachQueryProps } from '@/decorators/search-query/types';
-import { SupplyPriority } from '../supply/types';
 
 @Injectable()
 export class ShelterService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly shelterSupplyService: ShelterSupplyService,
+  ) {}
 
   async store(body: z.infer<typeof CreateShelterSchema>) {
     const payload = CreateShelterSchema.parse(body);
@@ -101,7 +105,40 @@ export class ShelterService {
   async index(props: SeachQueryProps) {
     const { handleSearch } = props;
 
-    return await handleSearch<Prisma.ShelterSelect<DefaultArgs>>(
+    const partialResult = await handleSearch<Prisma.ShelterSelect<DefaultArgs>>(
+      this.prismaService.shelter,
+      {
+        select: {
+          id: true,
+          shelterSupplies: {
+            where: {
+              priority: {
+                gte: SupplyPriority.Urgent,
+              },
+            },
+            take: 10,
+            select: {
+              priority: true,
+              supply: {
+                select: {
+                  id: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    );
+
+    await this.shelterSupplyService.checkAndUpdateOutdatedPriorities(
+      partialResult.results.flatMap((r) =>
+        r.shelterSupplies.map((s) => ({ ...s, shelterId: r.id })),
+      ),
+    );
+
+    const result = await handleSearch<Prisma.ShelterSelect<DefaultArgs>>(
       this.prismaService.shelter,
       {
         select: {
@@ -140,5 +177,7 @@ export class ShelterService {
         },
       },
     );
+
+    return result;
   }
 }

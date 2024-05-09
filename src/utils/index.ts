@@ -6,6 +6,7 @@ import {
   getSearchWhere,
   parseStringToObject,
   capitalize,
+  getDifferenceInHours,
 } from './utils';
 
 export {
@@ -16,4 +17,5 @@ export {
   deepMerge,
   getSearchWhere,
   parseStringToObject,
+  getDifferenceInHours,
 };

@@ -1,7 +1,10 @@
-import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
+import { z } from 'zod';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { SupplyPriority } from '../supply/types';
+import { getDifferenceInHours } from '../utils';
+import { priorityExpiryInterval } from './constants';
 import { CreateShelterSupplySchema, UpdateShelterSupplySchema } from './types';
 
 @Injectable()
@@ -96,6 +99,25 @@ export class ShelterSupplyService {
         createdAt: true,
         updatedAt: true,
       },
+    });
+  }
+
+  async checkAndUpdateOutdatedPriorities(shelterSupplies: Array<any>) {
+    shelterSupplies.forEach((s) => {
+      if (
+        s.priority === SupplyPriority.Urgent &&
+        getDifferenceInHours(
+          new Date(s.supply.updatedAt || s.supply.createdAt),
+          new Date(Date.now()),
+        ) >= priorityExpiryInterval
+      ) {
+        this.update({
+          data: {
+            priority: SupplyPriority.Needing,
+          },
+          where: { shelterId: s.shelterId, supplyId: s.supply.id },
+        });
+      }
     });
   }
 }

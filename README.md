@@ -64,9 +64,32 @@ O sistema backend é projetado para ser robusto e escalável, garantindo que pos
    ```
    A API estará acessível via `http://localhost:4000`.
 
+## Deploy
+
+A aplicação executa em um Lambda, da AWS. O deploy é realizado pela framework [Serverless][1]. Contudo, alguns passos extras devem ser feitos. Isto se deve ao fato de ser necessário realizar as migrações do Prisma durante a inicialização do Lambda. Para mais informações, favor consultar a [documentação][2].
+
+:warning: Os passos abaixo são apenas necessários para realizar o deploy em um lambda!
+
+Como os Lambdas rodam em uma versão modificada do RedHat linux, devemos dizer ao Prisma que queremos suportar esta versão. Na hora da instalação, devemos passar uma variável de ambiente:
+
+```sh
+PRISMA_CLI_BINARY_TARGETS=native,rhel-openssl-1.0.x npm install
+```
+
+Para realizar o deploy, basta executar:
+
+```
+npx prisma generate
+npm run build
+npx serverless deploy --verbose
+```
+
 ## Contribuição
 
 Contribuições são bem-vindas! Se quiser contribuir, por favor faça um fork do repositório, crie uma branch para suas modificações e depois envie um pull request.
 
 
 Sua participação é essencial para ajudarmos a comunidade afetada pelas enchentes no Rio Grande do Sul!
+
+[1]: https://www.serverless.com/
+[2]: https://www.prisma.io/docs/orm/prisma-client/deployment/serverless/deploy-to-aws-lambda

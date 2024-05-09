@@ -9,10 +9,11 @@ services:
     depends_on:
       - db
     ports:
-      - "4000:4000"
+      - '4000:4000'
     volumes:
       - .:/usr/app
-    working_dir: "/usr/app"
+      - /usr/app/node_modules
+    working_dir: '/usr/app'
     environment:
       - DB_HOST=sos-rs-db
       - DB_PORT=5432
@@ -23,7 +24,7 @@ services:
       sh -c "npm install &&
       npx prisma generate &&
       npx prisma migrate dev &&
-      npm run start:dev"
+      npm run start"
   db:
     container_name: sos-rs-db
     image: postgres

@@ -177,6 +177,11 @@ export class ShelterService {
             select: {
               name: true,
               priority: true,
+              supplyCategory: {
+                select: {
+                  name: true,
+                },
+              },
             },
             orderBy: {
               priority: 'desc',

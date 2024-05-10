@@ -71,6 +71,7 @@ export class ShelterService {
         prioritySum: true,
         latitude: true,
         longitude: true,
+        verified: true,
         shelterSupplies: {
           where: {
             priority: {

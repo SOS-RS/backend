@@ -184,6 +184,15 @@ export class ShelterService {
       payload.search,
     );
 
+    if (payload.search && unnaccentShelterIds.length === 0) {
+      return {
+        perPage: payload.perPage,
+        page: payload.page,
+        count: 0,
+        results: [],
+      };
+    }
+
     const where = await this.mountWhereFilter(payload, unnaccentShelterIds);
     const take = payload.perPage;
     const skip = payload.perPage * (payload.page - 1);

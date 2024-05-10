@@ -46,8 +46,11 @@ ports:
   - '4000:4000'
 ```
 
-Se você estiver recebendo algum erro relacionado a PORT da DATABASE_URL, tem uma linha comentada no .env que pode ser
-descomentada para resolver o problema.
+Se você estiver recebendo algum erro relacionado a PORT da DATABASE_URL, use:
+
+```bash
+DATABASE_URL="postgresql://postgres:admin@localhost:5432/test?schema=public&sslmode=prefer"
+```
 
 ## Configuração inicial para rodar localmente
 

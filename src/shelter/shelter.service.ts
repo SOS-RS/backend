@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { PrismaService } from '../prisma/prisma.service';
@@ -14,6 +14,8 @@ import { SupplyPriority } from '../supply/types';
 
 @Injectable()
 export class ShelterService {
+  private logger = new Logger(ShelterService.name);
+
   constructor(private readonly prismaService: PrismaService) {}
 
   async store(body: z.infer<typeof CreateShelterSchema>) {
@@ -143,6 +145,34 @@ export class ShelterService {
     );
   }
 
+  normalizeString(str: string) {
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase();
+  }
+
+  getUnaccentShelterIds = async (searchText: string) => {
+    try {
+      if (!searchText) return [];
+      const normalizedSearch = this.normalizeString(searchText);
+
+      const nameWhere = `unaccent(lower(name)) LIKE '%${normalizedSearch}%'`;
+      const addressWhere = `unaccent(lower(address)) LIKE '%${normalizedSearch}%'`;
+      const whereClause = `${nameWhere} OR ${addressWhere}`;
+
+      const select = `SELECT id FROM shelters WHERE ${whereClause};`;
+
+      const idsFound =
+        await this.prismaService.$queryRawUnsafe<{ id: string }[]>(select);
+
+      return idsFound.map(({ id }) => id);
+    } catch (e) {
+      this.logger.error(`Failed to get unnacent shelter ids ${e}`);
+      return [];
+    }
+  };
+
   async search(props: z.infer<typeof ComplexSearchSchema>) {
     const payload = ComplexSearchSchema.parse({
       ...props,
@@ -157,7 +187,12 @@ export class ShelterService {
     });
 
     const shelterStatusFilter = this.addShelterStatusFilter(payload);
-    const where = this.mountWhereFilter(payload);
+
+    const unnaccentShelterIds = await this.getUnaccentShelterIds(
+      payload.search,
+    );
+
+    const where = await this.mountWhereFilter(payload, unnaccentShelterIds);
     const take = payload.perPage;
     const skip = payload.perPage * (payload.page - 1);
 
@@ -217,11 +252,15 @@ export class ShelterService {
     return { perPage: payload.perPage, page: payload.page, count, results };
   }
 
-  private mountWhereFilter(payload: z.infer<typeof ComplexSearchSchema>) {
+  private async mountWhereFilter(
+    payload: z.infer<typeof ComplexSearchSchema>,
+    unnaccentShelterIds?: string[],
+  ) {
     const filter: any = {
       AND: [
         {
           OR: [
+            unnaccentShelterIds && { id: { in: unnaccentShelterIds } },
             { address: { contains: payload.search, mode: 'insensitive' } },
             { name: { contains: payload.search, mode: 'insensitive' } },
           ],

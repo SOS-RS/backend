@@ -26,7 +26,7 @@ jobs:
         run: npm ci
       # Lint App
       - name: Lint App
-        run: npm run lint -
+        run: npm run lint:ci
       # Build App
       - name: Build App
         run: npm run build 

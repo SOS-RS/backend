@@ -54,6 +54,7 @@ const CreateShelterSchema = ShelterSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  verified: true,
 });
 
 const UpdateShelterSchema = ShelterSchema.pick({

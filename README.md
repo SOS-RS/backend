@@ -10,7 +10,7 @@ gerenciamento de abrigos e suprimentos, entre outros.
 - **Prisma**: ORM para Node.js e TypeScript.
 - **Docker**: Plataforma para desenvolvimento, envio e execução de aplicativos em contêineres.
 - **Nest**: Framework para aplicação web para Node.js.
-- **PostgreSQL**: Banco de dados NoSQL para armazenar dados de forma eficiente.
+- **PostgreSQL**: Banco de dados relacional para armazenar dados de forma eficiente.
 
 ## Dump do banco de dados
 
@@ -18,6 +18,15 @@ Após toda a configuração feita, seja local ou via docker, você pode subir um
 para testar a aplicação.
 O dump está disponível no arquivo `prisma/migration/dev_dump.sql`. Para subir o dump, basta executar ele.
 Lembrando que a migrations já deve ter sido rodada para ele funcionar.
+
+Caso esteja no docker o dump pode ser carregado com os seguintes comandos:
+
+```bash
+# Copiando o dump para a pasta temporária do docker
+docker exec -it cp backup.sql POSTGRES_CONTAINER_ID:/tmp/backup.sql
+# Importando o dump para o banco
+docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backup.sql
+```
 
 ## Configuração com Docker
 
@@ -44,12 +53,6 @@ port do serviço db no docker-compose.dev.yml
 ports:
   - '5432:5432'
   - '4000:4000'
-```
-
-Se você estiver recebendo algum erro relacionado a PORT da DATABASE_URL, use:
-
-```bash
-DATABASE_URL="postgresql://postgres:admin@localhost:5432/test?schema=public&sslmode=prefer"
 ```
 
 ## Configuração inicial para rodar localmente

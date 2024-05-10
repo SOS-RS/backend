@@ -145,10 +145,7 @@ export class ShelterService {
   }
 
   normalizeString(str: string) {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLocaleLowerCase();
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
   async getUnaccentShelterIds(searchText: string) {
@@ -156,15 +153,11 @@ export class ShelterService {
       if (!searchText) return [];
       const normalizedSearch = this.normalizeString(searchText);
 
-      const nameWhere = `unaccent(lower(name)) LIKE '%${normalizedSearch}%'`;
-      const addressWhere = `unaccent(lower(address)) LIKE '%${normalizedSearch}%'`;
-      const whereClause = `${nameWhere} OR ${addressWhere}`;
+      const parameterizedSearch = `%${normalizedSearch}%`;
 
-      const select = `SELECT id FROM shelters WHERE ${whereClause};`;
-
-      const idsFound =
-        await this.prismaService.$queryRawUnsafe<{ id: string }[]>(select);
-
+      const idsFound = await this.prismaService.$queryRaw<{ id: string }[]>(
+        Prisma.sql`SELECT id FROM shelters WHERE unaccent(name) ILIKE ${parameterizedSearch} OR unaccent(address) ILIKE ${parameterizedSearch};`,
+      );
       return idsFound.map(({ id }) => id);
     } catch (e) {
       this.logger.error(`Failed to get unnacent shelter ids ${e}`);
@@ -258,11 +251,7 @@ export class ShelterService {
     const filter: any = {
       AND: [
         {
-          OR: [
-            unnaccentShelterIds && { id: { in: unnaccentShelterIds } },
-            { address: { contains: payload.search, mode: 'insensitive' } },
-            { name: { contains: payload.search, mode: 'insensitive' } },
-          ],
+          OR: [{ id: { in: unnaccentShelterIds } }],
         },
       ],
     };

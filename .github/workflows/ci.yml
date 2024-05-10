@@ -40,4 +40,4 @@ jobs:
         run: npm run build
       
       - name: Lint & Format
-        run: npm run lint
+        run: npm run lint:ci

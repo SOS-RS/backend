@@ -12,7 +12,6 @@ import {
 import { SeachQueryProps } from '@/decorators/search-query/types';
 import { SupplyPriority } from 'src/supply/types';
 
-
 @Injectable()
 export class ShelterService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -74,8 +73,7 @@ export class ShelterService {
         verified: true,
         shelterSupplies: {
           where: {
-            priority: {
-            },
+            priority: {},
           },
           select: {
             priority: true,

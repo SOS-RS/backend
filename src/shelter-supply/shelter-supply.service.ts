@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateShelterSupplySchema, UpdateShelterSupplySchema } from './types';
+import { SupplyPriority } from '../supply/types';
 
 @Injectable()
 export class ShelterSupplyService {
@@ -35,7 +36,7 @@ export class ShelterSupplyService {
         shelterId,
         priority,
         supplyId,
-        quantity,
+        quantity: priority !== SupplyPriority.UnderControl ? quantity : null,
         createdAt: new Date().toISOString(),
       },
     });
@@ -43,7 +44,7 @@ export class ShelterSupplyService {
 
   async update(body: z.infer<typeof UpdateShelterSupplySchema>) {
     const { data, where } = UpdateShelterSupplySchema.parse(body);
-    const { priority } = data;
+    const { priority, quantity } = data;
     if (priority !== null && priority !== undefined) {
       const shelterSupply = await this.prismaService.shelterSupply.findFirst({
         where: {
@@ -68,6 +69,7 @@ export class ShelterSupplyService {
       },
       data: {
         ...data,
+        quantity: priority !== SupplyPriority.UnderControl ? quantity : null,
         createdAt: new Date().toISOString(),
       },
     });

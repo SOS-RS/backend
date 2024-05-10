@@ -80,6 +80,7 @@ export class ShelterSupplyService {
       },
       select: {
         priority: true,
+        quantity: true,
         supply: {
           select: {
             id: true,

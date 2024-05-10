@@ -72,6 +72,7 @@ export class ShelterService {
         shelterSupplies: {
           select: {
             priority: true,
+            quantity: true,
             supply: {
               select: {
                 id: true,
@@ -121,6 +122,7 @@ export class ShelterService {
           shelterSupplies: {
             select: {
               priority: true,
+              quantity: true,
               supply: {
                 select: {
                   id: true,
@@ -195,6 +197,7 @@ export class ShelterService {
         shelterSupplies: {
           select: {
             priority: true,
+            quantity: true,
             supply: {
               select: {
                 id: true,

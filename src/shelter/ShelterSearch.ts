@@ -111,7 +111,7 @@ class ShelterSearch {
         this.supplyIds,
       ],
     };
-    console.log(JSON.stringify(queryData, null, 2));
+
     return queryData;
   }
 }

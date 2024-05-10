@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   HttpException,
   Logger,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -33,15 +35,12 @@ export class SupplyController {
   }
 
   @Get('top')
-  async top(@Query('limit') limit: number = 10, @Query('skip') skip: number) {
+  async top(
+    @Query('perPage', new DefaultValuePipe(10), ParseIntPipe) perPage: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
     try {
-      if (limit && typeof limit === 'string') {
-        limit = Number.parseInt(limit);
-      }
-      if (skip && typeof skip === 'string') {
-        skip = Number.parseInt(skip);
-      }
-      const data = await this.supplyServices.top(limit, skip);
+      const data = await this.supplyServices.top({ perPage, page });
       return new ServerResponse(200, 'Successfully get top supplies', data);
     } catch (err: any) {
       this.logger.error(`Failed to get supplies: ${err}`);

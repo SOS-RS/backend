@@ -16,6 +16,14 @@ const SupplySchema = z.object({
   updatedAt: z.string().nullable().optional(),
 });
 
+const SupplySearchSchema = z.object({
+  page: z.preprocess((v) => +((v ?? '1') as string), z.number().min(1)),
+  perPage: z.preprocess(
+    (v) => +((v ?? '10') as string),
+    z.number().min(1).max(100),
+  ),
+});
+
 const CreateSupplySchema = SupplySchema.omit({
   id: true,
   createdAt: true,
@@ -27,4 +35,10 @@ const UpdateSupplySchema = SupplySchema.pick({
   supplyCategoryId: true,
 }).partial();
 
-export { SupplySchema, CreateSupplySchema, UpdateSupplySchema, SupplyPriority };
+export {
+  SupplySchema,
+  SupplySearchSchema,
+  CreateSupplySchema,
+  UpdateSupplySchema,
+  SupplyPriority,
+};

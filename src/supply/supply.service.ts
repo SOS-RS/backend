@@ -2,7 +2,11 @@ import z from 'zod';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateSupplySchema, UpdateSupplySchema } from './types';
+import {
+  CreateSupplySchema,
+  SupplySearchSchema,
+  UpdateSupplySchema,
+} from './types';
 
 @Injectable()
 export class SupplyService {
@@ -54,7 +58,11 @@ export class SupplyService {
     return data;
   }
 
-  async top(top: number = 10, skip: number = 0) {
+  async top(body: z.infer<typeof SupplySearchSchema>) {
+    const payload = SupplySearchSchema.parse(body);
+    const take = payload.perPage;
+    const skip = payload.perPage * (payload.page - 1);
+
     const data = await this.prismaService.supply.groupBy({
       by: ['name'],
       _count: {
@@ -65,8 +73,8 @@ export class SupplyService {
           name: 'desc',
         },
       },
-      skip: skip ?? 0,
-      take: top ?? 10,
+      take,
+      skip,
     });
 
     return data.map((row) => ({ name: row.name, amount: row._count.name }));

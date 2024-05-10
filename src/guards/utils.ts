@@ -12,7 +12,7 @@ async function canActivate(context: ExecutionContext, allowed: AccessLevel[]) {
     const { userId, sessionId } = request.user;
 
     const session = await service.session.findUnique({
-      where: { id: sessionId, active: true, user: { id: userId } },
+      where: { id: sessionId, active: true, userId },
       include: {
         user: true,
       },

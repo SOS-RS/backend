@@ -156,44 +156,46 @@ function parseTagResponse(
     };
     return {
       ...result,
-      shelterSupplies: result.shelterSupplies.reduce((prev, shelterSupply) => {
-        const supplyTags: ShelterTagType[] = [];
-        let tagged: boolean = false;
-        if (
-          tags.NeedDonations &&
-          [SupplyPriority.Needing, SupplyPriority.Urgent].includes(
-            shelterSupply.priority,
-          )
-        ) {
-          if (qtd.NeedDonations < tags.NeedDonations) {
-            qtd.NeedDonations++;
-            tagged = true;
-            supplyTags.push('NeedDonations');
+      shelterSupplies: result.shelterSupplies
+        .sort((a, b) => b.priority - a.priority)
+        .reduce((prev, shelterSupply) => {
+          const supplyTags: ShelterTagType[] = [];
+          let tagged: boolean = false;
+          if (
+            tags.NeedDonations &&
+            [SupplyPriority.Needing, SupplyPriority.Urgent].includes(
+              shelterSupply.priority,
+            )
+          ) {
+            if (qtd.NeedDonations < tags.NeedDonations) {
+              qtd.NeedDonations++;
+              tagged = true;
+              supplyTags.push('NeedDonations');
+            }
           }
-        }
-        if (
-          tags.NeedVolunteers &&
-          voluntaryIds.includes(shelterSupply.supply.supplyCategoryId)
-        ) {
-          if (qtd.NeedVolunteers < tags.NeedVolunteers) {
-            qtd.NeedVolunteers++;
-            tagged = true;
-            supplyTags.push('NeedVolunteers');
+          if (
+            tags.NeedVolunteers &&
+            voluntaryIds.includes(shelterSupply.supply.supplyCategoryId)
+          ) {
+            if (qtd.NeedVolunteers < tags.NeedVolunteers) {
+              qtd.NeedVolunteers++;
+              tagged = true;
+              supplyTags.push('NeedVolunteers');
+            }
           }
-        }
-        if (
-          tags.RemainingSupplies &&
-          [SupplyPriority.Remaining].includes(shelterSupply.priority)
-        ) {
-          if (qtd.RemainingSupplies < tags.RemainingSupplies) {
-            qtd.RemainingSupplies++;
-            tagged = true;
-            supplyTags.push('RemainingSupplies');
+          if (
+            tags.RemainingSupplies &&
+            [SupplyPriority.Remaining].includes(shelterSupply.priority)
+          ) {
+            if (qtd.RemainingSupplies < tags.RemainingSupplies) {
+              qtd.RemainingSupplies++;
+              tagged = true;
+              supplyTags.push('RemainingSupplies');
+            }
           }
-        }
-        if (tagged) return [...prev, { ...shelterSupply, tags: supplyTags }];
-        else return prev;
-      }, [] as any),
+          if (tagged) return [...prev, { ...shelterSupply, tags: supplyTags }];
+          else return prev;
+        }, [] as any),
     };
   });
   return parsed;

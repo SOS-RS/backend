@@ -88,7 +88,6 @@ export class ShelterService {
               select: {
                 id: true,
                 name: true,
-
                 supplyCategory: {
                   select: {
                     id: true,
@@ -155,7 +154,7 @@ export class ShelterService {
             },
           },
           orderBy: {
-            updatedAt: 'desc',
+            priority: 'desc',
           },
           include: {
             supply: true,

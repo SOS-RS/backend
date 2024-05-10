@@ -10,6 +10,8 @@ import {
   UpdateShelterSchema,
 } from './types';
 import { SeachQueryProps } from '@/decorators/search-query/types';
+import { SupplyPriority } from 'src/supply/types';
+
 
 @Injectable()
 export class ShelterService {
@@ -70,6 +72,11 @@ export class ShelterService {
         latitude: true,
         longitude: true,
         shelterSupplies: {
+          where: {
+            priority: {
+              gt: SupplyPriority.UnderControl,
+            },
+          },
           select: {
             priority: true,
             supply: {
@@ -119,6 +126,11 @@ export class ShelterService {
           createdAt: true,
           updatedAt: true,
           shelterSupplies: {
+            where: {
+              priority: {
+                gt: SupplyPriority.UnderControl,
+              },
+            },
             select: {
               priority: true,
               supply: {
@@ -193,6 +205,11 @@ export class ShelterService {
         createdAt: true,
         updatedAt: true,
         shelterSupplies: {
+          where: {
+            priority: {
+              gt: SupplyPriority.UnderControl,
+            },
+          },
           select: {
             priority: true,
             supply: {

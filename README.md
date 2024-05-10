@@ -58,12 +58,13 @@ O sistema backend é projetado para ser robusto e escalável, garantindo que pos
    ```bash
    npm run docker:start
    ```
-4. Acesse o bash do container:
+4. Acesse o bash do container (Se preferir, use o VSCode dev-container, abrindo o diretório `/usr/app/`):
    ```bash
    npm run docker:shell
    ```
 4. Rode as migrations para criar as tabelas no banco de dados:
    ```bash
+   npx prisma generate
    npx prisma migrate dev
    ```
 5. Inicie o servidor:

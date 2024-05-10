@@ -21,6 +21,8 @@ services:
   database:
     image: postgres:16
     restart: unless-stopped
+    ports:
+      - '5432:5432'
     environment:
       POSTGRES_PASSWORD: sos_rs
     volumes:

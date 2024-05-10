@@ -149,20 +149,15 @@ export class ShelterService {
   }
 
   async getUnaccentShelterIds(searchText: string) {
-    try {
-      if (!searchText) return [];
-      const normalizedSearch = this.normalizeString(searchText);
+    if (!searchText) return [];
+    const normalizedSearch = this.normalizeString(searchText);
 
-      const parameterizedSearch = `%${normalizedSearch}%`;
+    const parameterizedSearch = `%${normalizedSearch}%`;
 
-      const idsFound = await this.prismaService.$queryRaw<{ id: string }[]>(
-        Prisma.sql`SELECT id FROM shelters WHERE unaccent(name) ILIKE ${parameterizedSearch} OR unaccent(address) ILIKE ${parameterizedSearch};`,
-      );
-      return idsFound.map(({ id }) => id);
-    } catch (e) {
-      this.logger.error(`Failed to get unnacent shelter ids ${e}`);
-      return [];
-    }
+    const idsFound = await this.prismaService.$queryRaw<{ id: string }[]>(
+      Prisma.sql`SELECT id FROM shelters WHERE unaccent(name) ILIKE ${parameterizedSearch} OR unaccent(address) ILIKE ${parameterizedSearch};`,
+    );
+    return idsFound.map(({ id }) => id);
   }
 
   async search(props: z.infer<typeof ComplexSearchSchema>) {

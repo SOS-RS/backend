@@ -19,6 +19,16 @@ para testar a aplicação.
 O dump está disponível no arquivo `prisma/migration/dev_dump.sql`. Para subir o dump, basta executar ele.
 Lembrando que a migrations já deve ter sido rodada para ele funcionar.
 
+Caso esteja no docker o dump pode ser carregado com os seguintes comandos:
+- Copiando o dump para a pasta temporária do docker
+   ```bash
+      docker exec -it cp backup.sql POSTGRES_CONTAINER_ID:/tmp/backup.sql
+   ```
+- Importando o dump para o banco
+   ```bash
+      docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backup.sql
+   ```
+
 ## Configuração com Docker
 
 Caso você esteja desenvolvendo frontend e não precise rodar uma instancia da API e do banco localmente, siga essas

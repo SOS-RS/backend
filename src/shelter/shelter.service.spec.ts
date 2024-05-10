@@ -13,7 +13,7 @@ describe('ShelterService', () => {
         {
           provide: PrismaService,
           useValue: {
-            $queryRawUnsafe: jest.fn() as jest.Mock,
+            $queryRaw: jest.fn() as jest.Mock,
           },
         },
       ],
@@ -35,42 +35,52 @@ describe('ShelterService', () => {
 
     it('should normalize strings with special characters', () => {
       const result = service.normalizeString('Muçum');
-      expect(result).toBe('mucum');
+      expect(result).toBe('Mucum');
     });
 
     it('should normalize strings with accents', () => {
       const result = service.normalizeString('Guaporé');
-      expect(result).toBe('guapore');
+      expect(result).toBe('Guapore');
     });
 
     it('should normalize strings with both accents and special characters', () => {
       const result = service.normalizeString('Muçúm');
-      expect(result).toBe('mucum');
+      expect(result).toBe('Mucum');
     });
   });
 
   describe('getUnaccentShelterIds', () => {
-    it('should call $queryRawUnsafe with the correctly mounted query', async () => {
+    it('should call $queryRaw with the correctly mounted query', async () => {
       const searchText = 'Muçum';
-      const expectedQuery =
-        "SELECT id FROM shelters WHERE unaccent(lower(name)) LIKE '%mucum%' OR unaccent(lower(address)) LIKE '%mucum%';";
       await service.getUnaccentShelterIds(searchText);
-      expect(prismaService.$queryRawUnsafe).toHaveBeenCalledWith(expectedQuery);
+      expect(prismaService.$queryRaw).toHaveBeenCalledWith({
+        strings: [
+          'SELECT id FROM shelters WHERE unaccent(name) ILIKE ',
+          ' OR unaccent(address) ILIKE ',
+          ';',
+        ],
+        values: ['%Mucum%', '%Mucum%'],
+      });
     });
 
     it('should return an empty array if an error occurs', async () => {
       const searchText = 'Muçum';
       const spy = jest
-        .spyOn(prismaService, '$queryRawUnsafe')
+        .spyOn(prismaService, '$queryRaw')
         .mockImplementation(() => {
           throw new Error('Database error');
         });
 
       const result = await service.getUnaccentShelterIds(searchText);
       expect(result).toEqual([]);
-      expect(spy).toHaveBeenCalledWith(
-        "SELECT id FROM shelters WHERE unaccent(lower(name)) LIKE '%mucum%' OR unaccent(lower(address)) LIKE '%mucum%';",
-      );
+      expect(spy).toHaveBeenCalledWith({
+        strings: [
+          'SELECT id FROM shelters WHERE unaccent(name) ILIKE ',
+          ' OR unaccent(address) ILIKE ',
+          ';',
+        ],
+        values: ['%Mucum%', '%Mucum%'],
+      });
 
       spy.mockRestore();
     });

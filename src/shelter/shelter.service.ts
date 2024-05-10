@@ -246,19 +246,15 @@ export class ShelterService {
 
   private async mountWhereFilter(
     payload: z.infer<typeof ComplexSearchSchema>,
-    unnaccentShelterIds?: string[],
+    unnaccentShelterIds: string[] = [],
   ) {
-    const filter: any = {
-      AND: [
-        {
-          OR: [
-            { id: { in: unnaccentShelterIds } },
-            { address: { contains: payload.search, mode: 'insensitive' } },
-            { name: { contains: payload.search, mode: 'insensitive' } },
-          ],
-        },
-      ],
-    };
+    const andClauses: Prisma.ShelterWhereInput[] = [];
+
+    if (unnaccentShelterIds.length > 0) {
+      andClauses.push({
+        id: { in: unnaccentShelterIds },
+      });
+    }
 
     const shelterSuppliesFilter = {
       shelterSupplies: {
@@ -287,10 +283,12 @@ export class ShelterService {
     }
 
     if (Object.keys(shelterSuppliesFilter.shelterSupplies.some).length !== 0) {
-      filter['AND'].push(shelterSuppliesFilter);
+      andClauses.push(shelterSuppliesFilter);
     }
 
-    return filter;
+    return {
+      AND: andClauses,
+    };
   }
 
   private addShelterStatusFilter(payload: z.infer<typeof ComplexSearchSchema>) {

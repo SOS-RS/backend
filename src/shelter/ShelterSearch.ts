@@ -1,11 +1,15 @@
 import { Prisma } from '@prisma/client';
+
 import { IFilterFormProps } from './types';
+import { PrismaService } from '../prisma/prisma.service';
 
 class ShelterSearch {
   private data: IFilterFormProps;
+  private prismaService: PrismaService;
 
-  constructor(props: IFilterFormProps) {
+  constructor(prismaService: PrismaService, props: IFilterFormProps) {
     this.data = props;
+    this.prismaService = prismaService;
   }
 
   get priority(): Prisma.ShelterWhereInput[] {
@@ -31,15 +35,82 @@ class ShelterSearch {
           return {
             capacity: null,
           };
-        else if (status === 'available') return {};
+        else if (status === 'available')
+          return {
+            capacity: {
+              gt: this.prismaService.shelter.fields.shelteredPeople,
+            },
+          };
         else
           return {
-            // capacity: {
-            //   lte: Prisma.ShelterScalarFieldEnum.shelteredPeople,
-            // },
+            capacity: {
+              lte: this.prismaService.shelter.fields.shelteredPeople,
+            },
           };
       });
     }
+  }
+
+  get supplyCategoryIds(): Prisma.ShelterWhereInput {
+    if (!this.data.supplyCategoryIds) return {};
+    return {
+      shelterSupplies: {
+        some: {
+          supply: {
+            supplyCategoryId: {
+              in: this.data.supplyCategoryIds,
+            },
+          },
+        },
+      },
+    };
+  }
+
+  get supplyIds(): Prisma.ShelterWhereInput {
+    if (!this.data.supplyIds) return {};
+    return {
+      shelterSupplies: {
+        some: {
+          supply: {
+            id: {
+              in: this.data.supplyIds,
+            },
+          },
+        },
+      },
+    };
+  }
+
+  get search(): Prisma.ShelterWhereInput[] {
+    if (!this.data.search) return [];
+    else
+      return [
+        {
+          address: {
+            contains: this.data.search,
+            mode: 'insensitive',
+          },
+        },
+        {
+          name: {
+            contains: this.data.search,
+            mode: 'insensitive',
+          },
+        },
+      ];
+  }
+
+  get query(): Prisma.ShelterWhereInput {
+    if (Object.keys(this.data).length === 0) return {};
+    return {
+      OR: [
+        ...this.search,
+        ...this.shelterStatus,
+        this.supplyCategoryIds,
+        this.supplyIds,
+        ...this.search,
+      ],
+    };
   }
 }
 

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import * as qs from 'qs';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -114,27 +113,7 @@ export class ShelterService {
       search: searchQuery,
     } = SearchSchema.parse(query);
     const queryData = qs.parse(searchQuery) as unknown as IFilterFormProps;
-    const { priority, search, shelterStatus, supplyCategoryIds, supplyIds } =
-      queryData;
-    const shelterSearch = new ShelterSearch(queryData);
-    const where: Prisma.ShelterWhereInput = {
-      OR: [
-        {
-          address: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-        {
-          name: {
-            contains: search,
-            mode: 'insensitive',
-          },
-        },
-        ...shelterSearch.priority,
-        ...shelterSearch.shelterStatus,
-      ],
-    };
+    const { query: where } = new ShelterSearch(this.prismaService, queryData);
 
     const count = await this.prismaService.shelter.count({ where });
 

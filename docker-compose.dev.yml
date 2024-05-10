@@ -24,7 +24,7 @@ services:
       sh -c "npm install &&
       npx prisma generate &&
       npx prisma migrate dev &&
-      npm run start"
+      npm run start:dev"
   db:
     container_name: sos-rs-db
     image: postgres

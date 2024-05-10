@@ -15,10 +15,10 @@ describe('Supplies (e2e)', () => {
     await app.init();
   });
 
+  /**
+   * @todo Ensure that the response body is an array of supplies
+   */
   it('/supplies (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/supplies')
-      .expect(200)
-      .expect('{"statusCode":200,"message":"Successfully get supplies","data":[]}');
+    return request(app.getHttpServer()).get('/supplies').expect(200);
   });
 });

@@ -75,10 +75,17 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   }
 }
 
+function removeEmptyStrings(obj: Record<string, any>): Record<string, any> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => value !== ''),
+  );
+}
+
 export {
   ServerResponse,
   removeNotNumbers,
   getSessionData,
   deepMerge,
   capitalize,
+  removeEmptyStrings,
 };

@@ -251,7 +251,11 @@ export class ShelterService {
     const filter: any = {
       AND: [
         {
-          OR: [{ id: { in: unnaccentShelterIds } }],
+          OR: [
+            { id: { in: unnaccentShelterIds } },
+            { address: { contains: payload.search, mode: 'insensitive' } },
+            { name: { contains: payload.search, mode: 'insensitive' } },
+          ],
         },
       ],
     };

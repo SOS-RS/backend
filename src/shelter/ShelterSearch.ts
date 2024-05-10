@@ -166,6 +166,7 @@ function parseTagResponse(
           )
         ) {
           if (qtd.NeedDonations < tags.NeedDonations) {
+            qtd.NeedDonations++;
             tagged = true;
             supplyTags.push('NeedDonations');
           }
@@ -175,6 +176,7 @@ function parseTagResponse(
           voluntaryIds.includes(shelterSupply.supply.supplyCategoryId)
         ) {
           if (qtd.NeedVolunteers < tags.NeedVolunteers) {
+            qtd.NeedVolunteers++;
             tagged = true;
             supplyTags.push('NeedVolunteers');
           }
@@ -184,6 +186,7 @@ function parseTagResponse(
           [SupplyPriority.Remaining].includes(shelterSupply.priority)
         ) {
           if (qtd.RemainingSupplies < tags.RemainingSupplies) {
+            qtd.RemainingSupplies++;
             tagged = true;
             supplyTags.push('RemainingSupplies');
           }

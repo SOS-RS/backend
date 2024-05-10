@@ -10,7 +10,7 @@ gerenciamento de abrigos e suprimentos, entre outros.
 - **Prisma**: ORM para Node.js e TypeScript.
 - **Docker**: Plataforma para desenvolvimento, envio e execução de aplicativos em contêineres.
 - **Nest**: Framework para aplicação web para Node.js.
-- **PostgreSQL**: Banco de dados NoSQL para armazenar dados de forma eficiente.
+- **PostgreSQL**: Banco de dados relacional para armazenar dados de forma eficiente.
 
 ## Dump do banco de dados
 

@@ -17,7 +17,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migrations:run": "npx prisma migrate deploy",
+    "migrations:dev": "npx prisma migrate dev",
+    "docker:compose": "docker-compose -f docker-compose.dev.yml up"
   },
   "dependencies": {
     "@fastify/static": "^7.0.3",

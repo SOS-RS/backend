@@ -38,9 +38,10 @@ export class SupplyController {
   async top(
     @Query('perPage', new DefaultValuePipe(10), ParseIntPipe) perPage: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('shelterId') shelterId: string,
   ) {
     try {
-      const data = await this.supplyServices.top({ perPage, page });
+      const data = await this.supplyServices.top({ perPage, page, shelterId });
       return new ServerResponse(200, 'Successfully get top supplies', data);
     } catch (err: any) {
       this.logger.error(`Failed to get supplies: ${err}`);

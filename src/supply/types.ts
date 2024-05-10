@@ -17,6 +17,7 @@ const SupplySchema = z.object({
 });
 
 const SupplySearchSchema = z.object({
+  shelterId: z.string().nullable().optional(),
   page: z.preprocess((v) => +((v ?? '1') as string), z.number().min(1)),
   perPage: z.preprocess(
     (v) => +((v ?? '10') as string),

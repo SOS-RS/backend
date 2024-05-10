@@ -11,11 +11,17 @@ import {
 } from './types';
 import { SearchSchema } from '../types';
 import { ShelterSearch } from './ShelterSearch';
+import { Prisma } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 import { SupplyPriority } from 'src/supply/types';
 
 @Injectable()
 export class ShelterService {
-  constructor(private readonly prismaService: PrismaService) {}
+  private voluntaryIds: string[] = [];
+
+  constructor(private readonly prismaService: PrismaService) {
+    this.loadVoluntaryIds();
+  }
 
   async store(body: z.infer<typeof CreateShelterSchema>) {
     const payload = CreateShelterSchema.parse(body);
@@ -120,7 +126,7 @@ export class ShelterService {
     const take = perPage;
     const skip = perPage * (page - 1);
 
-    const whereData = {
+    const whereData: Prisma.ShelterFindManyArgs<DefaultArgs> = {
       take,
       skip,
       orderBy: { [orderBy]: order },
@@ -147,31 +153,42 @@ export class ShelterService {
         shelterSupplies: {
           where: {
             priority: {
-              gt: SupplyPriority.UnderControl,
+              notIn: [SupplyPriority.UnderControl],
             },
           },
+          take: 10,
+          orderBy: {
+            updatedAt: 'desc',
+          },
           select: {
-            priority: true,
-            quantity: true,
             supply: {
               select: {
                 id: true,
                 name: true,
-                supplyCategory: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-                createdAt: true,
-                updatedAt: true,
               },
             },
+            priority: true,
+            createdAt: true,
+            updatedAt: true,
           },
         },
       },
     });
 
     return { page, perPage, count, results };
+  }
+
+  loadVoluntaryIds() {
+    this.prismaService.supplyCategory
+      .findMany({
+        where: {
+          name: {
+            in: ['Especialistas e Profissionais', 'Voluntariado'],
+          },
+        },
+      })
+      .then((resp) => {
+        this.voluntaryIds.push(...resp.map((s) => s.id));
+      });
   }
 }

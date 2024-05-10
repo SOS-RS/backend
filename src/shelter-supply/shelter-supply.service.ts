@@ -27,7 +27,7 @@ export class ShelterSupplyService {
   }
 
   async store(body: z.infer<typeof CreateShelterSupplySchema>) {
-    const { shelterId, priority, supplyId } =
+    const { shelterId, priority, supplyId, quantity } =
       CreateShelterSupplySchema.parse(body);
     await this.handleUpdateShelterSum(shelterId, 0, priority);
     await this.prismaService.shelterSupply.create({
@@ -35,6 +35,7 @@ export class ShelterSupplyService {
         shelterId,
         priority,
         supplyId,
+        quantity,
         createdAt: new Date().toISOString(),
       },
     });

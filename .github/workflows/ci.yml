@@ -14,7 +14,7 @@ jobs:
       # Check out the source
       - name: Checkout Source
         uses: actions/checkout@v4
-      # Setup node.js, Install and Build App
+      # Setup node.js and cache
       - name: "Setup node.js"
         uses: actions/setup-node@v4
         with:

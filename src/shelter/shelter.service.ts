@@ -144,13 +144,13 @@ export class ShelterService {
     );
   }
 
-  normalizeString(str: string) {
+  unaccentString(str: string) {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
-  async getUnaccentShelterIds(searchText: string) {
+  private async getUnaccentShelterIds(searchText: string) {
     if (!searchText) return [];
-    const normalizedSearch = this.normalizeString(searchText);
+    const normalizedSearch = this.unaccentString(searchText);
 
     const parameterizedSearch = `%${normalizedSearch}%`;
 

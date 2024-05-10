@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -25,6 +26,23 @@ export class SupplyController {
     try {
       const data = await this.supplyServices.index();
       return new ServerResponse(200, 'Successfully get supplies', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get supplies: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
+  @Get('top')
+  async top(@Query('limit') limit: number = 10, @Query('skip') skip: number) {
+    try {
+      if (limit && typeof limit === 'string') {
+        limit = Number.parseInt(limit);
+      }
+      if (skip && typeof skip === 'string') {
+        skip = Number.parseInt(skip);
+      }
+      const data = await this.supplyServices.top(limit, skip);
+      return new ServerResponse(200, 'Successfully get top supplies', data);
     } catch (err: any) {
       this.logger.error(`Failed to get supplies: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);

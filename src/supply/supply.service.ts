@@ -53,4 +53,22 @@ export class SupplyService {
 
     return data;
   }
+
+  async top(top: number = 10, skip: number = 0) {
+    const data = await this.prismaService.supply.groupBy({
+      by: ['name'],
+      _count: {
+        name: true,
+      },
+      orderBy: {
+        _count: {
+          name: 'desc',
+        },
+      },
+      skip: skip ?? 0,
+      take: top ?? 10,
+    });
+
+    return data.map((row) => ({ name: row.name, amount: row._count.name }));
+  }
 }

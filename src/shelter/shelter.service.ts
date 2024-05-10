@@ -74,7 +74,6 @@ export class ShelterService {
         shelterSupplies: {
           where: {
             priority: {
-              gt: SupplyPriority.UnderControl,
             },
           },
           select: {

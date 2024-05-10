@@ -13,7 +13,7 @@ class ShelterSearch {
   }
 
   get priority(): Prisma.ShelterWhereInput[] {
-    if (this.data.priority !== null) {
+    if (this.data.priority) {
       return [
         {
           shelterSupplies: {
@@ -102,15 +102,17 @@ class ShelterSearch {
 
   get query(): Prisma.ShelterWhereInput {
     if (Object.keys(this.data).length === 0) return {};
-    return {
-      OR: [
-        ...this.search,
-        ...this.shelterStatus,
+    const queryData = {
+      AND: [
+        { OR: this.search },
+        { OR: this.shelterStatus },
+        { OR: this.priority },
         this.supplyCategoryIds,
         this.supplyIds,
-        ...this.search,
       ],
     };
+    console.log(JSON.stringify(queryData, null, 2));
+    return queryData;
   }
 }
 

@@ -151,7 +151,7 @@ export class ShelterService {
       .toLocaleLowerCase();
   }
 
-  getUnaccentShelterIds = async (searchText: string) => {
+  async getUnaccentShelterIds(searchText: string) {
     try {
       if (!searchText) return [];
       const normalizedSearch = this.normalizeString(searchText);
@@ -170,7 +170,7 @@ export class ShelterService {
       this.logger.error(`Failed to get unnacent shelter ids ${e}`);
       return [];
     }
-  };
+  }
 
   async search(props: z.infer<typeof ComplexSearchSchema>) {
     const payload = ComplexSearchSchema.parse({

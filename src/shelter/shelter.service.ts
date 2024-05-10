@@ -1,19 +1,19 @@
 import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
 import * as qs from 'qs';
+import { Prisma } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '../prisma/prisma.service';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
-  IFilterFormProps,
   UpdateShelterSchema,
-} from './types';
+} from './types/types';
 import { SearchSchema } from '../types';
-import { ShelterSearch } from './ShelterSearch';
-import { Prisma } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library';
-import { SupplyPriority } from 'src/supply/types';
+import { ShelterSearch, parseTagResponse } from './ShelterSearch';
+import { SupplyPriority } from '../supply/types';
+import { IFilterFormProps } from './types/search.types';
 
 @Injectable()
 export class ShelterService {
@@ -115,7 +115,6 @@ export class ShelterService {
     } = SearchSchema.parse(query);
     const queryData = qs.parse(searchQuery) as unknown as IFilterFormProps;
     const { query: where } = new ShelterSearch(this.prismaService, queryData);
-
     const count = await this.prismaService.shelter.count({ where });
 
     const take = perPage;
@@ -151,26 +150,24 @@ export class ShelterService {
               notIn: [SupplyPriority.UnderControl],
             },
           },
-          take: 10,
           orderBy: {
             updatedAt: 'desc',
           },
-          select: {
-            supply: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-            priority: true,
-            createdAt: true,
-            updatedAt: true,
+          include: {
+            supply: true,
           },
         },
       },
     });
 
-    return { page, perPage, count, results };
+    const parsed = parseTagResponse(queryData, results, this.voluntaryIds);
+
+    return {
+      page,
+      perPage,
+      count,
+      results: parsed,
+    };
   }
 
   loadVoluntaryIds() {

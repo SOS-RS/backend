@@ -1,24 +1,39 @@
 import { Prisma } from '@prisma/client';
 
-import { IFilterFormProps } from './types';
 import { PrismaService } from '../prisma/prisma.service';
+import { SupplyPriority } from 'src/supply/types';
+import {
+  IFilterFormProps,
+  SearchShelterTagResponse,
+  ShelterTagInfo,
+  ShelterTagType,
+} from './types/search.types';
+
+const defaultTagsData: ShelterTagInfo = {
+  NeedDonations: 10,
+  NeedVolunteers: 10,
+  RemainingSupplies: 10,
+};
 
 class ShelterSearch {
-  private data: IFilterFormProps;
+  private formProps: Partial<IFilterFormProps>;
   private prismaService: PrismaService;
 
-  constructor(prismaService: PrismaService, props: IFilterFormProps) {
-    this.data = props;
+  constructor(
+    prismaService: PrismaService,
+    props: Partial<IFilterFormProps> = {},
+  ) {
     this.prismaService = prismaService;
+    this.formProps = { ...props };
   }
 
   get priority(): Prisma.ShelterWhereInput[] {
-    if (this.data.priority) {
+    if (this.formProps.priority) {
       return [
         {
           shelterSupplies: {
             some: {
-              priority: +this.data.priority,
+              priority: +this.formProps.priority,
             },
           },
         },
@@ -28,9 +43,9 @@ class ShelterSearch {
   }
 
   get shelterStatus(): Prisma.ShelterWhereInput[] {
-    if (!this.data.shelterStatus) return [];
+    if (!this.formProps.shelterStatus) return [];
     else {
-      return this.data.shelterStatus.map((status) => {
+      return this.formProps.shelterStatus.map((status) => {
         if (status === 'waiting')
           return {
             capacity: null,
@@ -52,13 +67,13 @@ class ShelterSearch {
   }
 
   get supplyCategoryIds(): Prisma.ShelterWhereInput {
-    if (!this.data.supplyCategoryIds) return {};
+    if (!this.formProps.supplyCategoryIds) return {};
     return {
       shelterSupplies: {
         some: {
           supply: {
             supplyCategoryId: {
-              in: this.data.supplyCategoryIds,
+              in: this.formProps.supplyCategoryIds,
             },
           },
         },
@@ -67,13 +82,13 @@ class ShelterSearch {
   }
 
   get supplyIds(): Prisma.ShelterWhereInput {
-    if (!this.data.supplyIds) return {};
+    if (!this.formProps.supplyIds) return {};
     return {
       shelterSupplies: {
         some: {
           supply: {
             id: {
-              in: this.data.supplyIds,
+              in: this.formProps.supplyIds,
             },
           },
         },
@@ -82,18 +97,18 @@ class ShelterSearch {
   }
 
   get search(): Prisma.ShelterWhereInput[] {
-    if (!this.data.search) return [];
+    if (!this.formProps.search) return [];
     else
       return [
         {
           address: {
-            contains: this.data.search,
+            contains: this.formProps.search,
             mode: 'insensitive',
           },
         },
         {
           name: {
-            contains: this.data.search,
+            contains: this.formProps.search,
             mode: 'insensitive',
           },
         },
@@ -101,7 +116,7 @@ class ShelterSearch {
   }
 
   get query(): Prisma.ShelterWhereInput {
-    if (Object.keys(this.data).length === 0) return {};
+    if (Object.keys(this.formProps).length === 0) return {};
     const queryData = {
       AND: [
         { OR: this.search },
@@ -116,4 +131,69 @@ class ShelterSearch {
   }
 }
 
-export { ShelterSearch };
+/**
+ *
+ * @param formProps Uma interface do tipo ShelterTagInfo | null. Que indica a quantidade máxima de cada categoria deverá ser retornada
+ * @param results Resultado da query em `this.prismaService.shelter.findMany`
+ * @param voluntaryIds
+ * @returns Retorna a lista de resultados, adicionando o campo tags em cada supply para assim categoriza-los corretamente e limitar a quantidade de cada retornada respeitando os parametros em formProps
+ */
+function parseTagResponse(
+  tagProps: Partial<Pick<IFilterFormProps, 'tags'>> = {},
+  results: SearchShelterTagResponse[],
+  voluntaryIds: string[],
+): SearchShelterTagResponse[] {
+  const tags: ShelterTagInfo = {
+    ...defaultTagsData,
+    ...(tagProps?.tags ?? {}),
+  };
+
+  const parsed = results.map((result) => {
+    const qtd: Required<ShelterTagInfo> = {
+      NeedDonations: 0,
+      NeedVolunteers: 0,
+      RemainingSupplies: 0,
+    };
+    return {
+      ...result,
+      shelterSupplies: result.shelterSupplies.reduce((prev, shelterSupply) => {
+        const supplyTags: ShelterTagType[] = [];
+        let tagged: boolean = false;
+        if (
+          tags.NeedDonations &&
+          [SupplyPriority.Needing, SupplyPriority.Urgent].includes(
+            shelterSupply.priority,
+          )
+        ) {
+          if (qtd.NeedDonations < tags.NeedDonations) {
+            tagged = true;
+            supplyTags.push('NeedDonations');
+          }
+        }
+        if (
+          tags.NeedVolunteers &&
+          voluntaryIds.includes(shelterSupply.supply.supplyCategoryId)
+        ) {
+          if (qtd.NeedVolunteers < tags.NeedVolunteers) {
+            tagged = true;
+            supplyTags.push('NeedVolunteers');
+          }
+        }
+        if (
+          tags.RemainingSupplies &&
+          [SupplyPriority.Remaining].includes(shelterSupply.priority)
+        ) {
+          if (qtd.RemainingSupplies < tags.RemainingSupplies) {
+            tagged = true;
+            supplyTags.push('RemainingSupplies');
+          }
+        }
+        if (tagged) return [...prev, { ...shelterSupply, tags: supplyTags }];
+        else return prev;
+      }, [] as any),
+    };
+  });
+  return parsed;
+}
+
+export { ShelterSearch, parseTagResponse };

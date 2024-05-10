@@ -1,7 +1,6 @@
 import z from 'zod';
 
-import { capitalize } from '../utils';
-import { SupplyPriority } from '../supply/types';
+import { capitalize } from '../../utils';
 
 export interface DefaultSupplyProps {
   category: string;
@@ -41,16 +40,6 @@ const FullUpdateShelterSchema = ShelterSchema.omit({
   createdAt: true,
   updatedAt: true,
 }).partial();
-
-export type ShelterAvailabilityStatus = 'available' | 'unavailable' | 'waiting';
-
-export interface IFilterFormProps {
-  search: string;
-  priority: SupplyPriority | null;
-  supplyCategoryIds: string[];
-  supplyIds: string[];
-  shelterStatus: ShelterAvailabilityStatus[];
-}
 
 export {
   ShelterSchema,

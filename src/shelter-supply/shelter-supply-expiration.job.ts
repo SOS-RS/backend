@@ -15,7 +15,7 @@ export class ShelterSupplyExpirationJob {
 
   private readonly logger = new Logger(ShelterSupplyExpirationJob.name);
 
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_30_MINUTES)
   async handleCron() {
     this.logger.log(`${ShelterSupplyExpirationJob.name} running`);
 

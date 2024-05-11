@@ -13,7 +13,9 @@ describe('SupplyCategoriesController', () => {
       controllers: [SupplyCategoriesController],
     }).compile();
 
-    controller = module.get<SupplyCategoriesController>(SupplyCategoriesController);
+    controller = module.get<SupplyCategoriesController>(
+      SupplyCategoriesController,
+    );
   });
 
   it('should be defined', () => {

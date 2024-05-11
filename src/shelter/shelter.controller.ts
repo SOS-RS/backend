@@ -14,9 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { ShelterService } from './shelter.service';
 import { ServerResponse } from '../utils';
-import { SearchQuery } from '../decorators';
-import { SeachQueryProps } from '@/decorators/search-query/types';
-import { UserGuard } from '@/guards/user.guard';
+import { StaffGuard } from '@/guards/staff.guard';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -26,20 +24,9 @@ export class ShelterController {
   constructor(private readonly shelterService: ShelterService) {}
 
   @Get('')
-  async index(@SearchQuery() searchQueryParams: SeachQueryProps) {
+  async index(@Query() query) {
     try {
-      const data = await this.shelterService.index(searchQueryParams);
-      return new ServerResponse(200, 'Successfully get shelters', data);
-    } catch (err: any) {
-      this.logger.error(`Failed to get shelters: ${err}`);
-      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
-    }
-  }
-
-  @Get('/search')
-  async search(@Query() complexSearchQueryParams) {
-    try {
-      const data = await this.shelterService.search(complexSearchQueryParams);
+      const data = await this.shelterService.index(query);
       return new ServerResponse(200, 'Successfully get shelters', data);
     } catch (err: any) {
       this.logger.error(`Failed to get shelters: ${err}`);
@@ -59,7 +46,7 @@ export class ShelterController {
   }
 
   @Post('')
-  @UseGuards(UserGuard)
+  @UseGuards(StaffGuard)
   async store(@Body() body) {
     try {
       const data = await this.shelterService.store(body);
@@ -82,7 +69,7 @@ export class ShelterController {
   }
 
   @Put(':id/admin')
-  @UseGuards(UserGuard)
+  @UseGuards(StaffGuard)
   async fullUpdate(@Param('id') id: string, @Body() body) {
     try {
       const data = await this.shelterService.fullUpdate(id, body);

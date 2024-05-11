@@ -28,7 +28,7 @@ services:
       npm run start:dev -- --preserveWatchOutput"
   db:
     container_name: sos-rs-db
-    image: postgres:13.15-bullseye
+    image: postgres:13.15-alpine3.19
     volumes:
       - ./prisma:/tmp/
     ports:

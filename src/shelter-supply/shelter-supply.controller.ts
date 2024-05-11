@@ -67,4 +67,22 @@ export class ShelterSupplyController {
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }
+
+  @Put(':shelterId/supplies/many')
+  async updateMany(@Body() body, @Param('shelterId') shelterId: string) {
+    try {
+      const data = await this.shelterSupplyService.updateMany({
+        shelterId,
+        ...body,
+      });
+      return new ServerResponse(
+        200,
+        'Successfully updated many shelter supplies',
+        data,
+      );
+    } catch (err: any) {
+      this.logger.error(`Failed to update many shelter supplies: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
 }

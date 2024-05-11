@@ -44,8 +44,14 @@ const UpdateShelterSupplySchema = z.object({
   }),
 });
 
+const UpdateManyShelterSupplySchema = z.object({
+  ids: z.array(z.string()),
+  shelterId: z.string(),
+});
+
 export {
   ShelterSupplySchema,
   CreateShelterSupplySchema,
   UpdateShelterSupplySchema,
+  UpdateManyShelterSupplySchema,
 };

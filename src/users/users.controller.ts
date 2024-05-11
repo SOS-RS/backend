@@ -9,12 +9,21 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 import { UserGuard } from '@/guards/user.guard';
 import { ServerResponse } from '../utils';
 import { UsersService } from './users.service';
 import { AdminGuard } from '@/guards/admin.guard';
+import { CreateUserDTO } from './dtos/CreateUserDTO';
+import { UpdateUserDTO } from './dtos/UpdateUserDTO';
 
 @ApiTags('Usuários')
 @Controller('users')
@@ -23,9 +32,13 @@ export class UsersController {
 
   constructor(private readonly userServices: UsersService) {}
 
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  @ApiInternalServerErrorResponse()
+  @ApiCreatedResponse()
   @Post('')
   @UseGuards(AdminGuard)
-  async store(@Body() body) {
+  async store(@Body() body: CreateUserDTO) {
     try {
       await this.userServices.store(body);
       return new ServerResponse(201, 'Successfully created user');
@@ -35,9 +48,14 @@ export class UsersController {
     }
   }
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  @ApiInternalServerErrorResponse()
+  @ApiCreatedResponse()
   @Put(':id')
   @UseGuards(AdminGuard)
-  async update(@Body() body, @Param('id') id: string) {
+  async update(@Body() body: UpdateUserDTO, @Param('id') id: string) {
     try {
       await this.userServices.update(id, body);
       return new ServerResponse(201, 'Successfully updated user');
@@ -47,9 +65,14 @@ export class UsersController {
     }
   }
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  @ApiInternalServerErrorResponse()
+  @ApiCreatedResponse()
   @Put('')
   @UseGuards(UserGuard)
-  async selfUpdate(@Body() body, @Req() req) {
+  async selfUpdate(@Body() body: UpdateUserDTO, @Req() req) {
     try {
       const { userId } = req.user;
       await this.userServices.update(userId, body);

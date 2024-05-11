@@ -84,6 +84,7 @@ export class ShelterSupplyService {
 
     const supplies = await this.prismaService.shelterSupply.findMany({
       where: {
+        shelterId,
         supplyId: {
           in: ids,
         },
@@ -109,7 +110,7 @@ export class ShelterSupplyService {
       }),
       this.prismaService.shelterSupply.updateMany({
         where: {
-          shelterId: shelterId,
+          shelterId,
           supplyId: {
             in: ids,
           },

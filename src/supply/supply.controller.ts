@@ -1,12 +1,15 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   HttpException,
   Logger,
   Param,
+  ParseIntPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -49,6 +52,21 @@ export class SupplyController {
       return new ServerResponse(200, 'Successfully updated supply', data);
     } catch (err: any) {
       this.logger.error(`Failed to update supply: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
+  @Get('surplus-demand-matches')
+  async surplus_demand_matches(
+    @Query('supplyId') supplyId: string,
+    @Query('perPage', new DefaultValuePipe(20), ParseIntPipe) perPage: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    try {
+      const data = await this.supplyServices.surplus_demand_matches({ supplyId, perPage, page });
+      return new ServerResponse(200, 'Successfully got matches between surplus and demand', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get matches: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }

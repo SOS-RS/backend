@@ -85,25 +85,44 @@ model Supply {
 }
 
 model Shelter {
-  id              String   @id @default(uuid())
-  name            String   @unique
-  pix             String?  @unique
-  address         String
-  petFriendly     Boolean? @map("pet_friendly")
-  shelteredPeople Int?     @map("sheltered_people")
-  capacity        Int?
-  contact         String?
-  prioritySum     Int      @default(value: 0) @map("priority_sum")
-  latitude        Float?
-  longitude       Float?
-  verified        Boolean  @default(value: false)
-  createdAt       String   @map("created_at") @db.VarChar(32)
-  updatedAt       String?  @map("updated_at") @db.VarChar(32)
+  id                   String   @id @default(uuid())
+  name                 String   @unique
+  pix                  String?  @unique
+  address              String
+  petFriendly          Boolean? @map("pet_friendly")
+  totalShelteredPeople Int?     @map("total_sheltered_people")
+  capacity             Int?
+  contact              String?
+  prioritySum          Int      @default(value: 0) @map("priority_sum")
+  latitude             Float?
+  longitude            Float?
+  verified             Boolean  @default(value: false)
+  createdAt            String   @map("created_at") @db.VarChar(32)
+  updatedAt            String?  @map("updated_at") @db.VarChar(32)
 
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
+  shelteredPeople ShelteredPeople[]
 
   @@map("shelters")
+}
+
+model ShelteredPeople {
+  id        String @id @default(uuid())
+  shelterId String @map("shelter_id")
+  name      String
+  address   String
+  cpf       String?
+  email     String?
+  phone     String?
+  gender    String?
+
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
+
+  shelter Shelter @relation(fields: [shelterId], references: [id])
+
+  @@map("sheltered_people")
 }
 
 model ShelterManagers {

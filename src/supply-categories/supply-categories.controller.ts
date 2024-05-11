@@ -13,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { SupplyCategoriesService } from './supply-categories.service';
 import { ServerResponse } from '../utils';
-import { StaffGuard } from '@/guards/staff.guard';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @ApiTags('Categoria de Suprimentos')
 @Controller('supply-categories')
@@ -40,7 +40,7 @@ export class SupplyCategoriesController {
   }
 
   @Post('')
-  @UseGuards(StaffGuard)
+  @UseGuards(AdminGuard)
   async store(@Body() body) {
     try {
       const data = await this.supplyCategoryServices.store(body);
@@ -56,7 +56,7 @@ export class SupplyCategoriesController {
   }
 
   @Put(':id')
-  @UseGuards(StaffGuard)
+  @UseGuards(AdminGuard)
   async update(@Param('id') id: string, @Body() body) {
     try {
       const data = await this.supplyCategoryServices.update(id, body);

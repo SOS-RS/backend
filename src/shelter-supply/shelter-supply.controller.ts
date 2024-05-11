@@ -7,11 +7,13 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { ShelterSupplyService } from './shelter-supply.service';
 import { ServerResponse } from '../utils';
+import { DistributionCenterGuard } from '@/guards/distribution-center.guard';
 
 @ApiTags('Suprimento de abrigos')
 @Controller('shelter/supplies')
@@ -64,6 +66,25 @@ export class ShelterSupplyController {
       );
     } catch (err: any) {
       this.logger.error(`Failed to update shelter supply: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
+  @Put(':shelterId/supplies/many')
+  @UseGuards(DistributionCenterGuard)
+  async updateMany(@Body() body, @Param('shelterId') shelterId: string) {
+    try {
+      const data = await this.shelterSupplyService.updateMany({
+        shelterId,
+        ...body,
+      });
+      return new ServerResponse(
+        200,
+        'Successfully updated many shelter supplies',
+        data,
+      );
+    } catch (err: any) {
+      this.logger.error(`Failed to update many shelter supplies: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }

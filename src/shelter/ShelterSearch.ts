@@ -27,19 +27,22 @@ class ShelterSearch {
     this.formProps = { ...props };
   }
 
-  get priority(): Prisma.ShelterWhereInput[] {
+  priority(supplyIds: string[] = []): Prisma.ShelterWhereInput {
     if (this.formProps.priority) {
-      return [
-        {
-          shelterSupplies: {
-            some: {
-              priority: +this.formProps.priority,
-            },
+      return {
+        shelterSupplies: {
+          some: {
+            priority: +this.formProps.priority,
+            supplyId:
+              supplyIds.length > 0
+                ? {
+                    in: supplyIds,
+                  }
+                : undefined,
           },
         },
-      ];
-    }
-    return [];
+      };
+    } else return {};
   }
 
   get shelterStatus(): Prisma.ShelterWhereInput[] {
@@ -66,11 +69,14 @@ class ShelterSearch {
     }
   }
 
-  get supplyCategoryIds(): Prisma.ShelterWhereInput {
+  supplyCategoryIds(
+    priority?: SupplyPriority | null,
+  ): Prisma.ShelterWhereInput {
     if (!this.formProps.supplyCategoryIds) return {};
     return {
       shelterSupplies: {
         some: {
+          priority: priority ? +priority : undefined,
           supply: {
             supplyCategoryId: {
               in: this.formProps.supplyCategoryIds,
@@ -121,9 +127,8 @@ class ShelterSearch {
       AND: [
         { OR: this.search },
         { OR: this.shelterStatus },
-        { OR: this.priority },
-        this.supplyCategoryIds,
-        this.supplyIds,
+        this.priority(this.formProps.supplyIds),
+        this.supplyCategoryIds(this.formProps.priority),
       ],
     };
 
@@ -173,7 +178,10 @@ function parseTagResponse(
         }
         if (
           tags.NeedVolunteers &&
-          voluntaryIds.includes(shelterSupply.supply.supplyCategoryId)
+          voluntaryIds.includes(shelterSupply.supply.supplyCategoryId) &&
+          [SupplyPriority.Urgent, SupplyPriority.Needing].includes(
+            shelterSupply.priority,
+          )
         ) {
           if (qtd.NeedVolunteers < tags.NeedVolunteers) {
             qtd.NeedVolunteers++;

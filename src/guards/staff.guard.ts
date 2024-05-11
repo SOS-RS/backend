@@ -12,7 +12,10 @@ export class StaffGuard extends AuthGuard('jwt') {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     await super.canActivate(context);
-    const ok = await canActivate(context, [AccessLevel.Staff]);
+    const ok = await canActivate(context, [
+      AccessLevel.Admin,
+      AccessLevel.Staff,
+    ]);
     if (ok) return true;
 
     throw new HttpException('Acesso não autorizado', 401);

@@ -1,53 +1,43 @@
-# README para o Backend do App de Ajuda em Enchentes
+# 🌊 Backend para App de Ajuda em Enchentes 🌊
 
-Este repositório contém o backend de um aplicativo desenvolvido para organizar e distribuir suprimentos, bem como
-coordenar voluntários durante os alagamentos no Rio Grande do Sul. O backend fornece APIs para autenticação de usuários,
-gerenciamento de abrigos e suprimentos, entre outros.
+Este repositório contém o backend de um aplicativo projetado para ajudar na organização e distribuição de suprimentos, bem como na coordenação de voluntários durante enchentes no Rio Grande do Sul. Ele fornece APIs essenciais para a autenticação de usuários, gerenciamento de abrigos e suprimentos, e muito mais.
 
-## Tecnologias Utilizadas
+## 🛠 Tecnologias Utilizadas
 
-- **Node.js**: Ambiente de execução para JavaScript.
-- **Prisma**: ORM para Node.js e TypeScript.
-- **Docker**: Plataforma para desenvolvimento, envio e execução de aplicativos em contêineres.
-- **Nest**: Framework para aplicação web para Node.js.
-- **PostgreSQL**: Banco de dados relacional para armazenar dados de forma eficiente.
+- **🟢 Node.js**: Ambiente de execução para JavaScript.
+- **🔗 Prisma**: ORM para Node.js e TypeScript, facilitando o gerenciamento do banco de dados.
+- **🐳 Docker**: Solução para desenvolvimento e execução de aplicativos em contêineres.
+- **🐦 Nest**: Framework de alto desempenho para aplicações web em Node.js.
+- **📦 PostgreSQL**: Banco de dados relacional robusto e eficiente.
 
-## Dump do banco de dados
+## 🗂 Dump do Banco de Dados
 
-Após toda a configuração feita, seja local ou via docker, você pode subir um dump do servidor para ter dados iniciais
-para testar a aplicação.
-O dump está disponível no arquivo `prisma/migration/dev_dump.sql`. Para subir o dump, basta executar ele.
-Lembrando que a migrations já deve ter sido rodada para ele funcionar.
+Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/migration/dev_dump.sql`. Este arquivo pode ser executado após as migrations estarem aplicadas.
 
-Caso esteja no docker o dump pode ser carregado com os seguintes comandos:
+Se estiver usando Docker, os comandos para carregar o dump são:
 
 ```bash
-# Copiando o dump para a pasta temporária do docker
+# Copiar o dump para a pasta temporária do Docker
 docker exec -it cp backup.sql POSTGRES_CONTAINER_ID:/tmp/backup.sql
-# Importando o dump para o banco
+# Importar o dump para o banco
 docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backup.sql
 ```
 
-## Configuração com Docker
+## 🐳 Configuração com Docker
 
-Caso você esteja desenvolvendo frontend e não precise rodar uma instancia da API e do banco localmente, siga essas
-instruções:
+Para desenvolvedores de frontend que não precisam executar localmente a API e o banco, siga estes passos:
 
-1. Clone o .env de exemplo:
+1. Clone o arquivo `.env` de exemplo:
    ```bash
    cp .env.local .env
    ```
 
-2. Criar e iniciar o banco via docker. Esse comando irá subir um container com a API e outro container com o banco
-   Postgresql.
-   Além disso, ele também irá rodar as migrations do Prisma e terá um banco com o schema já configurado.
-
+2. Use o seguinte comando para criar e iniciar o banco via Docker:
     ```bash
     docker-compose -f docker-compose.dev.yml up
     ```
 
-Se você estiver tendo problemas para acessar o banco via um gerenciador (dbeaver, etc), pode ser preciso adicionar o
-port do serviço db no docker-compose.dev.yml
+Adicione a porta do serviço de banco no `docker-compose.dev.yml` para acessos externos:
 
 ```yaml
 ports:
@@ -55,63 +45,57 @@ ports:
   - '4000:4000'
 ```
 
-## Configuração inicial para rodar localmente
+## 🚀 Configuração Inicial Local
 
 1. Clone o repositório:
    ```bash
    git clone https://github.com/seuusuario/projeto-enchentes-backend.git
    ```
-2. Entre no diretório do projeto:
-   ```bash
-   cd projeto-enchentes-backend
-   ```
-3. Instale as dependências:
+2. Instale as dependências:
    ```bash
    npm install 
    npx prisma generate 
    npx prisma migrate dev 
    npm run start:dev
    ```
-4. Inicie o servidor:
+3. Inicie o servidor:
    ```bash
    npm start
    ```
-   A API estará acessível via `http://localhost:4000`.
+   A API estará disponível em `http://localhost:4000`.
 
-## API Endpoints
+## 📡 API Endpoints
 
-### Usuários
+### 🧑‍💻 Usuários
 
-- **POST /users** - Cadastrar um novo usuário.
-- **PUT /users** - Atualizar um usuário existente.
+- **📝 POST /users** - Registra um novo usuário.
+- **🔧 PUT /users** - Atualiza um usuário existente.
 
-### Sessões
+### 🚪 Sessões
 
-- **POST /sessions** - Criar uma nova sessão de usuário (login).
-- **GET /sessions/:sessionId** - Obter detalhes de uma sessão.
-- **PUT /sessions/:sessionId** - Atualizar uma sessão específica.
+- **📝 POST /sessions** - Inicia uma nova sessão de usuário.
+- **👀 GET /sessions/:sessionId** - Retorna detalhes de uma sessão.
+- **🔧 PUT /sessions/:sessionId** - Atualiza uma sessão.
 
-### Abrigos
+### 🏠 Abrigos
 
-- **POST /shelters** - Cadastrar um novo abrigo.
-- **PUT /shelters/:shelterId** - Atualizar um abrigo existente.
-- **GET /shelters** - Listar abrigos.
+- **📝 POST /shelters** - Registra um novo abrigo.
+- **🔧 PUT /shelters/:shelterId** - Atualiza um abrigo.
+- **👀 GET /shelters** - Lista abrigos.
 
-### Suprimentos
+### 📦 Suprimentos
 
-- **POST /supply** - Cadastrar um novo item de suprimento.
-- **PUT /supplies/:supplyId** - Atualizar um suprimento.
-- **GET /supplies** - Listar suprimentos.
+- **📝 POST /supply** - Registra um novo item de suprimento.
+- **🔧 PUT /supplies/:supplyId** - Atualiza um suprimento.
+- **👀 GET /supplies** - Lista suprimentos.
 
-### Categorias de Suprimentos
+### 🏷️ Categorias de Suprimentos
 
-- **POST /supply-categories** - Cadastrar uma nova categoria de suprimentos.
-- **PUT /supply-categories/:categoryId** - Atualizar uma categoria de suprimentos.
-- **GET /supply-categories** - Listar categorias de suprimentos.
+- **📝 POST /supply-categories** - Registra uma nova categoria de suprimentos.
+- **🔧 PUT /supply-categories/:categoryId** - Atualiza uma categoria.
 
-## Contribuição
+## 🤝 Contribuição
 
-Contribuições são bem-vindas! Se quiser contribuir, por favor faça um fork do repositório, crie uma branch para suas
-modificações e depois envie um pull request.
+Contribuições são muito bem-vindas! Se deseja ajudar, faça um fork do repositório, crie uma branch com suas modificações, e envie um pull request.
 
-Sua participação é essencial para ajudarmos a comunidade afetada pelas enchentes no Rio Grande do Sul!
+Sua ajuda é crucial para apoiar a comunidade afetada pelas enchentes no Rio Grande do Sul!

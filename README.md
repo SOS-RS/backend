@@ -36,7 +36,7 @@ Para desenvolvedores de frontend que não precisam executar localmente a API e o
 
 2. Use o seguinte comando para criar e iniciar o banco via Docker:
     ```bash
-    docker-compose -f docker-compose.dev.yml up
+    docker-compose -f docker-compose.dev.yml up -d --build
     ```
 3. Crie os dados de exemplo do banco:
     ```base

@@ -83,6 +83,14 @@ ports:
 - **🔧 PUT /shelters/:shelterId** - Atualiza um abrigo.
 - **👀 GET /shelters** - Lista abrigos.
 
+### 👤 Abrigados
+
+- **📝 POST /shelter/people** - Registra uma nova pessoa em um abrigo.
+- **🔧 PUT /shelter/people/:personId** - Atualiza um abrigado
+- **🔧 PUT /shelter/people/:personId/admin** - Atualiza qualquer informacao de um abrigado (exceto Id)
+- **👀 GET /shelter/people** - Lista abrigados.
+- **👀 GET /shelter/people/:personId** - Retorna informações de um abrigado específico.
+
 ### 📦 Suprimentos
 
 - **📝 POST /supply** - Registra um novo item de suprimento.

@@ -122,7 +122,6 @@ class ShelterSearch {
   }
 
   get query(): Prisma.ShelterWhereInput {
-    console.log(this.formProps);
     if (Object.keys(this.formProps).length === 0) return {};
     const queryData = {
       AND: [

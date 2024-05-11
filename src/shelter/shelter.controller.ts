@@ -14,7 +14,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { ShelterService } from './shelter.service';
 import { ServerResponse } from '../utils';
-import { UserGuard } from '@/guards/user.guard';
+import { StaffGuard } from '@/guards/staff.guard';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -46,7 +46,7 @@ export class ShelterController {
   }
 
   @Post('')
-  @UseGuards(UserGuard)
+  @UseGuards(StaffGuard)
   async store(@Body() body) {
     try {
       const data = await this.shelterService.store(body);
@@ -69,7 +69,7 @@ export class ShelterController {
   }
 
   @Put(':id/admin')
-  @UseGuards(UserGuard)
+  @UseGuards(StaffGuard)
   async fullUpdate(@Param('id') id: string, @Body() body) {
     try {
       const data = await this.shelterService.fullUpdate(id, body);

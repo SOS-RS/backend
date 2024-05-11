@@ -11,6 +11,7 @@ enum AccessLevel {
   User
   Staff
   DistributionCenter
+  Admin
 }
 
 model User {

@@ -13,8 +13,10 @@ export class UserGuard extends AuthGuard('jwt') {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     await super.canActivate(context);
     const ok = await canActivate(context, [
-      AccessLevel.Staff,
       AccessLevel.User,
+      AccessLevel.Staff,
+      AccessLevel.DistributionCenter,
+      AccessLevel.Admin,
     ]);
     if (ok) return true;
     throw new HttpException('Acesso não autorizado', 401);

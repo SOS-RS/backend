@@ -38,7 +38,11 @@ Para desenvolvedores de frontend que não precisam executar localmente a API e o
     ```bash
     docker-compose -f docker-compose.dev.yml up -d --build
     ```
-3. Crie os dados de exemplo do banco:
+3. Crie os dados de exemplo do banco: 
+   
+   | Aguarde um tempo (15 segundos) após subir o docker do banco para rodar esse comando abaixo, processadores mais lentos podem demorar um pouco para subir o 
+   
+   banco de fato.
     ```base
     docker exec -i sos-rs-db psql -U root -d sos_rs -f /tmp/dev_dump.sql 
     ```

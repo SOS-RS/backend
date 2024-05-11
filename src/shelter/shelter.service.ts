@@ -144,7 +144,6 @@ export class ShelterService {
         pix: true,
         address: true,
         capacity: true,
-        contact: true,
         petFriendly: true,
         shelteredPeople: true,
         prioritySum: true,

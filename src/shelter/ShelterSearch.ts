@@ -120,8 +120,8 @@ class ShelterSearch {
     const queryData = {
       AND: [
         { OR: this.search },
-        { OR: this.shelterStatus },
-        { OR: this.priority },
+        ...this.priority,
+        ...this.shelterStatus,
         this.supplyCategoryIds,
         this.supplyIds,
       ],

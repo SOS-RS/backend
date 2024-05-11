@@ -19,8 +19,8 @@ const ShelterSchema = z.object({
   capacity: z.number().min(0).nullable().optional(),
   contact: z.string().nullable().optional(),
   verified: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string().nullable().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable().optional(),
 });
 
 const CreateShelterSchema = ShelterSchema.omit({

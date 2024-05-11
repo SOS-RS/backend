@@ -16,7 +16,7 @@ export class UsersService {
         phone,
         password: phone,
         login: phone,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       },
     });
   }
@@ -29,7 +29,7 @@ export class UsersService {
       },
       data: {
         ...payload,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
   }

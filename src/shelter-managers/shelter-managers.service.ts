@@ -14,7 +14,7 @@ export class ShelterManagersService {
       data: {
         shelterId,
         userId,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       },
     });
   }

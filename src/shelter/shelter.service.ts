@@ -29,7 +29,7 @@ export class ShelterService {
     await this.prismaService.shelter.create({
       data: {
         ...payload,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       },
     });
   }
@@ -42,7 +42,7 @@ export class ShelterService {
       },
       data: {
         ...payload,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
   }
@@ -55,7 +55,7 @@ export class ShelterService {
       },
       data: {
         ...payload,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
   }

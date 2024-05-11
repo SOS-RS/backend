@@ -12,8 +12,8 @@ const SupplySchema = z.object({
   id: z.string(),
   supplyCategoryId: z.string(),
   name: z.string().transform(capitalize),
-  createdAt: z.string(),
-  updatedAt: z.string().nullable().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable().optional(),
 });
 
 const CreateSupplySchema = SupplySchema.omit({

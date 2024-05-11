@@ -13,7 +13,7 @@ const ShelterSchema = z.object({
   pix: z.string().nullable().optional(),
   address: z.string().transform(capitalize),
   petFriendly: z.boolean().nullable().optional(),
-  shelteredPeople: z.number().min(0).nullable().optional(),
+  totalShelteredPeople: z.number().min(0).nullable().optional(),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   capacity: z.number().min(0).nullable().optional(),
@@ -32,7 +32,7 @@ const CreateShelterSchema = ShelterSchema.omit({
 
 const UpdateShelterSchema = ShelterSchema.pick({
   petFriendly: true,
-  shelteredPeople: true,
+  totalShelteredPeople: true,
 }).partial();
 
 const FullUpdateShelterSchema = ShelterSchema.omit({

@@ -7,11 +7,13 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { ShelterSupplyService } from './shelter-supply.service';
 import { ServerResponse } from '../utils';
+import { DistributionCenterGuard } from '@/guards/distribution-center.guard';
 
 @ApiTags('Suprimento de abrigos')
 @Controller('shelter/supplies')
@@ -69,6 +71,7 @@ export class ShelterSupplyController {
   }
 
   @Put(':shelterId/supplies/many')
+  @UseGuards(DistributionCenterGuard)
   async updateMany(@Body() body, @Param('shelterId') shelterId: string) {
     try {
       const data = await this.shelterSupplyService.updateMany({

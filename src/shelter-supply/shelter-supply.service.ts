@@ -2,7 +2,12 @@ import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateShelterSupplySchema, UpdateShelterSupplySchema } from './types';
+import {
+  CreateShelterSupplySchema,
+  UpdateManyShelterSupplySchema,
+  UpdateShelterSupplySchema,
+} from './types';
+import { SupplyPriority } from '../supply/types';
 
 @Injectable()
 export class ShelterSupplyService {
@@ -27,7 +32,7 @@ export class ShelterSupplyService {
   }
 
   async store(body: z.infer<typeof CreateShelterSupplySchema>) {
-    const { shelterId, priority, supplyId } =
+    const { shelterId, priority, supplyId, quantity } =
       CreateShelterSupplySchema.parse(body);
     await this.handleUpdateShelterSum(shelterId, 0, priority);
     await this.prismaService.shelterSupply.create({
@@ -35,6 +40,7 @@ export class ShelterSupplyService {
         shelterId,
         priority,
         supplyId,
+        quantity: priority !== SupplyPriority.UnderControl ? quantity : null,
         createdAt: new Date().toISOString(),
       },
     });
@@ -42,7 +48,7 @@ export class ShelterSupplyService {
 
   async update(body: z.infer<typeof UpdateShelterSupplySchema>) {
     const { data, where } = UpdateShelterSupplySchema.parse(body);
-    const { priority } = data;
+    const { priority, quantity } = data;
     if (priority !== null && priority !== undefined) {
       const shelterSupply = await this.prismaService.shelterSupply.findFirst({
         where: {
@@ -67,7 +73,25 @@ export class ShelterSupplyService {
       },
       data: {
         ...data,
-        createdAt: new Date().toISOString(),
+        quantity: priority !== SupplyPriority.UnderControl ? quantity : null,
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  }
+
+  async updateMany(body: z.infer<typeof UpdateManyShelterSupplySchema>) {
+    const { ids, shelterId } = UpdateManyShelterSupplySchema.parse(body);
+
+    await this.prismaService.shelterSupply.updateMany({
+      where: {
+        shelterId: shelterId,
+        supplyId: {
+          in: ids,
+        },
+      },
+      data: {
+        priority: SupplyPriority.UnderControl,
+        updatedAt: new Date().toISOString(),
       },
     });
   }
@@ -79,6 +103,7 @@ export class ShelterSupplyService {
       },
       select: {
         priority: true,
+        quantity: true,
         supply: {
           select: {
             id: true,

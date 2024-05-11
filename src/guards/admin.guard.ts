@@ -5,20 +5,16 @@ import { AccessLevel } from '@prisma/client';
 import { canActivate } from './utils';
 
 @Injectable()
-export class UserGuard extends AuthGuard('jwt') {
+export class AdminGuard extends AuthGuard('jwt') {
   constructor() {
     super();
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     await super.canActivate(context);
-    const ok = await canActivate(context, [
-      AccessLevel.User,
-      AccessLevel.Staff,
-      AccessLevel.DistributionCenter,
-      AccessLevel.Admin,
-    ]);
+    const ok = await canActivate(context, [AccessLevel.Admin]);
     if (ok) return true;
+
     throw new HttpException('Acesso não autorizado', 401);
   }
 }

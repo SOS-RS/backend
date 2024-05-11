@@ -10,6 +10,8 @@ datasource db {
 enum AccessLevel {
   User
   Staff
+  DistributionCenter
+  Admin
 }
 
 model User {
@@ -58,6 +60,7 @@ model ShelterSupply {
   shelterId String  @map("shelter_id")
   supplyId  String  @map("supply_id")
   priority  Int     @default(value: 0)
+  quantity  Int?
   createdAt String  @map("created_at") @db.VarChar(32)
   updatedAt String? @map("updated_at") @db.VarChar(32)
 

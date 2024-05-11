@@ -3,8 +3,6 @@ import {
   removeNotNumbers,
   getSessionData,
   deepMerge,
-  getSearchWhere,
-  parseStringToObject,
   capitalize,
 } from './utils';
 
@@ -14,6 +12,4 @@ export {
   removeNotNumbers,
   getSessionData,
   deepMerge,
-  getSearchWhere,
-  parseStringToObject,
 };

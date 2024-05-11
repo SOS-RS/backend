@@ -75,77 +75,10 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   }
 }
 
-function parseStringToObject(path: string, value: any) {
-  const keys = path.split('.');
-  const currentObj = {};
-  let temp = currentObj;
-
-  keys.forEach((key, index) => {
-    if (index === keys.length - 1) {
-      temp[key] = value;
-    } else {
-      temp[key] = {};
-      temp = temp[key];
-    }
-  });
-
-  return currentObj;
-}
-
-function getSearchWhere(search: string, or?: boolean) {
-  const where = {};
-  if (search !== '') {
-    const terms = search.split(',');
-    const groups: Record<string, { condition: string; mode?: string }[]> =
-      terms.reduce((prev, current) => {
-        const [key, condition, value] = current.split(':');
-        const isBoolean = ['true', 'false'].includes(value);
-        const mode =
-          isBoolean || ['in', 'notIn'].includes(condition)
-            ? undefined
-            : 'insensitive';
-        const parsedValue = isBoolean ? value === 'true' : value;
-
-        return {
-          ...prev,
-          [key]: [
-            ...(prev[key] ?? []),
-            {
-              [condition]: ['in', 'notIn'].includes(condition)
-                ? [parsedValue]
-                : parsedValue,
-              mode,
-            },
-          ],
-        };
-      }, {});
-
-    const parsed = Object.entries(groups).reduce((prev, [key, current]) => {
-      if (current.length > 1) {
-        return {
-          ...prev,
-          AND: current.map((c) => parseStringToObject(key, c)),
-        };
-      } else return deepMerge(prev, parseStringToObject(key, current[0]));
-    }, {});
-    Object.assign(where, parsed);
-  }
-  if (or) {
-    return {
-      OR: Object.entries(where).reduce(
-        (prev, [key, value]) => [...prev, { [key]: value }],
-        [] as any[],
-      ),
-    };
-  } else return where;
-}
-
 export {
   ServerResponse,
   removeNotNumbers,
   getSessionData,
   deepMerge,
-  parseStringToObject,
-  getSearchWhere,
   capitalize,
 };

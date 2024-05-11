@@ -13,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { ShelterManagersService } from './shelter-managers.service';
 import { ServerResponse } from '../utils';
-import { StaffGuard } from '@/guards/staff.guard';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @ApiTags('Admin de Abrigo')
 @Controller('shelter/managers')
@@ -25,7 +25,7 @@ export class ShelterManagersController {
   ) {}
 
   @Post('')
-  @UseGuards(StaffGuard)
+  @UseGuards(AdminGuard)
   async store(@Body() body) {
     try {
       await this.shelterManagerServices.store(body);

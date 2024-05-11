@@ -15,11 +15,11 @@ setup:
 	@$(MAKE) install
 	@$(MAKE) prisma
 
-local-start:
+start:
 	@$(MAKE) setup
 	@npm run start:dev
 
-local-start-debug:
+start-debug:
 	@$(MAKE) setup
 	@npm run start:debug
 
@@ -55,6 +55,10 @@ dev-down:
 
 dev-logs:
 	@docker compose -f docker-compose.dev.yml logs -f
+
+dev-db-load-dump:
+	@docker compose -f docker-compose.dev.yml cp prisma/dev_dump.sql db:/tmp/backup.sql
+	@docker compose -f docker-compose.dev.yml exec db psql -U root -d sos_rs -f /tmp/backup.sql
 
 # Para ser usado no workflow de build
 docker-build:

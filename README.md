@@ -14,14 +14,7 @@ Este repositório contém o backend de um aplicativo projetado para ajudar na or
 
 Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/migration/dev_dump.sql`. Este arquivo pode ser executado após as migrations estarem aplicadas.
 
-Se estiver usando Docker, os comandos para carregar o dump são:
-
-```bash
-# Copiar o dump para a pasta temporária do Docker
-docker exec -it cp backup.sql POSTGRES_CONTAINER_ID:/tmp/backup.sql
-# Importar o dump para o banco
-docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backup.sql
-```
+Se estiver usando Docker, você pode usar o comando `make dev-db-load-dump` para carregar automaticamente.
 
 ## 🐳 Configuração com Docker
 
@@ -37,15 +30,11 @@ Para desenvolvedores de frontend que não precisam executar localmente a API e o
     docker-compose -f docker-compose.dev.yml up
     ```
 
-Adicione a porta do serviço de banco no `docker-compose.dev.yml` para acessos externos:
-
-```yaml
-ports:
-  - '5432:5432'
-  - '4000:4000'
-```
-
 ## 🚀 Configuração Inicial Local
+Se você estiver recebendo algum erro relacionado a PORT da DATABASE_URL, tem uma linha comentada no .env que pode ser
+descomentada para resolver o problema.
+
+## Configuração inicial para rodar localmente
 
 1. Clone o repositório:
    ```bash
@@ -53,14 +42,11 @@ ports:
    ```
 2. Instale as dependências:
    ```bash
-   npm install 
-   npx prisma generate 
-   npx prisma migrate dev 
-   npm run start:dev
+   make install
    ```
 3. Inicie o servidor:
    ```bash
-   npm start
+   make start
    ```
    A API estará disponível em `http://localhost:4000`.
 
@@ -99,3 +85,4 @@ ports:
 Contribuições são muito bem-vindas! Se deseja ajudar, faça um fork do repositório, crie uma branch com suas modificações, e envie um pull request.
 
 Sua ajuda é crucial para apoiar a comunidade afetada pelas enchentes no Rio Grande do Sul!
+

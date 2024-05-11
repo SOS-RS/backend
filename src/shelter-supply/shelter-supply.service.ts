@@ -82,18 +82,45 @@ export class ShelterSupplyService {
   async updateMany(body: z.infer<typeof UpdateManyShelterSupplySchema>) {
     const { ids, shelterId } = UpdateManyShelterSupplySchema.parse(body);
 
-    await this.prismaService.shelterSupply.updateMany({
+    const supplies = await this.prismaService.shelterSupply.findMany({
       where: {
-        shelterId: shelterId,
+        shelterId,
         supplyId: {
           in: ids,
         },
       },
-      data: {
-        priority: SupplyPriority.UnderControl,
-        updatedAt: new Date().toISOString(),
-      },
     });
+
+    const prioritySum = supplies.reduce(
+      (prev, current) => prev + current.priority,
+      0,
+    );
+
+    await this.prismaService.$transaction([
+      this.prismaService.shelter.update({
+        where: {
+          id: shelterId,
+        },
+        data: {
+          prioritySum: {
+            decrement: prioritySum,
+          },
+          updatedAt: new Date().toISOString(),
+        },
+      }),
+      this.prismaService.shelterSupply.updateMany({
+        where: {
+          shelterId,
+          supplyId: {
+            in: ids,
+          },
+        },
+        data: {
+          priority: SupplyPriority.UnderControl,
+          updatedAt: new Date().toISOString(),
+        },
+      }),
+    ]);
   }
 
   async index(shelterId: string) {

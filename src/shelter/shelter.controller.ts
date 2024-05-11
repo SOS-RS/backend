@@ -15,6 +15,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { ShelterService } from './shelter.service';
 import { ServerResponse } from '../utils';
 import { StaffGuard } from '@/guards/staff.guard';
+import { ApplyUser } from '@/guards/apply-user.guard';
+import { UserDecorator } from '@/decorators/UserDecorator';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -35,9 +37,10 @@ export class ShelterController {
   }
 
   @Get(':id')
-  async show(@Param('id') id: string) {
+  @UseGuards(ApplyUser)
+  async show(@UserDecorator() user: any, @Param('id') id: string) {
     try {
-      const data = await this.shelterService.show(id);
+      const data = await this.shelterService.show(id, user);
       return new ServerResponse(200, 'Successfully get shelter', data);
     } catch (err: any) {
       this.logger.error(`Failed to get shelter: ${err}`);

@@ -11,22 +11,34 @@ async function canActivate(context: ExecutionContext, allowed: AccessLevel[]) {
   if (request.user) {
     const { userId, sessionId } = request.user;
 
-    const session = await service.session.findUnique({
-      where: { id: sessionId, active: true, user: { id: userId } },
-      include: {
-        user: true,
-      },
-    });
-
-    if (
-      session &&
-      allowed.some((permission) => permission === session.user.accessLevel)
-    ) {
-      return true;
-    }
+    return isRightSessionRole(allowed, sessionId, userId);
   }
 
   return false;
 }
 
-export { canActivate };
+async function isRightSessionRole(
+  allowed: AccessLevel[],
+  sessionId?: string,
+  userId?: string,
+) {
+  if (!sessionId) return false;
+  if (!userId) return false;
+
+  const session = await service.session.findUnique({
+    where: { id: sessionId, active: true, user: { id: userId } },
+    include: {
+      user: true,
+    },
+  });
+
+  if (
+    session &&
+    allowed.some((permission) => permission === session.user.accessLevel)
+  ) {
+    return true;
+  }
+  return false;
+}
+
+export { canActivate, isRightSessionRole };

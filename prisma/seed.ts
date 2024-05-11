@@ -11,11 +11,6 @@ async function main() {
       continue;
     }
 
-    // ignore prisma migrations at it is already applied by migrate command
-    // if (query.includes('_prisma_migrations')) {
-    // 	continue;
-    // }
-
     try {
       await prisma.$executeRawUnsafe(query);
     } catch (e) {

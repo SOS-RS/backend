@@ -12,7 +12,9 @@ export interface IFilterFormProps {
   tags: ShelterTagInfo | null;
 }
 
-export type SearchShelterTagResponse = Shelter & {
+type AllowedShelterFields = Omit<Shelter, 'contact'>;
+
+export type SearchShelterTagResponse = AllowedShelterFields & {
   shelterSupplies: (ShelterSupply & { supply: Supply })[];
 };
 

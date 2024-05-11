@@ -185,4 +185,41 @@ export class ShelterService {
         this.voluntaryIds.push(...resp.map((s) => s.id));
       });
   }
+
+  async list(query: any) {
+    const { order, orderBy, search: searchQuery } = SearchSchema.parse(query);
+    const queryData = qs.parse(searchQuery) as unknown as IFilterFormProps;
+    const { query: where } = new ShelterSearch(this.prismaService, queryData);
+    const count = await this.prismaService.shelter.count({ where });
+
+    const whereData: Prisma.ShelterFindManyArgs<DefaultArgs> = {
+      orderBy: { [orderBy]: order },
+      where,
+    };
+
+    const results = await this.prismaService.shelter.findMany({
+      ...whereData,
+      select: {
+        id: true,
+        name: true,
+        pix: true,
+        address: true,
+        capacity: true,
+        contact: true,
+        petFriendly: true,
+        shelteredPeople: true,
+        prioritySum: true,
+        verified: true,
+        latitude: true,
+        longitude: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      count,
+      results: results,
+    };
+  }
 }

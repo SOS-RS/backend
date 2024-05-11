@@ -79,4 +79,15 @@ export class ShelterController {
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }
+
+  @Get('/all')
+  async list(@Query() query) {
+    try {
+      const data = await this.shelterService.list(query);
+      return new ServerResponse(200, 'Successfully get shelters', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get shelters: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
 }

@@ -11,6 +11,7 @@ import { SessionsModule } from './sessions/sessions.module';
 import { SupplyCategoriesModule } from './supply-categories/supply-categories.module';
 import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
+import { ShelteredPeopleModule } from "./sheltered-people/sheltered-people.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
     UsersModule,
     SessionsModule,
     ShelterModule,
+    ShelteredPeopleModule,
     SupplyModule,
     SupplyCategoriesModule,
     ShelterManagersModule,

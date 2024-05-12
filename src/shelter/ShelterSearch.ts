@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import {
   SearchShelterTagResponse,
   ShelterSearchProps,
+  ShelterStatus,
   ShelterTagInfo,
   ShelterTagType,
 } from './types/search.types';
@@ -28,45 +29,42 @@ class ShelterSearch {
   }
 
   priority(supplyIds: string[] = []): Prisma.ShelterWhereInput {
-    if (this.formProps.priority) {
-      return {
-        shelterSupplies: {
-          some: {
-            priority: +this.formProps.priority,
-            supplyId:
-              supplyIds.length > 0
-                ? {
-                    in: supplyIds,
-                  }
-                : undefined,
-          },
+    if (!this.formProps.priority) return {};
+
+    return {
+      shelterSupplies: {
+        some: {
+          priority: +this.formProps.priority,
+          supplyId:
+            supplyIds.length > 0
+              ? {
+                  in: supplyIds,
+                }
+              : undefined,
         },
-      };
-    } else return {};
+      },
+    };
   }
 
   get shelterStatus(): Prisma.ShelterWhereInput[] {
     if (!this.formProps.shelterStatus) return [];
-    else {
-      return this.formProps.shelterStatus.map((status) => {
-        if (status === 'waiting')
-          return {
-            capacity: null,
-          };
-        else if (status === 'available')
-          return {
-            capacity: {
-              gt: this.prismaService.shelter.fields.shelteredPeople,
-            },
-          };
-        else
-          return {
-            capacity: {
-              lte: this.prismaService.shelter.fields.shelteredPeople,
-            },
-          };
-      });
-    }
+
+    const clausesFromStatus: Record<
+      ShelterStatus,
+      Prisma.ShelterWhereInput['capacity'] | null
+    > = {
+      waiting: null,
+      available: {
+        gt: this.prismaService.shelter.fields.shelteredPeople,
+      },
+      unavailable: {
+        lte: this.prismaService.shelter.fields.shelteredPeople,
+      },
+    };
+
+    return this.formProps.shelterStatus.map((status) => ({
+      capacity: clausesFromStatus[status],
+    }));
   }
 
   supplyCategoryIds(
@@ -104,21 +102,21 @@ class ShelterSearch {
 
   get search(): Prisma.ShelterWhereInput[] {
     if (!this.formProps.search) return [];
-    else
-      return [
-        {
-          address: {
-            contains: this.formProps.search,
-            mode: 'insensitive',
-          },
+
+    return [
+      {
+        address: {
+          contains: this.formProps.search,
+          mode: 'insensitive',
         },
-        {
-          name: {
-            contains: this.formProps.search,
-            mode: 'insensitive',
-          },
+      },
+      {
+        name: {
+          contains: this.formProps.search,
+          mode: 'insensitive',
         },
-      ];
+      },
+    ];
   }
 
   get cities(): Prisma.ShelterWhereInput {

@@ -2,6 +2,10 @@ import { Shelter, ShelterSupply, Supply } from '@prisma/client';
 import { z } from 'zod';
 import { SupplyPriority } from '../../supply/types';
 
+const ShelterStatusSchema = z.enum(['available', 'unavailable', 'waiting']);
+
+export type ShelterStatus = z.infer<typeof ShelterStatusSchema>;
+
 const ShelterTagTypeSchema = z.enum([
   'NeedVolunteers',
   'NeedDonations',
@@ -19,12 +23,13 @@ export type ShelterTagInfo = z.infer<typeof ShelterTagInfoSchema>;
 
 export const ShelterSearchPropsSchema = z.object({
   search: z.string().optional(),
-  priority: z.preprocess(Number, z.nativeEnum(SupplyPriority).optional()),
+  priority: z.preprocess(
+    (value) => Number(value) || undefined,
+    z.nativeEnum(SupplyPriority).optional(),
+  ),
   supplyCategoryIds: z.array(z.string()).optional(),
   supplyIds: z.array(z.string()).optional(),
-  shelterStatus: z
-    .array(z.enum(['available', 'unavailable', 'waiting']))
-    .optional(),
+  shelterStatus: z.array(ShelterStatusSchema).optional(),
   tags: ShelterTagInfoSchema.nullable().optional(),
   cities: z.array(z.string()).optional(),
 });

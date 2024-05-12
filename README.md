@@ -98,4 +98,6 @@ ports:
 
 Contribuições são muito bem-vindas! Se deseja ajudar, faça um fork do repositório, crie uma branch com suas modificações, e envie um pull request.
 
+Se você quiser discutir ideias, problemas ou contribuições, sinta-se à vontade para se juntar ao nosso servidor do Discord [aqui](https://discord.gg/ZtkMVmSF).
+
 Sua ajuda é crucial para apoiar a comunidade afetada pelas enchentes no Rio Grande do Sul!

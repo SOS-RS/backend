@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import * as qs from 'qs';
@@ -17,10 +17,12 @@ import {
 import { subDays } from 'date-fns';
 
 @Injectable()
-export class ShelterService {
+export class ShelterService implements OnModuleInit {
   private voluntaryIds: string[] = [];
 
-  constructor(private readonly prismaService: PrismaService) {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  onModuleInit() {
     this.loadVoluntaryIds();
   }
 

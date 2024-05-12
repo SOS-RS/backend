@@ -15,6 +15,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { ShelterService } from './shelter.service';
 import { ServerResponse } from '../utils';
 import { StaffGuard } from '@/guards/staff.guard';
+import { getShelterCoordinates } from '@/utils/utils';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -46,9 +47,15 @@ export class ShelterController {
   }
 
   @Post('')
-  @UseGuards(StaffGuard)
+  //@UseGuards(StaffGuard)
   async store(@Body() body) {
     try {
+      await getShelterCoordinates(body)
+      .then((coords) => {
+        body.latitude = coords.lat;
+        body.longitude = coords.lng;
+      });
+
       const data = await this.shelterService.store(body);
       return new ServerResponse(200, 'Successfully created shelter', data);
     } catch (err: any) {

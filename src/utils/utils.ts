@@ -1,4 +1,6 @@
 import { Logger } from '@nestjs/common';
+import {  Shelter } from '@prisma/client';
+import { MapsApi } from '../googleMaps/mapsApi'
 
 class ServerResponse<T> {
   readonly message: string;
@@ -75,10 +77,22 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   }
 }
 
+async function getShelterCoordinates(shelter: Shelter){
+  const { address } = shelter;
+  let coordinates = MapsApi.getCoordinates(address);
+  coordinates.then((res) => {
+    shelter.latitude = res.lat;
+    shelter.longitude = res.lng;
+  });
+
+  return coordinates;
+}
+
 export {
   ServerResponse,
   removeNotNumbers,
   getSessionData,
   deepMerge,
   capitalize,
+  getShelterCoordinates
 };

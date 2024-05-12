@@ -150,4 +150,59 @@ export class ShelterSupplyService {
       },
     });
   }
+
+  async remaining(shelterId: string) {
+    const remainingSupplies = await this.prismaService.shelterSupply.findMany({
+      where: {
+        shelterId,
+        priority: SupplyPriority.Remaining,
+      },
+      select: {
+        priority: true,
+        quantity: true,
+        supply: {
+          select: {
+            id: true,
+            name: true,
+            supplyCategory: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            updatedAt: true,
+            createdAt: true,
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    const promises = remainingSupplies.map(async (remaining) => {
+      const needing = await this.prismaService.shelterSupply.findMany({
+        select: {
+          shelter: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+              latitude: true,
+              longitude: true,
+              verified: true,
+              contact: true,
+            },
+          },
+        },
+        where: {
+          supplyId: remaining.supply.id,
+          priority: { in: [SupplyPriority.Urgent, SupplyPriority.Needing] },
+        },
+      });
+
+      return { ...remaining, needing };
+    });
+
+    return await Promise.all(promises);
+  }
 }

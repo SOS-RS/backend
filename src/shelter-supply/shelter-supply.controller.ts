@@ -33,6 +33,21 @@ export class ShelterSupplyController {
     }
   }
 
+  @Get(':shelterId/remaining')
+  async remaining(@Param('shelterId') shelterId: string) {
+    try {
+      const data = await this.shelterSupplyService.remaining(shelterId);
+      return new ServerResponse(
+        200,
+        'Successfully get shelter supplies remaining',
+        data,
+      );
+    } catch (err: any) {
+      this.logger.error(`Failed to get shelter supplies remaining: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
   @Post('')
   async store(@Body() body) {
     try {

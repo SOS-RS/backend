@@ -75,10 +75,15 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   }
 }
 
+function unaccentString(str: string) {
+  return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+
 export {
   ServerResponse,
   removeNotNumbers,
   getSessionData,
   deepMerge,
   capitalize,
+  unaccentString,
 };

@@ -14,6 +14,7 @@ import { SearchSchema } from '../types';
 import { ShelterSearch, parseTagResponse } from './ShelterSearch';
 import { SupplyPriority } from '../supply/types';
 import { IFilterFormProps } from './types/search.types';
+import { unaccentString } from '@/utils/utils';
 
 @Injectable()
 export class ShelterService {
@@ -107,13 +108,9 @@ export class ShelterService {
     return data;
   }
 
-  unaccentString(str: string) {
-    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  }
-
-  private async getUnaccentShelterIds(searchText: string) {
+  async getUnaccentShelterIds(searchText: string) {
     if (!searchText) return [];
-    const normalizedSearch = this.unaccentString(searchText);
+    const normalizedSearch = unaccentString(searchText);
 
     const parameterizedSearch = `%${normalizedSearch}%`;
 

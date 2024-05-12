@@ -10,11 +10,19 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 import { UserGuard } from '@/guards/user.guard';
 import { ServerResponse } from '../utils';
 import { SessionsService } from './sessions.service';
+import { LoginSessionDTO } from './dtos/LoginSessionDTO';
 
 @ApiTags('Sessões')
 @Controller('sessions')
@@ -23,14 +31,17 @@ export class SessionsController {
 
   constructor(private readonly sessionService: SessionsService) {}
 
+  @ApiBadRequestResponse()
+  @ApiInternalServerErrorResponse()
+  @ApiOkResponse()
   @Post('')
   async login(
-    @Body() body,
+    @Body() body: LoginSessionDTO,
     @Headers('x-real-ip') ip: string,
     @Headers('user-agent') userAgent: string,
   ) {
     try {
-      const data = await this.sessionService.login({ ...body, ip, userAgent });
+      const data = await this.sessionService.login(body, ip, userAgent);
       return new ServerResponse(200, 'Successfully logged in', data);
     } catch (err: any) {
       this.logger.error(`Failed to login ${err}`);
@@ -41,6 +52,10 @@ export class SessionsController {
     }
   }
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse()
+  @ApiInternalServerErrorResponse()
+  @ApiOkResponse()
   @Get('')
   @UseGuards(UserGuard)
   async show(@Request() req) {
@@ -54,6 +69,10 @@ export class SessionsController {
     }
   }
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse()
+  @ApiInternalServerErrorResponse()
+  @ApiOkResponse()
   @Delete('')
   @UseGuards(UserGuard)
   async delete(@Request() req) {

@@ -134,15 +134,6 @@ export class ShelterService {
       queryData.search,
     );
 
-    if (searchQuery && unnaccentShelterIds.length === 0) {
-      return {
-        perPage,
-        page,
-        count: 0,
-        results: [],
-      };
-    }
-
     const { query: where } = new ShelterSearch(
       this.prismaService,
       queryData,

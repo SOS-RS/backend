@@ -39,6 +39,7 @@
     "zod": "^3.23.6"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
@@ -53,6 +54,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.5.0",
+    "jest-mock-extended": "^3.0.7",
     "prettier": "^3.0.0",
     "prisma": "^5.13.0",
     "source-map-support": "^0.5.21",

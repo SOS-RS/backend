@@ -18,13 +18,16 @@ const defaultTagsData: ShelterTagInfo = {
 class ShelterSearch {
   private formProps: Partial<IFilterFormProps>;
   private prismaService: PrismaService;
+  private unnacentShelterIds: string[];
 
   constructor(
     prismaService: PrismaService,
     props: Partial<IFilterFormProps> = {},
+    unnaccentShelterIds: string[],
   ) {
     this.prismaService = prismaService;
     this.formProps = { ...props };
+    this.unnacentShelterIds = unnaccentShelterIds;
   }
 
   priority(supplyIds: string[] = []): Prisma.ShelterWhereInput {
@@ -107,16 +110,7 @@ class ShelterSearch {
     else
       return [
         {
-          address: {
-            contains: this.formProps.search,
-            mode: 'insensitive',
-          },
-        },
-        {
-          name: {
-            contains: this.formProps.search,
-            mode: 'insensitive',
-          },
+          id: { in: this.unnacentShelterIds },
         },
       ];
   }

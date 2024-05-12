@@ -12,6 +12,7 @@ const ShelterSupplySchema = z.object({
     z.literal(SupplyPriority.Needing),
     z.literal(SupplyPriority.Urgent),
   ]),
+  quantity: z.number().gt(0).nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
 });
@@ -20,6 +21,7 @@ const CreateShelterSupplySchema = ShelterSupplySchema.pick({
   shelterId: true,
   supplyId: true,
   priority: true,
+  quantity: true,
 });
 
 const UpdateShelterSupplySchema = z.object({
@@ -31,6 +33,7 @@ const UpdateShelterSupplySchema = z.object({
         z.literal(SupplyPriority.Needing),
         z.literal(SupplyPriority.Urgent),
       ]),
+      quantity: z.number().nullable().optional(),
       shelterId: z.string(),
       supplyId: z.string(),
     })
@@ -41,8 +44,14 @@ const UpdateShelterSupplySchema = z.object({
   }),
 });
 
+const UpdateManyShelterSupplySchema = z.object({
+  ids: z.array(z.string()),
+  shelterId: z.string(),
+});
+
 export {
   ShelterSupplySchema,
   CreateShelterSupplySchema,
   UpdateShelterSupplySchema,
+  UpdateManyShelterSupplySchema,
 };

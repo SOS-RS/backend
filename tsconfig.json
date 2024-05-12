@@ -30,5 +30,8 @@
       "@/guards/*": ["./src/guards/*"],
       "@/guards": ["./src/guards"]
     }
+  },
+  "watchOptions": {
+    "watchFile": "fixedPollingInterval"
   }
 }

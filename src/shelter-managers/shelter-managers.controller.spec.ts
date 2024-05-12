@@ -9,7 +9,9 @@ describe('ShelterManagersController', () => {
       controllers: [ShelterManagersController],
     }).compile();
 
-    controller = module.get<ShelterManagersController>(ShelterManagersController);
+    controller = module.get<ShelterManagersController>(
+      ShelterManagersController,
+    );
   });
 
   it('should be defined', () => {

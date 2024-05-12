@@ -1,21 +1,27 @@
 import { z } from 'zod';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import * as qs from 'qs';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  ComplexSearchSchema,
   CreateShelterSchema,
   FullUpdateShelterSchema,
   UpdateShelterSchema,
-} from './types';
-import { SeachQueryProps } from '@/decorators/search-query/types';
+} from './types/types';
+import { SearchSchema } from '../types';
+import { ShelterSearch, parseTagResponse } from './ShelterSearch';
+import { SupplyPriority } from '../supply/types';
+import { IFilterFormProps } from './types/search.types';
 
 @Injectable()
 export class ShelterService {
-  private logger = new Logger(ShelterService.name);
+  private voluntaryIds: string[] = [];
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {
+    this.loadVoluntaryIds();
+  }
 
   async store(body: z.infer<typeof CreateShelterSchema>) {
     const payload = CreateShelterSchema.parse(body);
@@ -71,9 +77,11 @@ export class ShelterService {
         prioritySum: true,
         latitude: true,
         longitude: true,
+        verified: true,
         shelterSupplies: {
           select: {
             priority: true,
+            quantity: true,
             supply: {
               select: {
                 id: true,
@@ -99,51 +107,6 @@ export class ShelterService {
     return data;
   }
 
-  async index(props: SeachQueryProps) {
-    const { handleSearch } = props;
-
-    return await handleSearch<Prisma.ShelterSelect<DefaultArgs>>(
-      this.prismaService.shelter,
-      {
-        select: {
-          id: true,
-          name: true,
-          pix: true,
-          address: true,
-          capacity: true,
-          contact: true,
-          petFriendly: true,
-          shelteredPeople: true,
-          prioritySum: true,
-          verified: true,
-          latitude: true,
-          longitude: true,
-          createdAt: true,
-          updatedAt: true,
-          shelterSupplies: {
-            select: {
-              priority: true,
-              supply: {
-                select: {
-                  id: true,
-                  name: true,
-                  supplyCategory: {
-                    select: {
-                      id: true,
-                      name: true,
-                    },
-                  },
-                  createdAt: true,
-                  updatedAt: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    );
-  }
-
   unaccentString(str: string) {
     return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
@@ -160,55 +123,30 @@ export class ShelterService {
     return idsFound.map(({ id }) => id);
   }
 
-  async search(props: z.infer<typeof ComplexSearchSchema>) {
-    const payload = ComplexSearchSchema.parse({
-      ...props,
-      supplyCategories:
-        typeof props['supplyCategories[]'] === 'string'
-          ? [props['supplyCategories[]']]
-          : props['supplyCategories[]'],
-      supplies:
-        typeof props['supplies[]'] === 'string'
-          ? [props['supplies[]']]
-          : props['supplies[]'],
-    });
+  async index(query: any) {
+    const {
+      order,
+      orderBy,
+      page,
+      perPage,
+      search: searchQuery,
+    } = SearchSchema.parse(query);
+    const queryData = qs.parse(searchQuery) as unknown as IFilterFormProps;
+    const { query: where } = new ShelterSearch(this.prismaService, queryData);
+    const count = await this.prismaService.shelter.count({ where });
 
-    const shelterStatusFilter = this.addShelterStatusFilter(payload);
+    const take = perPage;
+    const skip = perPage * (page - 1);
 
-    const unnaccentShelterIds = await this.getUnaccentShelterIds(
-      payload.search,
-    );
-
-    if (payload.search && unnaccentShelterIds.length === 0) {
-      return {
-        perPage: payload.perPage,
-        page: payload.page,
-        count: 0,
-        results: [],
-      };
-    }
-
-    const where = await this.mountWhereFilter(payload, unnaccentShelterIds);
-    const take = payload.perPage;
-    const skip = payload.perPage * (payload.page - 1);
-
-    if (shelterStatusFilter.length > 0) {
-      where['AND'].push({
-        OR: shelterStatusFilter,
-      });
-    }
-
-    const count = await this.prismaService.shelter.count({
-      where: where,
-    });
-
-    const results = await this.prismaService.shelter.findMany({
-      where: where,
-      orderBy: {
-        prioritySum: 'desc',
-      },
+    const whereData: Prisma.ShelterFindManyArgs<DefaultArgs> = {
       take,
       skip,
+      orderBy: { [orderBy]: order },
+      where,
+    };
+
+    const results = await this.prismaService.shelter.findMany({
+      ...whereData,
       select: {
         id: true,
         name: true,
@@ -216,134 +154,51 @@ export class ShelterService {
         address: true,
         capacity: true,
         contact: true,
-        verified: true,
         petFriendly: true,
         shelteredPeople: true,
         prioritySum: true,
+        verified: true,
         latitude: true,
         longitude: true,
         createdAt: true,
         updatedAt: true,
         shelterSupplies: {
-          select: {
-            priority: true,
-            supply: {
-              select: {
-                id: true,
-                name: true,
-                supplyCategory: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-                createdAt: true,
-                updatedAt: true,
-              },
+          where: {
+            priority: {
+              notIn: [SupplyPriority.UnderControl],
             },
+          },
+          orderBy: {
+            updatedAt: 'desc',
+          },
+          include: {
+            supply: true,
           },
         },
       },
     });
-    return { perPage: payload.perPage, page: payload.page, count, results };
-  }
 
-  private async mountWhereFilter(
-    payload: z.infer<typeof ComplexSearchSchema>,
-    unnaccentShelterIds: string[] = [],
-  ) {
-    const andClauses: Prisma.ShelterWhereInput[] = [];
-
-    if (unnaccentShelterIds.length > 0) {
-      andClauses.push({
-        id: { in: unnaccentShelterIds },
-      });
-    }
-
-    const shelterSuppliesFilter = {
-      shelterSupplies: {
-        some: {},
-      },
-    };
-
-    if (payload.priority) {
-      shelterSuppliesFilter.shelterSupplies.some['priority'] = parseInt(
-        payload.priority,
-      );
-    }
-
-    if (payload?.supplyCategories && payload?.supplyCategories.length !== 0) {
-      shelterSuppliesFilter.shelterSupplies.some['supply'] = {
-        supplyCategoryId: {
-          in: payload.supplyCategories,
-        },
-      };
-    }
-
-    if (payload?.supplies && payload?.supplies.length !== 0) {
-      shelterSuppliesFilter.shelterSupplies.some['supplyId'] = {
-        in: payload.supplies,
-      };
-    }
-
-    if (Object.keys(shelterSuppliesFilter.shelterSupplies.some).length !== 0) {
-      andClauses.push(shelterSuppliesFilter);
-    }
+    const parsed = parseTagResponse(queryData, results, this.voluntaryIds);
 
     return {
-      AND: andClauses,
+      page,
+      perPage,
+      count,
+      results: parsed,
     };
   }
 
-  private addShelterStatusFilter(payload: z.infer<typeof ComplexSearchSchema>) {
-    const shelterStatusFilter: any = [];
-
-    if (payload.filterAvailableShelter) {
-      shelterStatusFilter.push({
-        AND: [
-          {
-            capacity: {
-              gt: this.prismaService.shelter.fields.shelteredPeople,
-            },
+  loadVoluntaryIds() {
+    this.prismaService.supplyCategory
+      .findMany({
+        where: {
+          name: {
+            in: ['Especialistas e Profissionais', 'Voluntariado'],
           },
-          {
-            capacity: { not: null },
-          },
-          {
-            shelteredPeople: { not: null },
-          },
-        ],
+        },
+      })
+      .then((resp) => {
+        this.voluntaryIds.push(...resp.map((s) => s.id));
       });
-    }
-
-    if (payload.filterUnavailableShelter) {
-      shelterStatusFilter.push({
-        AND: [
-          {
-            capacity: {
-              lte: this.prismaService.shelter.fields.shelteredPeople,
-            },
-          },
-          {
-            capacity: { not: null },
-          },
-          {
-            shelteredPeople: { not: null },
-          },
-        ],
-      });
-    }
-
-    if (payload.waitingShelterAvailability) {
-      shelterStatusFilter.push({
-        capacity: null,
-      });
-
-      shelterStatusFilter.push({
-        shelteredPeople: null,
-      });
-    }
-
-    return shelterStatusFilter;
   }
 }

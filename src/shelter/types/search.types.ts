@@ -1,26 +1,36 @@
 import { Shelter, ShelterSupply, Supply } from '@prisma/client';
+import { z } from 'zod';
 import { SupplyPriority } from '../../supply/types';
 
-export type ShelterAvailabilityStatus = 'available' | 'unavailable' | 'waiting';
+const ShelterTagTypeSchema = z.enum([
+  'NeedVolunteers',
+  'NeedDonations',
+  'RemainingSupplies',
+]);
 
-export interface IFilterFormProps {
-  search: string;
-  priority: SupplyPriority | null;
-  supplyCategoryIds: string[];
-  supplyIds: string[];
-  shelterStatus: ShelterAvailabilityStatus[];
-  tags: ShelterTagInfo | null;
-}
+const ShelterTagInfoSchema = z.record(
+  ShelterTagTypeSchema,
+  z.number().optional(),
+);
+
+export type ShelterTagType = z.infer<typeof ShelterTagTypeSchema>;
+
+export type ShelterTagInfo = z.infer<typeof ShelterTagInfoSchema>;
+
+export const ShelterSearchPropsSchema = z.object({
+  search: z.string().optional(),
+  priority: z.preprocess(Number, z.nativeEnum(SupplyPriority).optional()),
+  supplyCategoryIds: z.array(z.string()).optional(),
+  supplyIds: z.array(z.string()).optional(),
+  shelterStatus: z
+    .array(z.enum(['available', 'unavailable', 'waiting']))
+    .optional(),
+  tags: ShelterTagInfoSchema.nullable().optional(),
+  cities: z.array(z.string()).optional(),
+});
+
+export type ShelterSearchProps = z.infer<typeof ShelterSearchPropsSchema>;
 
 export type SearchShelterTagResponse = Shelter & {
   shelterSupplies: (ShelterSupply & { supply: Supply })[];
-};
-
-export type ShelterTagType =
-  | 'NeedVolunteers'
-  | 'NeedDonations'
-  | 'RemainingSupplies';
-
-export type ShelterTagInfo = {
-  [key in ShelterTagType]?: number;
 };

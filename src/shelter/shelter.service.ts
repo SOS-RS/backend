@@ -1,19 +1,19 @@
-import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
-import * as qs from 'qs';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+import * as qs from 'qs';
+import { z } from 'zod';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { SupplyPriority } from '../supply/types';
+import { SearchSchema } from '../types';
+import { ShelterSearch, parseTagResponse } from './ShelterSearch';
+import { ShelterSearchPropsSchema } from './types/search.types';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types/types';
-import { SearchSchema } from '../types';
-import { ShelterSearch, parseTagResponse } from './ShelterSearch';
-import { SupplyPriority } from '../supply/types';
-import { IFilterFormProps } from './types/search.types';
 
 @Injectable()
 export class ShelterService {
@@ -115,7 +115,7 @@ export class ShelterService {
       perPage,
       search: searchQuery,
     } = SearchSchema.parse(query);
-    const queryData = qs.parse(searchQuery) as unknown as IFilterFormProps;
+    const queryData = ShelterSearchPropsSchema.parse(qs.parse(searchQuery));
     const { query: where } = new ShelterSearch(this.prismaService, queryData);
     const count = await this.prismaService.shelter.count({ where });
 
@@ -177,7 +177,26 @@ export class ShelterService {
     };
   }
 
-  loadVoluntaryIds() {
+  async getCities() {
+    const cities = await this.prismaService.shelter.groupBy({
+      by: ['city'],
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        _count: {
+          id: 'desc',
+        },
+      },
+    });
+
+    return cities.map(({ city, _count: { id: sheltersCount } }) => ({
+      city: city || 'Cidade não informada',
+      sheltersCount,
+    }));
+  }
+
+  private loadVoluntaryIds() {
     this.prismaService.supplyCategory
       .findMany({
         where: {

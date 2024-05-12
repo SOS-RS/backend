@@ -1,10 +1,10 @@
 import { Prisma } from '@prisma/client';
 
-import { PrismaService } from '../prisma/prisma.service';
 import { SupplyPriority } from 'src/supply/types';
+import { PrismaService } from '../prisma/prisma.service';
 import {
-  IFilterFormProps,
   SearchShelterTagResponse,
+  ShelterSearchProps,
   ShelterTagInfo,
   ShelterTagType,
 } from './types/search.types';
@@ -16,12 +16,12 @@ const defaultTagsData: ShelterTagInfo = {
 };
 
 class ShelterSearch {
-  private formProps: Partial<IFilterFormProps>;
+  private formProps: Partial<ShelterSearchProps>;
   private prismaService: PrismaService;
 
   constructor(
     prismaService: PrismaService,
-    props: Partial<IFilterFormProps> = {},
+    props: Partial<ShelterSearchProps> = {},
   ) {
     this.prismaService = prismaService;
     this.formProps = { ...props };
@@ -121,10 +121,21 @@ class ShelterSearch {
       ];
   }
 
+  get cities(): Prisma.ShelterWhereInput {
+    if (!this.formProps.cities) return {};
+
+    return {
+      city: {
+        in: this.formProps.cities,
+      },
+    };
+  }
+
   get query(): Prisma.ShelterWhereInput {
     if (Object.keys(this.formProps).length === 0) return {};
     const queryData = {
       AND: [
+        this.cities,
         { OR: this.search },
         { OR: this.shelterStatus },
         this.priority(this.formProps.supplyIds),
@@ -144,7 +155,7 @@ class ShelterSearch {
  * @returns Retorna a lista de resultados, adicionando o campo tags em cada supply para assim categoriza-los corretamente e limitar a quantidade de cada retornada respeitando os parametros em formProps
  */
 function parseTagResponse(
-  tagProps: Partial<Pick<IFilterFormProps, 'tags'>> = {},
+  tagProps: Partial<Pick<ShelterSearchProps, 'tags'>> = {},
   results: SearchShelterTagResponse[],
   voluntaryIds: string[],
 ): SearchShelterTagResponse[] {

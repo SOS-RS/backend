@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
 import * as qs from 'qs';
-import { Prisma, AccessLevel } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -14,7 +14,6 @@ import { SearchSchema } from '../types';
 import { ShelterSearch, parseTagResponse } from './ShelterSearch';
 import { SupplyPriority } from '../supply/types';
 import { IFilterFormProps } from './types/search.types';
-import { isRightSessionRole } from '@/guards/utils';
 
 @Injectable()
 export class ShelterService {
@@ -62,11 +61,8 @@ export class ShelterService {
   }
 
   async show(id: string, user: any) {
-    const isLogged = await isRightSessionRole(
-      [AccessLevel.User, AccessLevel.Staff],
-      user?.sessionId,
-      user?.userId,
-    );
+    const isLogged =
+      Boolean(user) && Boolean(user?.sessionId) && Boolean(user?.userId);
 
     const data = await this.prismaService.shelter.findFirst({
       where: {

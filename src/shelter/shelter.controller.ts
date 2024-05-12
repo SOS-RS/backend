@@ -13,9 +13,8 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 
 import { ShelterService } from './shelter.service';
-import { ServerResponse } from '../utils';
+import { ServerResponse, fetchShelterCoordinates } from '../utils';
 import { StaffGuard } from '@/guards/staff.guard';
-import { getShelterCoordinates } from '@/utils/utils';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -47,22 +46,17 @@ export class ShelterController {
   }
 
   @Post('')
-  //@UseGuards(StaffGuard)
+  @UseGuards(StaffGuard)
   async store(@Body() body) {
     try {
-      await getShelterCoordinates(body)
-      .then((coords) => {
-        body.latitude = coords.lat;
-        body.longitude = coords.lng;
-      });
-
+      await fetchShelterCoordinates(body);
       const data = await this.shelterService.store(body);
       return new ServerResponse(200, 'Successfully created shelter', data);
     } catch (err: any) {
       this.logger.error(`Failed to create shelter: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
-  }
+}
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() body) {
@@ -79,6 +73,7 @@ export class ShelterController {
   @UseGuards(StaffGuard)
   async fullUpdate(@Param('id') id: string, @Body() body) {
     try {
+      await fetchShelterCoordinates(body);
       const data = await this.shelterService.fullUpdate(id, body);
       return new ServerResponse(200, 'Successfully updated shelter', data);
     } catch (err: any) {

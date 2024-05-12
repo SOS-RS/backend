@@ -76,16 +76,16 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
     return source;
   }
 }
-
-async function getShelterCoordinates(shelter: Shelter){
-  const { address } = shelter;
-  let coordinates = MapsApi.getCoordinates(address);
-  coordinates.then((res) => {
-    shelter.latitude = res.lat;
-    shelter.longitude = res.lng;
-  });
-
-  return coordinates;
+async function fetchShelterCoordinates(shelter: Shelter) {
+  try {
+    const { address } = shelter;
+    const coordinates = await MapsApi.getCoordinates(address);
+    shelter.latitude = coordinates.lat;
+    shelter.longitude = coordinates.lng;
+  } catch (error) {
+    console.error(`Failed to fetch coordinates for shelter: ${error}`);
+    console.log("Failed to fetch coordinates for shelter: ", error);
+  }
 }
 
 export {
@@ -94,5 +94,5 @@ export {
   getSessionData,
   deepMerge,
   capitalize,
-  getShelterCoordinates
+  fetchShelterCoordinates,
 };

@@ -59,6 +59,30 @@ export class SupplyService {
     const payload = SurplusDemandMatch.parse(body);
     const skip = payload.perPage * (payload.page - 1);
 
+    let where: Prisma.Sql[] = [];
+
+    if (payload.supplyId) {
+      if (where.length == 0) {
+        where.push(Prisma.sql`WHERE spl.supply_id = ${payload.supplyId}`);
+      } else {
+        where.push(Prisma.sql`spl.supply_id = ${payload.supplyId}`);
+      }
+    }
+    if (payload.shelterIdSurplus) {
+      if (where.length == 0) {
+        where.push(Prisma.sql`WHERE spl.shelter_id = ${payload.shelterIdSurplus}`);
+      } else {
+        where.push(Prisma.sql`spl.shelter_id = ${payload.shelterIdSurplus}`);
+      }
+    }
+    if (payload.shelterIdNeeded) {
+      if (where.length == 0) {
+        where.push(Prisma.sql`WHERE sd.shelter_id = ${payload.shelterIdNeeded}`);
+      } else {
+        where.push(Prisma.sql`sd.shelter_id = ${payload.shelterIdNeeded}`);
+      }
+    }
+
     const query = Prisma.sql`
       WITH supply_surplus AS (
         SELECT
@@ -90,9 +114,7 @@ export class SupplyService {
         sd.shelter_name AS shelter_to_name
       FROM supply_surplus spl
       INNER JOIN supply_demand sd ON sd.supply_id = spl.supply_id
-      ${payload.supplyId
-          ? Prisma.sql`WHERE spl.supply_id = ${payload.supplyId}`
-          : Prisma.empty}
+      ${where.length > 0 ? Prisma.join(where, ' AND ') : Prisma.empty}
       ORDER BY spl.supply_name DESC, shelter_from_name DESC, shelter_to_name DESC
       LIMIT ${payload.perPage} OFFSET ${skip}
     `;

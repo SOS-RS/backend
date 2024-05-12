@@ -59,11 +59,19 @@ export class SupplyController {
   @Get('surplus-demand-matches')
   async surplus_demand_matches(
     @Query('supplyId') supplyId: string,
+    @Query('shelterIdSurplus') shelterIdSurplus: string,
+    @Query('shelterIdNeeded') shelterIdNeeded: string,
     @Query('perPage', new DefaultValuePipe(20), ParseIntPipe) perPage: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
   ) {
     try {
-      const data = await this.supplyServices.surplus_demand_matches({ supplyId, perPage, page });
+      const data = await this.supplyServices.surplus_demand_matches({
+        supplyId,
+        shelterIdSurplus,
+        shelterIdNeeded,
+        perPage,
+        page
+      });
       return new ServerResponse(200, 'Successfully got matches between surplus and demand', data);
     } catch (err: any) {
       this.logger.error(`Failed to get matches: ${err}`);

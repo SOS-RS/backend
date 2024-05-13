@@ -56,13 +56,13 @@ class ShelterSearch {
         else if (status === 'available')
           return {
             capacity: {
-              gt: this.prismaService.shelter.fields.shelteredPeople,
+              gt: this.prismaService.shelter.fields.totalShelteredPeople,
             },
           };
         else
           return {
             capacity: {
-              lte: this.prismaService.shelter.fields.shelteredPeople,
+              lte: this.prismaService.shelter.fields.totalShelteredPeople,
             },
           };
       });

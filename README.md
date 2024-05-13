@@ -24,7 +24,7 @@ Se estiver usando Docker, os comandos para carregar o dump são:
 
 ```bash
 # Copiar o dump para a pasta temporária do Docker
-docker exec -it cp backup.sql POSTGRES_CONTAINER_ID:/tmp/backup.sql
+docker cp backup.sql POSTGRES_CONTAINER_ID:/tmp/backup.sql
 # Importar o dump para o banco
 docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backup.sql
 ```
@@ -88,6 +88,14 @@ ports:
 - **📝 POST /shelters** - Registra um novo abrigo.
 - **🔧 PUT /shelters/:shelterId** - Atualiza um abrigo.
 - **👀 GET /shelters** - Lista abrigos.
+
+### 👤 Abrigados
+
+- **📝 POST /shelter/people** - Registra uma nova pessoa em um abrigo.
+- **🔧 PUT /shelter/people/:personId** - Atualiza um abrigado
+- **🔧 PUT /shelter/people/:personId/admin** - Atualiza qualquer informacao de um abrigado (exceto Id)
+- **👀 GET /shelter/people** - Lista abrigados.
+- **👀 GET /shelter/people/:personId** - Retorna informações de um abrigado específico.
 
 ### 📦 Suprimentos
 

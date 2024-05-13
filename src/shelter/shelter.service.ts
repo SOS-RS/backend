@@ -20,20 +20,39 @@ import { fetchShelterCoordinates } from '../utils';
 export class ShelterService {
   private voluntaryIds: string[] = [];
 
+  private async generatePayloadWithCoordinates(
+    payload:
+      | z.infer<typeof CreateShelterSchema>
+      | z.infer<typeof FullUpdateShelterSchema>,
+  ) {
+    if ((payload.latitude && payload.longitude) || !payload.address) {
+      return payload;
+    }
+
+    const { latitude, longitude } = await fetchShelterCoordinates(
+      payload.address,
+    );
+
+    const updatedPayload = {
+      ...payload,
+    };
+
+    if (latitude && longitude) {
+      updatedPayload.latitude = latitude;
+      updatedPayload.longitude = longitude;
+    }
+
+    return updatedPayload;
+  }
+
   constructor(private readonly prismaService: PrismaService) {
     this.loadVoluntaryIds();
   }
 
   async store(body: z.infer<typeof CreateShelterSchema>) {
-    const payload = CreateShelterSchema.parse(body);
-
-    const { latitude, longitude } = await fetchShelterCoordinates(
-      payload.address,
+    const payload = CreateShelterSchema.parse(
+      await this.generatePayloadWithCoordinates(body),
     );
-    if (latitude && longitude) {
-      payload.latitude = latitude;
-      payload.longitude = longitude;
-    }
 
     await this.prismaService.shelter.create({
       data: {
@@ -57,16 +76,9 @@ export class ShelterService {
   }
 
   async fullUpdate(id: string, body: z.infer<typeof FullUpdateShelterSchema>) {
-    const payload = FullUpdateShelterSchema.parse(body);
-    if (payload.address) {
-      const { latitude, longitude } = await fetchShelterCoordinates(
-        payload.address,
-      );
-      if (latitude && longitude) {
-        payload.latitude = latitude;
-        payload.longitude = longitude;
-      }
-    }
+    const payload = FullUpdateShelterSchema.parse(
+      await this.generatePayloadWithCoordinates(body),
+    );
 
     await this.prismaService.shelter.update({
       where: {

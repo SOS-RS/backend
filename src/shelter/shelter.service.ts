@@ -5,16 +5,19 @@ import * as qs from 'qs';
 import { z } from 'zod';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { SupplyPriority } from '../supply/types';
-import { SearchSchema } from '../types';
-import { ShelterSearch, parseTagResponse } from './ShelterSearch';
-import { ShelterSearchPropsSchema } from './types/search.types';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types/types';
 import { subDays } from 'date-fns';
+import { SupplyPriority } from 'src/supply/types';
+import { SearchSchema } from 'src/types';
+import { ShelterSearch, parseTagResponse } from './ShelterSearch';
+import { CreateShelterDTO } from './dtos/CreateShelterDTO';
+import { ShelterQueryDTO } from './dtos/ShelterQuerysDTO';
+import { UpdateShelterDTO } from './dtos/UpdateShelterDTO';
+import { ShelterSearchPropsSchema } from './types/search.types';
 
 @Injectable()
 export class ShelterService {
@@ -24,7 +27,7 @@ export class ShelterService {
     this.loadVoluntaryIds();
   }
 
-  async store(body: z.infer<typeof CreateShelterSchema>) {
+  async store(body: CreateShelterDTO) {
     const payload = CreateShelterSchema.parse(body);
 
     await this.prismaService.shelter.create({
@@ -36,7 +39,7 @@ export class ShelterService {
     });
   }
 
-  async update(id: string, body: z.infer<typeof UpdateShelterSchema>) {
+  async update(id: string, body: UpdateShelterDTO) {
     const payload = UpdateShelterSchema.parse(body);
     await this.prismaService.shelter.update({
       where: {
@@ -114,7 +117,8 @@ export class ShelterService {
     return data;
   }
 
-  async index(query: any) {
+  // ARRUMAR o queryData
+  async index(query: ShelterQueryDTO) {
     const {
       order,
       orderBy,

@@ -4,6 +4,7 @@ import {
   getSessionData,
   deepMerge,
   capitalize,
+  addHours,
 } from './utils';
 
 export {
@@ -12,4 +13,5 @@ export {
   removeNotNumbers,
   getSessionData,
   deepMerge,
+  addHours,
 };

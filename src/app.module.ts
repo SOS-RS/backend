@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 
 import { PrismaModule } from './prisma/prisma.module';
 import { ShelterModule } from './shelter/shelter.module';
@@ -15,6 +16,7 @@ import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 @Module({
   imports: [
     PrismaModule,
+    ScheduleModule.forRoot(),
     UsersModule,
     SessionsModule,
     ShelterModule,

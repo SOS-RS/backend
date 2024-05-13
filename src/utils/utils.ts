@@ -75,10 +75,17 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   }
 }
 
+function addHours(date: Date, hours: number) {
+  const result = new Date();
+  result.setTime(date.getTime() + hours * 60 * 60 * 1000);
+  return result;
+}
+
 export {
   ServerResponse,
   removeNotNumbers,
   getSessionData,
   deepMerge,
   capitalize,
+  addHours,
 };

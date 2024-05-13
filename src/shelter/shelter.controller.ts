@@ -36,6 +36,17 @@ export class ShelterController {
     }
   }
 
+  @Get('cities')
+  async cities() {
+    try {
+      const data = await this.shelterService.getCities();
+      return new ServerResponse(200, 'Successfully get shelters cities', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get shelters cities: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
   @Get(':id')
   @UseGuards(ApplyUser)
   async show(@UserDecorator() user: any, @Param('id') id: string) {

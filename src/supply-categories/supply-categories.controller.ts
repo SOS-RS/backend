@@ -9,13 +9,23 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 import { SupplyCategoriesService } from './supply-categories.service';
 import { ServerResponse } from '../utils';
 import { AdminGuard } from '@/guards/admin.guard';
+import { CreateSupplyCategoryDTO } from './dtos/CreateSupplyCategoryDTO';
+import { UpdateSupplyCategoryDTO } from './dtos/UpdateSupplyCategoryDTO';
 
 @ApiTags('Categoria de Suprimentos')
+@ApiInternalServerErrorResponse()
 @Controller('supply-categories')
 export class SupplyCategoriesController {
   private logger = new Logger(SupplyCategoriesController.name);
@@ -24,6 +34,7 @@ export class SupplyCategoriesController {
     private readonly supplyCategoryServices: SupplyCategoriesService,
   ) {}
 
+  @ApiOkResponse()
   @Get('')
   async index() {
     try {
@@ -39,9 +50,13 @@ export class SupplyCategoriesController {
     }
   }
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  @ApiOkResponse()
   @Post('')
   @UseGuards(AdminGuard)
-  async store(@Body() body) {
+  async store(@Body() body: CreateSupplyCategoryDTO) {
     try {
       const data = await this.supplyCategoryServices.store(body);
       return new ServerResponse(
@@ -55,9 +70,13 @@ export class SupplyCategoriesController {
     }
   }
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  @ApiOkResponse()
   @Put(':id')
   @UseGuards(AdminGuard)
-  async update(@Param('id') id: string, @Body() body) {
+  async update(@Param('id') id: string, @Body() body: UpdateSupplyCategoryDTO) {
     try {
       const data = await this.supplyCategoryServices.update(id, body);
       return new ServerResponse(

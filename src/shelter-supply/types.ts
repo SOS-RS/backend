@@ -25,23 +25,18 @@ const CreateShelterSupplySchema = ShelterSupplySchema.pick({
 });
 
 const UpdateShelterSupplySchema = z.object({
-  data: z
-    .object({
-      priority: z.union([
-        z.literal(SupplyPriority.UnderControl),
-        z.literal(SupplyPriority.Remaining),
-        z.literal(SupplyPriority.Needing),
-        z.literal(SupplyPriority.Urgent),
-      ]),
-      quantity: z.number().nullable().optional(),
-      shelterId: z.string(),
-      supplyId: z.string(),
-    })
-    .partial(),
-  where: z.object({
-    shelterId: z.string(),
-    supplyId: z.string(),
-  }),
+  shelterId: z.string(),
+  supplyId: z.string(),
+  priority: z
+    .union([
+      z.literal(SupplyPriority.UnderControl),
+      z.literal(SupplyPriority.Remaining),
+      z.literal(SupplyPriority.Needing),
+      z.literal(SupplyPriority.Urgent),
+    ])
+    .nullable()
+    .optional(),
+  quantity: z.number().nullable().optional(),
 });
 
 const UpdateManyShelterSupplySchema = z.object({

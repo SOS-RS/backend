@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -8,6 +7,9 @@ import {
   UpdateShelterSupplySchema,
 } from './types';
 import { SupplyPriority } from '../supply/types';
+import { CreateShelterSupplyDTO } from './dtos/CreateShelterSupplyDTO';
+import { UpdateShelterSupplyDTO } from './dtos/UpdateShelterSupplyDTO';
+import { UpdateManyShelterSupplySchemaDTO } from './dtos/UpdateManyShelterSupplyDTO';
 
 @Injectable()
 export class ShelterSupplyService {
@@ -31,7 +33,7 @@ export class ShelterSupplyService {
     });
   }
 
-  async store(body: z.infer<typeof CreateShelterSupplySchema>) {
+  async store(body: CreateShelterSupplyDTO) {
     const { shelterId, priority, supplyId, quantity } =
       CreateShelterSupplySchema.parse(body);
     await this.handleUpdateShelterSum(shelterId, 0, priority);
@@ -46,22 +48,31 @@ export class ShelterSupplyService {
     });
   }
 
-  async update(body: z.infer<typeof UpdateShelterSupplySchema>) {
-    const { data, where } = UpdateShelterSupplySchema.parse(body);
-    const { priority, quantity } = data;
+  async update(
+    body: UpdateShelterSupplyDTO,
+    shelterId: string,
+    supplyId: string,
+  ) {
+    const {
+      shelterId: shelterIdParse,
+      supplyId: supplyIdParse,
+      priority,
+      quantity,
+    } = UpdateShelterSupplySchema.parse({ ...body, shelterId, supplyId });
     if (priority !== null && priority !== undefined) {
       const shelterSupply = await this.prismaService.shelterSupply.findFirst({
         where: {
-          shelterId: where.shelterId,
-          supplyId: where.supplyId,
+          shelterId: shelterIdParse,
+          supplyId: supplyIdParse,
         },
         select: {
           priority: true,
         },
       });
+
       if (shelterSupply)
         await this.handleUpdateShelterSum(
-          where.shelterId,
+          shelterIdParse,
           shelterSupply.priority,
           priority,
         );
@@ -69,22 +80,26 @@ export class ShelterSupplyService {
 
     await this.prismaService.shelterSupply.update({
       where: {
-        shelterId_supplyId: where,
+        shelterId_supplyId: {
+          shelterId: shelterIdParse,
+          supplyId: supplyIdParse,
+        },
       },
       data: {
-        ...data,
+        priority: priority ?? undefined,
         quantity: priority !== SupplyPriority.UnderControl ? quantity : null,
         updatedAt: new Date().toISOString(),
       },
     });
   }
 
-  async updateMany(body: z.infer<typeof UpdateManyShelterSupplySchema>) {
-    const { ids, shelterId } = UpdateManyShelterSupplySchema.parse(body);
+  async updateMany(body: UpdateManyShelterSupplySchemaDTO, shelterId: string) {
+    const { ids, shelterId: shelterIdParsed } =
+      UpdateManyShelterSupplySchema.parse({ ...body, shelterId });
 
     const supplies = await this.prismaService.shelterSupply.findMany({
       where: {
-        shelterId,
+        shelterId: shelterIdParsed,
         supplyId: {
           in: ids,
         },
@@ -99,7 +114,7 @@ export class ShelterSupplyService {
     await this.prismaService.$transaction([
       this.prismaService.shelter.update({
         where: {
-          id: shelterId,
+          id: shelterIdParsed,
         },
         data: {
           prioritySum: {
@@ -110,7 +125,7 @@ export class ShelterSupplyService {
       }),
       this.prismaService.shelterSupply.updateMany({
         where: {
-          shelterId,
+          shelterId: shelterIdParsed,
           supplyId: {
             in: ids,
           },

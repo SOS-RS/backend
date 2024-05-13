@@ -18,6 +18,7 @@
     "noFallthroughCasesInSwitch": false,
     "strictNullChecks": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "paths": {
       "@/decorators/*": ["./src/decorators/*"],
       "@/decorators": ["./src/decorators"],

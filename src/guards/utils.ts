@@ -41,4 +41,4 @@ async function isRightSessionRole(
   return false;
 }
 
-export { canActivate, isRightSessionRole };
+export { canActivate };

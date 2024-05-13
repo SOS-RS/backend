@@ -3,6 +3,20 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 
+type ReverseGeoCodeInput = {
+  latitude: number;
+  longitude: number;
+}
+
+type ReverseGeoCodeOutput = {
+  city?: string;
+  street?: string;
+  streetNumber?: string;
+  neighbourhood?: string;
+  stateDistrict?: string;
+  zipCode?: string;
+}
+
 @Injectable()
 export class PopulateShelterCity {
   private readonly logger = new Logger(PopulateShelterCity.name);
@@ -73,17 +87,7 @@ export class PopulateShelterCity {
   private async reverseGeocode({
     latitude,
     longitude,
-  }: {
-    latitude: number;
-    longitude: number;
-  }): Promise<{
-    city?: string;
-    street?: string;
-    streetNumber?: string;
-    neighbourhood?: string;
-    stateDistrict?: string;
-    zipCode?: string;
-  }> {
+  }: ReverseGeoCodeInput): Promise<ReverseGeoCodeOutput> {
     const reverseGeocodeURI = `https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}&api_key=${this.geocodeApiKey}`;
 
     const response = await fetch(reverseGeocodeURI, {

@@ -97,6 +97,12 @@ model Shelter {
   latitude        Float?
   longitude       Float?
   verified        Boolean  @default(value: false)
+  city            String?
+  street          String?
+  streetNumber    String?  @map("street_number")
+  neighbourhood   String?
+  stateDistrict   String?  @map("state_district")
+  zipCode         String?  @map("zip_code")
   createdAt       String   @map("created_at") @db.VarChar(32)
   updatedAt       String?  @map("updated_at") @db.VarChar(32)
 

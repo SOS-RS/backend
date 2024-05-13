@@ -143,6 +143,12 @@ export class ShelterService {
         verified: true,
         latitude: true,
         longitude: true,
+        city: true,
+        street: true,
+        streetNumber: true,
+        neighbourhood: true,
+        stateDistrict: true,
+        zipCode: true,
         createdAt: true,
         updatedAt: true,
         shelterSupplies: {

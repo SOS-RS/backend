@@ -1,10 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import * as fs from 'fs';
+import { readFileSync } from 'fs';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const devDump = fs.readFileSync('./prisma/dev_dump.sql', 'utf-8');
+  const devDump = readFileSync('./prisma/dev_dump.sql', 'utf-8');
 
   for (const query of devDump.split('\n')) {
     if (query.trim() === '') {

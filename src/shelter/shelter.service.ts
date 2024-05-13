@@ -79,7 +79,7 @@ export class ShelterService {
     });
   }
 
-  async show(id: string) {
+  async show(id: string, shouldShowContact: boolean) {
     const data = await this.prismaService.shelter.findFirst({
       where: {
         id,
@@ -91,7 +91,7 @@ export class ShelterService {
         pix: true,
         shelteredPeople: true,
         capacity: true,
-        contact: true,
+        contact: shouldShowContact,
         petFriendly: true,
         prioritySum: true,
         latitude: true,
@@ -156,7 +156,6 @@ export class ShelterService {
         pix: true,
         address: true,
         capacity: true,
-        contact: true,
         petFriendly: true,
         shelteredPeople: true,
         prioritySum: true,

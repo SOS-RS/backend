@@ -89,6 +89,11 @@ model Shelter {
   name            String   @unique
   pix             String?  @unique
   address         String
+  street          String?
+  neighbourhood   String?
+  city            String?
+  streetNumber    String?  @map("street_number")
+  zipCode         String?  @map("zip_code")
   petFriendly     Boolean? @map("pet_friendly")
   shelteredPeople Int?     @map("sheltered_people")
   capacity        Int?

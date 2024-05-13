@@ -1,14 +1,15 @@
-import z from 'zod';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSupplySchema, UpdateSupplySchema } from './types';
+import { CreateSupplyDTO } from './dtos/CreateSupplyDTO';
+import { UpdateSupplyDTO } from './dtos/UpdateSupplyDTO';
 
 @Injectable()
 export class SupplyService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async store(body: z.infer<typeof CreateSupplySchema>) {
+  async store(body: CreateSupplyDTO) {
     const payload = CreateSupplySchema.parse(body);
     return await this.prismaService.supply.create({
       data: {
@@ -18,7 +19,7 @@ export class SupplyService {
     });
   }
 
-  async update(id: string, body: z.infer<typeof UpdateSupplySchema>) {
+  async update(id: string, body: UpdateSupplyDTO) {
     const payload = UpdateSupplySchema.parse(body);
     await this.prismaService.supply.update({
       where: {

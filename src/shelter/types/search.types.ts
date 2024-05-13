@@ -21,6 +21,14 @@ export type ShelterTagType = z.infer<typeof ShelterTagTypeSchema>;
 
 export type ShelterTagInfo = z.infer<typeof ShelterTagInfoSchema>;
 
+export const GeolocationFilterSchema = z.object({
+  latitude: z.coerce.number(),
+  longitude: z.coerce.number(),
+  radiusInMeters: z.coerce.number(),
+});
+
+export type GeolocationFilter = z.infer<typeof GeolocationFilterSchema>;
+
 export const ShelterSearchPropsSchema = z.object({
   search: z.string().optional(),
   priority: z.preprocess(
@@ -32,6 +40,7 @@ export const ShelterSearchPropsSchema = z.object({
   shelterStatus: z.array(ShelterStatusSchema).optional(),
   tags: ShelterTagInfoSchema.nullable().optional(),
   cities: z.array(z.string()).optional(),
+  geolocation: GeolocationFilterSchema.optional(),
 });
 
 export type ShelterSearchProps = z.infer<typeof ShelterSearchPropsSchema>;

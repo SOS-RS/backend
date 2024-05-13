@@ -32,6 +32,7 @@ export class UsersController {
 
   constructor(private readonly userServices: UsersService) {}
 
+  @ApiBearerAuth()
   @ApiUnauthorizedResponse()
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()

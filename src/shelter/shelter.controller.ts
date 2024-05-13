@@ -27,6 +27,7 @@ import { UserDecorator } from '@/decorators/UserDecorator/user.decorator';
 import { ShelterQueryDTO } from './dtos/ShelterQuerysDTO';
 import { CreateShelterDTO } from './dtos/CreateShelterDTO';
 import { UpdateShelterDTO } from './dtos/UpdateShelterDTO';
+import { FullUpdateShelterDTO } from './dtos/FullUpdateShelterDTO';
 
 @ApiTags('Abrigos')
 @ApiInternalServerErrorResponse()
@@ -113,7 +114,10 @@ export class ShelterController {
   @ApiOkResponse()
   @Put(':id/admin')
   @UseGuards(StaffGuard)
-  async fullUpdate(@Param('id') id: string, @Body() body: UpdateShelterDTO) {
+  async fullUpdate(
+    @Param('id') id: string,
+    @Body() body: FullUpdateShelterDTO,
+  ) {
     try {
       const data = await this.shelterService.fullUpdate(id, body);
       return new ServerResponse(200, 'Successfully updated shelter', data);

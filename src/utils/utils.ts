@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { MapsApi } from '../googleMaps/mapsApi';
 
 class ServerResponse<T> {
   readonly message: string;
@@ -74,6 +75,15 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
     return source;
   }
 }
+async function fetchShelterCoordinates(address: string) {
+  try {
+    const { lat, lng } = await MapsApi.getCoordinates(address);
+    return { latitude: lat, longitude: lng };
+  } catch (error) {
+    console.error(`Failed to fetch coordinates for shelter: ${error}`);
+    return { latitude: null, longitude: null };
+  }
+}
 
 export {
   ServerResponse,
@@ -81,4 +91,5 @@ export {
   getSessionData,
   deepMerge,
   capitalize,
+  fetchShelterCoordinates,
 };

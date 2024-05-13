@@ -60,10 +60,7 @@ export class ShelterService {
     });
   }
 
-  async show(id: string, user: any) {
-    const isLogged =
-      Boolean(user) && Boolean(user?.sessionId) && Boolean(user?.userId);
-
+  async show(id: string, shouldShowContact: boolean) {
     const data = await this.prismaService.shelter.findFirst({
       where: {
         id,
@@ -75,7 +72,7 @@ export class ShelterService {
         pix: true,
         shelteredPeople: true,
         capacity: true,
-        contact: isLogged,
+        contact: shouldShowContact,
         petFriendly: true,
         prioritySum: true,
         latitude: true,

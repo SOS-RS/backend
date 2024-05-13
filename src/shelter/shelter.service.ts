@@ -14,6 +14,7 @@ import { SearchSchema } from '../types';
 import { ShelterSearch, parseTagResponse } from './ShelterSearch';
 import { SupplyPriority } from '../supply/types';
 import { IFilterFormProps } from './types/search.types';
+import { fetchShelterCoordinates } from '../utils';
 
 @Injectable()
 export class ShelterService {
@@ -25,6 +26,14 @@ export class ShelterService {
 
   async store(body: z.infer<typeof CreateShelterSchema>) {
     const payload = CreateShelterSchema.parse(body);
+
+    const { latitude, longitude } = await fetchShelterCoordinates(
+      payload.address,
+    );
+    if (latitude && longitude) {
+      payload.latitude = latitude;
+      payload.longitude = longitude;
+    }
 
     await this.prismaService.shelter.create({
       data: {
@@ -49,6 +58,16 @@ export class ShelterService {
 
   async fullUpdate(id: string, body: z.infer<typeof FullUpdateShelterSchema>) {
     const payload = FullUpdateShelterSchema.parse(body);
+    if (payload.address) {
+      const { latitude, longitude } = await fetchShelterCoordinates(
+        payload.address,
+      );
+      if (latitude && longitude) {
+        payload.latitude = latitude;
+        payload.longitude = longitude;
+      }
+    }
+
     await this.prismaService.shelter.update({
       where: {
         id,

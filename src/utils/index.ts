@@ -4,7 +4,7 @@ import {
   getSessionData,
   deepMerge,
   capitalize,
-  fetchShelterCoordinates
+  fetchShelterCoordinates,
 } from './utils';
 
 export {
@@ -13,5 +13,5 @@ export {
   removeNotNumbers,
   getSessionData,
   deepMerge,
-  fetchShelterCoordinates
+  fetchShelterCoordinates,
 };

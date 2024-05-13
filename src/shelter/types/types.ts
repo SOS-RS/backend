@@ -41,9 +41,26 @@ const FullUpdateShelterSchema = ShelterSchema.omit({
   updatedAt: true,
 }).partial();
 
+interface ShelterData {
+  id: string;
+  name: string;
+  pix: string | null;
+  address: string;
+  petFriendly: boolean | null;
+  shelteredPeople: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  capacity: number | null;
+  contact: string | null;
+  verified: boolean;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
 export {
   ShelterSchema,
   CreateShelterSchema,
   UpdateShelterSchema,
   FullUpdateShelterSchema,
+  ShelterData,
 };

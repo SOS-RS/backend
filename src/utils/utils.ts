@@ -1,6 +1,5 @@
 import { Logger } from '@nestjs/common';
-import {  Shelter } from '@prisma/client';
-import { MapsApi } from '../googleMaps/mapsApi'
+import { MapsApi } from '../googleMaps/mapsApi';
 
 class ServerResponse<T> {
   readonly message: string;
@@ -76,15 +75,13 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
     return source;
   }
 }
-async function fetchShelterCoordinates(shelter: Shelter) {
+async function fetchShelterCoordinates(address: string) {
   try {
-    const { address } = shelter;
-    const coordinates = await MapsApi.getCoordinates(address);
-    shelter.latitude = coordinates.lat;
-    shelter.longitude = coordinates.lng;
+    const { lat, lng } = await MapsApi.getCoordinates(address);
+    return { latitude: lat, longitude: lng };
   } catch (error) {
     console.error(`Failed to fetch coordinates for shelter: ${error}`);
-    console.log("Failed to fetch coordinates for shelter: ", error);
+    return { latitude: null, longitude: null };
   }
 }
 

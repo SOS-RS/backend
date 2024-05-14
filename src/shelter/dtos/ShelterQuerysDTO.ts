@@ -2,6 +2,7 @@ import { IsOptional, IsString, IsNumber, IsIn, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { SupplyPriority } from 'src/supply/types';
 import { Transform } from 'class-transformer';
+import { ShelterStatus } from '../types/search.types';
 
 export class ShelterQueryDTO {
   @ApiProperty({
@@ -11,18 +12,18 @@ export class ShelterQueryDTO {
   @IsOptional()
   @IsNumber()
   @Transform((value) => Number(value.value))
-  perPage?: number;
+  readonly perPage?: number;
 
   @ApiProperty({ required: false, description: 'Número da página' })
   @IsOptional()
   @IsNumber()
   @Transform((value) => Number(value.value))
-  page?: number;
+  readonly page?: number;
 
   @ApiProperty({ required: false, description: 'Termo de busca' })
   @IsOptional()
   @IsString()
-  search?: string;
+  readonly search?: string;
 
   @ApiProperty({
     required: false,
@@ -31,7 +32,7 @@ export class ShelterQueryDTO {
   })
   @IsOptional()
   @IsIn(['asc', 'desc'])
-  order?: 'asc' | 'desc';
+  readonly order?: 'asc' | 'desc';
 
   @ApiProperty({
     required: false,
@@ -39,7 +40,7 @@ export class ShelterQueryDTO {
   })
   @IsOptional()
   @IsString()
-  orderBy?: string;
+  readonly orderBy?: string;
 
   @ApiProperty({
     required: false,
@@ -47,7 +48,7 @@ export class ShelterQueryDTO {
   })
   @IsOptional()
   @IsString({ each: true })
-  supplyCategoryIds?: string[];
+  readonly supplyCategoryIds?: string[];
 
   @ApiProperty({
     required: false,
@@ -57,12 +58,12 @@ export class ShelterQueryDTO {
   @IsOptional()
   @IsEnum(SupplyPriority)
   @Transform((value) => Number(value.value))
-  priority?: SupplyPriority;
+  readonly priority?: SupplyPriority;
 
   @ApiProperty({ required: false, description: 'IDs de suprimento' })
   @IsOptional()
   @IsString({ each: true })
-  supplyIds?: string[];
+  readonly supplyIds?: string[];
 
   @ApiProperty({
     required: false,
@@ -70,5 +71,5 @@ export class ShelterQueryDTO {
   })
   @IsOptional()
   @IsIn(['available', 'unavailable', 'waiting'], { each: true })
-  shelterStatus?: ('available' | 'unavailable' | 'waiting')[]; // MUDAR !!!!
+  readonly shelterStatus?: ShelterStatus[];
 }

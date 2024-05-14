@@ -10,13 +10,13 @@ import {
   UpdateShelterSchema,
 } from './types/types';
 import { subDays } from 'date-fns';
-import { SupplyPriority } from 'src/supply/types';
 import { SearchSchema } from 'src/types';
 import { ShelterSearch, parseTagResponse } from './ShelterSearch';
+import { SupplyPriority } from '../supply/types';
+import { ShelterSearchPropsSchema } from './types/search.types';
 import { CreateShelterDTO } from './dtos/CreateShelterDTO';
 import { ShelterQueryDTO } from './dtos/ShelterQuerysDTO';
 import { UpdateShelterDTO } from './dtos/UpdateShelterDTO';
-import { ShelterSearchPropsSchema } from './types/search.types';
 import { FullUpdateShelterDTO } from './dtos/FullUpdateShelterDTO';
 
 @Injectable()
@@ -117,7 +117,6 @@ export class ShelterService {
     return data;
   }
 
-  // ARRUMAR o queryData
   async index(query: ShelterQueryDTO) {
     const {
       order,

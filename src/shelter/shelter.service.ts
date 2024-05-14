@@ -30,6 +30,7 @@ export class ShelterService {
       data: {
         ...payload,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     });
   }

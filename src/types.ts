@@ -8,7 +8,7 @@ const SearchSchema = z.object({
   page: z.preprocess((v) => +((v ?? '1') as string), z.number().min(1)),
   search: z.string().default(''),
   order: z.enum(['desc', 'asc']).default('desc'),
-  orderBy: z.string().default('createdAt'),
+  orderBy: z.string().default('updatedAt'),
 });
 
 export { SearchSchema };

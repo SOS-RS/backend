@@ -8,18 +8,27 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { ServerResponse } from '../utils';
 import { SupplyService } from './supply.service';
+import { CreateSupplyDTO } from './dtos/CreateSupplyDTO';
+import { UpdateSupplyDTO } from './dtos/UpdateSupplyDTO';
 
 @ApiTags('Suprimentos')
+@ApiInternalServerErrorResponse()
 @Controller('supplies')
 export class SupplyController {
   private logger = new Logger(SupplyController.name);
 
   constructor(private readonly supplyServices: SupplyService) {}
 
+  @ApiOkResponse()
   @Get('')
   async index() {
     try {
@@ -31,8 +40,10 @@ export class SupplyController {
     }
   }
 
+  @ApiBadRequestResponse()
+  @ApiOkResponse()
   @Post('')
-  async store(@Body() body) {
+  async store(@Body() body: CreateSupplyDTO) {
     try {
       const data = await this.supplyServices.store(body);
       return new ServerResponse(200, 'Successfully created supply', data);
@@ -42,8 +53,10 @@ export class SupplyController {
     }
   }
 
+  @ApiBadRequestResponse()
+  @ApiOkResponse()
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body) {
+  async update(@Param('id') id: string, @Body() body: UpdateSupplyDTO) {
     try {
       const data = await this.supplyServices.update(id, body);
       return new ServerResponse(200, 'Successfully updated supply', data);

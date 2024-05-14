@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginSchema, TokenPayload } from './types';
+import { LoginSessionDTO } from './dtos/LoginSessionDTO';
 
 @Injectable()
 export class SessionsService {
@@ -12,8 +13,16 @@ export class SessionsService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(body: any) {
-    const { login, password, ip, userAgent } = LoginSchema.parse(body);
+  async login(
+    body: LoginSessionDTO,
+    ipHeaders: string,
+    userAgentHeaders: string,
+  ) {
+    const { login, password, ip, userAgent } = LoginSchema.parse({
+      ...body,
+      ipHeaders,
+      userAgentHeaders,
+    });
     const user = await this.prismaService.user.findUnique({
       where: { login },
     });

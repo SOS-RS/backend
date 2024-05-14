@@ -1,14 +1,14 @@
-import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateShelterManagerSchema } from './types';
+import { CreateShelterManagerDTO } from './dtos/CreateShelterManagerDTO';
 
 @Injectable()
 export class ShelterManagersService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async store(body: z.infer<typeof CreateShelterManagerSchema>) {
+  async store(body: CreateShelterManagerDTO) {
     const { shelterId, userId } = CreateShelterManagerSchema.parse(body);
     await this.prismaService.shelterManagers.create({
       data: {

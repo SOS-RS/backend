@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { z } from 'zod';
 import {
   CreateSupplyCategorySchema,
   UpdateSupplyCategorySchema,
 } from './types';
+import { CreateSupplyCategoryDTO } from './dtos/CreateSupplyCategoryDTO';
+import { UpdateSupplyCategoryDTO } from './dtos/UpdateSupplyCategoryDTO';
 
 @Injectable()
 export class SupplyCategoriesService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async store(body: z.infer<typeof CreateSupplyCategorySchema>) {
+  async store(body: CreateSupplyCategoryDTO) {
     const payload = CreateSupplyCategorySchema.parse(body);
     await this.prismaService.supplyCategory.create({
       data: {
@@ -21,7 +22,7 @@ export class SupplyCategoriesService {
     });
   }
 
-  async update(id: string, body: z.infer<typeof UpdateSupplyCategorySchema>) {
+  async update(id: string, body: UpdateSupplyCategoryDTO) {
     const payload = UpdateSupplyCategorySchema.parse(body);
     await this.prismaService.supplyCategory.update({
       where: {

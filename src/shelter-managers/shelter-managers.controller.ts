@@ -9,13 +9,22 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 import { ShelterManagersService } from './shelter-managers.service';
 import { ServerResponse } from '../utils';
 import { AdminGuard } from '@/guards/admin.guard';
+import { CreateShelterManagerDTO } from './dtos/CreateShelterManagerDTO';
 
 @ApiTags('Admin de Abrigo')
+@ApiInternalServerErrorResponse()
 @Controller('shelter/managers')
 export class ShelterManagersController {
   private logger = new Logger(ShelterManagersController.name);
@@ -24,9 +33,13 @@ export class ShelterManagersController {
     private readonly shelterManagerServices: ShelterManagersService,
   ) {}
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  @ApiOkResponse()
   @Post('')
   @UseGuards(AdminGuard)
-  async store(@Body() body) {
+  async store(@Body() body: CreateShelterManagerDTO) {
     try {
       await this.shelterManagerServices.store(body);
       return new ServerResponse(200, 'Successfully added manager to shelter');
@@ -36,6 +49,7 @@ export class ShelterManagersController {
     }
   }
 
+  @ApiOkResponse()
   @Get(':shelterId')
   async index(
     @Param('shelterId') shelterId: string,

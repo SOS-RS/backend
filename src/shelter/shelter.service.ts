@@ -2,19 +2,22 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import * as qs from 'qs';
-import { z } from 'zod';
 
 import { PrismaService } from '../prisma/prisma.service';
-import { SupplyPriority } from '../supply/types';
-import { SearchSchema } from '../types';
-import { ShelterSearch, parseTagResponse } from './ShelterSearch';
-import { ShelterSearchPropsSchema } from './types/search.types';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types/types';
 import { subDays } from 'date-fns';
+import { SearchSchema } from 'src/types';
+import { ShelterSearch, parseTagResponse } from './ShelterSearch';
+import { SupplyPriority } from '../supply/types';
+import { ShelterSearchPropsSchema } from './types/search.types';
+import { CreateShelterDTO } from './dtos/CreateShelterDTO';
+import { ShelterQueryDTO } from './dtos/ShelterQuerysDTO';
+import { UpdateShelterDTO } from './dtos/UpdateShelterDTO';
+import { FullUpdateShelterDTO } from './dtos/FullUpdateShelterDTO';
 
 @Injectable()
 export class ShelterService implements OnModuleInit {
@@ -26,7 +29,7 @@ export class ShelterService implements OnModuleInit {
     this.loadVoluntaryIds();
   }
 
-  async store(body: z.infer<typeof CreateShelterSchema>) {
+  async store(body: CreateShelterDTO) {
     const payload = CreateShelterSchema.parse(body);
 
     await this.prismaService.shelter.create({
@@ -38,7 +41,7 @@ export class ShelterService implements OnModuleInit {
     });
   }
 
-  async update(id: string, body: z.infer<typeof UpdateShelterSchema>) {
+  async update(id: string, body: UpdateShelterDTO) {
     const payload = UpdateShelterSchema.parse(body);
     await this.prismaService.shelter.update({
       where: {
@@ -51,7 +54,7 @@ export class ShelterService implements OnModuleInit {
     });
   }
 
-  async fullUpdate(id: string, body: z.infer<typeof FullUpdateShelterSchema>) {
+  async fullUpdate(id: string, body: FullUpdateShelterDTO) {
     const payload = FullUpdateShelterSchema.parse(body);
     await this.prismaService.shelter.update({
       where: {
@@ -116,7 +119,7 @@ export class ShelterService implements OnModuleInit {
     return data;
   }
 
-  async index(query: any) {
+  async index(query: ShelterQueryDTO) {
     const {
       order,
       orderBy,

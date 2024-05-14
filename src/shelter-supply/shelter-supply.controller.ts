@@ -9,19 +9,31 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 import { ShelterSupplyService } from './shelter-supply.service';
 import { ServerResponse } from '../utils';
 import { DistributionCenterGuard } from '@/guards/distribution-center.guard';
+import { CreateShelterSupplyDTO } from './dtos/CreateShelterSupplyDTO';
+import { UpdateShelterSupplyDTO } from './dtos/UpdateShelterSupplyDTO';
+import { UpdateManyShelterSupplySchemaDTO } from './dtos/UpdateManyShelterSupplyDTO';
 
 @ApiTags('Suprimento de abrigos')
+@ApiInternalServerErrorResponse()
 @Controller('shelter/supplies')
 export class ShelterSupplyController {
   private logger = new Logger(ShelterSupplyController.name);
 
   constructor(private readonly shelterSupplyService: ShelterSupplyService) {}
 
+  @ApiOkResponse()
   @Get(':shelterId')
   async index(@Param('shelterId') shelterId: string) {
     try {
@@ -33,8 +45,10 @@ export class ShelterSupplyController {
     }
   }
 
+  @ApiBadRequestResponse()
+  @ApiOkResponse()
   @Post('')
-  async store(@Body() body) {
+  async store(@Body() body: CreateShelterSupplyDTO) {
     try {
       const data = await this.shelterSupplyService.store(body);
       return new ServerResponse(
@@ -48,17 +62,20 @@ export class ShelterSupplyController {
     }
   }
 
+  @ApiBadRequestResponse()
+  @ApiOkResponse()
   @Put(':shelterId/:supplyId')
   async update(
-    @Body() body,
+    @Body() body: UpdateShelterSupplyDTO,
     @Param('shelterId') shelterId: string,
     @Param('supplyId') supplyId: string,
   ) {
     try {
-      const data = await this.shelterSupplyService.update({
-        where: { shelterId, supplyId },
-        data: body,
-      });
+      const data = await this.shelterSupplyService.update(
+        body,
+        shelterId,
+        supplyId,
+      );
       return new ServerResponse(
         200,
         'Successfully updated shelter supply',
@@ -70,14 +87,18 @@ export class ShelterSupplyController {
     }
   }
 
+  @ApiBearerAuth()
+  @ApiUnauthorizedResponse()
+  @ApiBadRequestResponse()
+  @ApiOkResponse()
   @Put(':shelterId/supplies/many')
   @UseGuards(DistributionCenterGuard)
-  async updateMany(@Body() body, @Param('shelterId') shelterId: string) {
+  async updateMany(
+    @Body() body: UpdateManyShelterSupplySchemaDTO,
+    @Param('shelterId') shelterId: string,
+  ) {
     try {
-      const data = await this.shelterSupplyService.updateMany({
-        shelterId,
-        ...body,
-      });
+      const data = await this.shelterSupplyService.updateMany(body, shelterId);
       return new ServerResponse(
         200,
         'Successfully updated many shelter supplies',

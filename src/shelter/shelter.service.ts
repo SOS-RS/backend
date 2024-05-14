@@ -14,6 +14,7 @@ import {
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types/types';
+import { subDays } from 'date-fns';
 
 @Injectable()
 export class ShelterService {
@@ -30,6 +31,7 @@ export class ShelterService {
       data: {
         ...payload,
         createdAt: new Date().toISOString(),
+        updatedAt: subDays(new Date(), 1).toISOString(),
       },
     });
   }

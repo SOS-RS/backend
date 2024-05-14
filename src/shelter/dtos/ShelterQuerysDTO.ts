@@ -1,4 +1,11 @@
-import { IsOptional, IsString, IsNumber, IsIn, IsEnum } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsIn,
+  IsEnum,
+  ValidateNested,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { SupplyPriority } from 'src/supply/types';
 import { Transform } from 'class-transformer';
@@ -72,4 +79,47 @@ export class ShelterQueryDTO {
   @IsOptional()
   @IsIn(['available', 'unavailable', 'waiting'], { each: true })
   readonly shelterStatus?: ShelterStatus[];
+
+  @ApiProperty({
+    required: false,
+    description: 'Informação sobre tags do abrigo',
+  })
+  @IsOptional()
+  @ValidateNested()
+  readonly tags?: Record<
+    'NeedVolunteers' | 'NeedDonations' | 'RemainingSupplies',
+    number | undefined
+  >;
+
+  @ApiProperty({ required: false, description: 'Lista de cidades' })
+  @IsOptional()
+  @IsString({ each: true })
+  readonly cities?: string[];
+
+  @ApiProperty({
+    required: false,
+    description: 'Latitude',
+  })
+  @IsOptional()
+  @IsNumber()
+  @Transform((value) => Number(value.value))
+  readonly latitude?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'Longitude',
+  })
+  @IsOptional()
+  @IsNumber()
+  @Transform((value) => Number(value.value))
+  readonly longitude?: number;
+
+  @ApiProperty({
+    required: false,
+    description: 'Raio em metros',
+  })
+  @IsOptional()
+  @IsNumber()
+  @Transform((value) => Number(value.value))
+  readonly radiusInMeters?: number;
 }

@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 
+import { calculateGeolocationBounds } from '@/utils/utils';
 import { SupplyPriority } from 'src/supply/types';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -129,11 +130,31 @@ class ShelterSearch {
     };
   }
 
+  get geolocation(): Prisma.ShelterWhereInput {
+    if (!this.formProps.geolocation) return {};
+
+    const { minLat, maxLat, minLong, maxLong } = calculateGeolocationBounds(
+      this.formProps.geolocation,
+    );
+
+    return {
+      latitude: {
+        gte: minLat,
+        lte: maxLat,
+      },
+      longitude: {
+        gte: minLong,
+        lte: maxLong,
+      },
+    };
+  }
+
   get query(): Prisma.ShelterWhereInput {
     if (Object.keys(this.formProps).length === 0) return {};
     const queryData = {
       AND: [
         this.cities,
+        this.geolocation,
         { OR: this.search },
         { OR: this.shelterStatus },
         this.priority(this.formProps.supplyIds),

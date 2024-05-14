@@ -10,12 +10,11 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { SupplyCategoriesService } from './supply-categories.service';
 import { ServerResponse } from '../utils';
 import { StaffGuard } from '@/guards/staff.guard';
-import { MakeSwagger } from 'src/swagger/swagger.config';
 import { SupplyCategoriesDto } from 'src/dto/supply-categories/supply-categories.dto';
 import { UpdateSupplyCategoriesDto } from 'src/dto/supply-categories/update-supply-categories.dto';
 
@@ -28,23 +27,16 @@ export class SupplyCategoriesController {
     private readonly supplyCategoryServices: SupplyCategoriesService,
   ) {}
 
-  @MakeSwagger({
-    operation: {
-      description: 'Search for supply categories',
-      deprecated: false,
-    },
-    responses: [
-      {
-        status: HttpStatus.OK,
-        description: 'Successfully get supply categories',
-      },
-      {
-        status: HttpStatus.BAD_REQUEST,
-        description: 'Failed to get supply categories',
-      },
-    ],
-  })
   @Get('')
+  @ApiOperation({ summary: 'Search for supplies categories' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully get supply categories',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to get supply categories',
+  })
   async index() {
     try {
       const data = await this.supplyCategoryServices.index();
@@ -58,23 +50,17 @@ export class SupplyCategoriesController {
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }
-  @MakeSwagger({
-    operation: {
-      description: 'Create supply category',
-      deprecated: false,
-    },
-    responses: [
-      {
-        status: HttpStatus.OK,
-        description: 'Successfully created supply category',
-      },
-      {
-        status: HttpStatus.BAD_REQUEST,
-        description: 'Failed to create supply category',
-      },
-    ],
-  })
+
   @Post('')
+  @ApiOperation({ summary: 'Create supply category' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully created supply category',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to create supply categories',
+  })
   @UseGuards(StaffGuard)
   async store(@Body() body: SupplyCategoriesDto) {
     try {
@@ -90,23 +76,16 @@ export class SupplyCategoriesController {
     }
   }
 
-  @MakeSwagger({
-    operation: {
-      description: 'Update supply category',
-      deprecated: false,
-    },
-    responses: [
-      {
-        status: HttpStatus.OK,
-        description: 'Successfully update supply category',
-      },
-      {
-        status: HttpStatus.BAD_REQUEST,
-        description: 'Failed to update supply category',
-      },
-    ],
-  })
   @Put(':id')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successfully updated supply category',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to update supply category',
+  })
+  @ApiOperation({ summary: 'Update supply category with id' })
   @UseGuards(StaffGuard)
   async update(
     @Param('id') id: string,

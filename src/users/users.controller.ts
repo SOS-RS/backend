@@ -10,13 +10,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { StaffGuard } from '@/guards/staff.guard';
 import { UserGuard } from '@/guards/user.guard';
 import { ServerResponse } from '../utils';
 import { UsersService } from './users.service';
-import { MakeSwagger } from 'src/swagger/swagger.config';
 import { CreateUserDto } from 'src/dto/users/create-user.dto';
 import { UpdateUserDto } from 'src/dto/users/update-user.dto';
 
@@ -28,17 +27,16 @@ export class UsersController {
   constructor(private readonly userServices: UsersService) {}
 
   @Post('')
-  @MakeSwagger({
-    operation: {
-      description: 'Create new user',
-      deprecated: false,
-    },
-    responses: [
-      { status: HttpStatus.OK, description: 'Successfully created user' },
-      { status: HttpStatus.BAD_REQUEST, description: 'Failed to create user' },
-    ],
-  })
   @UseGuards(StaffGuard)
+  @ApiOperation({ summary: 'Create user' })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully created user',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to create user',
+  })
   async store(@Body() body: CreateUserDto) {
     try {
       await this.userServices.store(body);
@@ -50,17 +48,16 @@ export class UsersController {
   }
 
   @Put(':id')
-  @MakeSwagger({
-    operation: {
-      description: 'Update user',
-      deprecated: false,
-    },
-    responses: [
-      { status: HttpStatus.OK, description: 'Successfully update user' },
-      { status: HttpStatus.BAD_REQUEST, description: 'Failed to update user' },
-    ],
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully update user',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to update user',
   })
   @UseGuards(StaffGuard)
+  @ApiOperation({ summary: 'Update user with id' })
   async update(@Body() body: UpdateUserDto, @Param('id') id: string) {
     try {
       await this.userServices.update(id, body);
@@ -72,17 +69,16 @@ export class UsersController {
   }
 
   @Put('')
-  @MakeSwagger({
-    operation: {
-      description: 'Update user',
-      deprecated: false,
-    },
-    responses: [
-      { status: HttpStatus.OK, description: 'Successfully update user' },
-      { status: HttpStatus.BAD_REQUEST, description: 'Failed to update user' },
-    ],
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Successfully update user',
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to update user',
   })
   @UseGuards(UserGuard)
+  @ApiOperation({ summary: 'Update user' })
   async selfUpdate(@Body() body: UpdateUserDto, @Req() req) {
     try {
       const { userId } = req.user;

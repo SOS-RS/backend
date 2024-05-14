@@ -1,19 +1,31 @@
-import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
 import * as qs from 'qs';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+<<<<<<< HEAD
+=======
+import * as qs from 'qs';
+import { z } from 'zod';
+>>>>>>> ab3d792dc16d3c7ce3bce781c14f5a0aab6934e2
 
 import { PrismaService } from '../prisma/prisma.service';
+import { SupplyPriority } from '../supply/types';
+import { SearchSchema } from '../types';
+import { ShelterSearch, parseTagResponse } from './ShelterSearch';
+import { ShelterSearchPropsSchema } from './types/search.types';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types/types';
+<<<<<<< HEAD
 import { SearchSchema } from '../types';
 import { ShelterSearch, parseTagResponse } from './ShelterSearch';
 import { SupplyPriority } from '../supply/types';
 import { IFilterFormProps } from './types/search.types';
+=======
+import { subDays } from 'date-fns';
+>>>>>>> ab3d792dc16d3c7ce3bce781c14f5a0aab6934e2
 
 @Injectable()
 export class ShelterService {
@@ -30,6 +42,7 @@ export class ShelterService {
       data: {
         ...payload,
         createdAt: new Date().toISOString(),
+        updatedAt: subDays(new Date(), 1).toISOString(),
       },
     });
   }
@@ -60,7 +73,7 @@ export class ShelterService {
     });
   }
 
-  async show(id: string) {
+  async show(id: string, shouldShowContact: boolean) {
     const data = await this.prismaService.shelter.findFirst({
       where: {
         id,
@@ -69,10 +82,15 @@ export class ShelterService {
         id: true,
         name: true,
         address: true,
+        street: true,
+        neighbourhood: true,
+        city: true,
+        streetNumber: true,
+        zipCode: true,
         pix: true,
         shelteredPeople: true,
         capacity: true,
-        contact: true,
+        contact: shouldShowContact,
         petFriendly: true,
         prioritySum: true,
         latitude: true,
@@ -115,7 +133,11 @@ export class ShelterService {
       perPage,
       search: searchQuery,
     } = SearchSchema.parse(query);
+<<<<<<< HEAD
     const queryData = qs.parse(searchQuery) as unknown as IFilterFormProps;
+=======
+    const queryData = ShelterSearchPropsSchema.parse(qs.parse(searchQuery));
+>>>>>>> ab3d792dc16d3c7ce3bce781c14f5a0aab6934e2
     const { query: where } = new ShelterSearch(this.prismaService, queryData);
     const count = await this.prismaService.shelter.count({ where });
 
@@ -136,8 +158,16 @@ export class ShelterService {
         name: true,
         pix: true,
         address: true,
+        street: true,
+        neighbourhood: true,
+        city: true,
+        streetNumber: true,
+        zipCode: true,
         capacity: true,
+<<<<<<< HEAD
         contact: true,
+=======
+>>>>>>> ab3d792dc16d3c7ce3bce781c14f5a0aab6934e2
         petFriendly: true,
         shelteredPeople: true,
         prioritySum: true,
@@ -172,7 +202,30 @@ export class ShelterService {
     };
   }
 
+<<<<<<< HEAD
   loadVoluntaryIds() {
+=======
+  async getCities() {
+    const cities = await this.prismaService.shelter.groupBy({
+      by: ['city'],
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        _count: {
+          id: 'desc',
+        },
+      },
+    });
+
+    return cities.map(({ city, _count: { id: sheltersCount } }) => ({
+      city: city || 'Cidade não informada',
+      sheltersCount,
+    }));
+  }
+
+  private loadVoluntaryIds() {
+>>>>>>> ab3d792dc16d3c7ce3bce781c14f5a0aab6934e2
     this.prismaService.supplyCategory
       .findMany({
         where: {

@@ -1,6 +1,11 @@
 # 🌊 Backend para App de Ajuda em Enchentes 🌊
 
-Este repositório contém o backend de um aplicativo projetado para ajudar na organização e distribuição de suprimentos, bem como na coordenação de voluntários durante enchentes no Rio Grande do Sul. Ele fornece APIs essenciais para a autenticação de usuários, gerenciamento de abrigos e suprimentos, e muito mais.
+Este repositório contém o backend de um aplicativo projetado para ajudar na organização e distribuição de suprimentos,
+bem como na coordenação de voluntários durante enchentes no Rio Grande do Sul. Ele fornece APIs essenciais para a
+autenticação de usuários, gerenciamento de abrigos e suprimentos, e muito mais.
+
+Se você quiser discutir ideias, problemas ou contribuições, sinta-se à vontade para se juntar ao nosso servidor do
+Discord [aqui](https://discord.gg/vjZS6BQXvM).
 
 ## 🛠 Tecnologias Utilizadas
 
@@ -12,7 +17,8 @@ Este repositório contém o backend de um aplicativo projetado para ajudar na or
 
 ## 🗂 Dump do Banco de Dados
 
-Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/migration/dev_dump.sql`. Este arquivo pode ser executado após as migrations estarem aplicadas.
+Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/migration/dev_dump.sql`. Este arquivo
+pode ser executado após as migrations estarem aplicadas.
 
 Se estiver usando Docker, os comandos para carregar o dump são:
 
@@ -96,6 +102,7 @@ ports:
 
 ## 🤝 Contribuição
 
-Contribuições são muito bem-vindas! Se deseja ajudar, faça um fork do repositório, crie uma branch com suas modificações, e envie um pull request.
+Contribuições são muito bem-vindas! Se deseja ajudar, faça um fork do repositório, crie uma branch com suas
+modificações, e envie um pull request.
 
 Sua ajuda é crucial para apoiar a comunidade afetada pelas enchentes no Rio Grande do Sul!

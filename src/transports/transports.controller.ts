@@ -6,10 +6,12 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TransportsService } from './transports.service';
 import { ServerResponse } from '../utils';
+import { StaffGuard } from '@/guards/staff.guard';
 
 @ApiTags('Transports')
 @Controller('transports')
@@ -19,6 +21,7 @@ export class TransportsController {
   constructor(private readonly transportsService: TransportsService) {}
 
   @Post('')
+  @UseGuards(StaffGuard)
   async store(@Body() body) {
     try {
       const data = await this.transportsService.store(body);
@@ -30,6 +33,7 @@ export class TransportsController {
   }
 
   @Put(':id')
+  @UseGuards(StaffGuard)
   async update(@Param('id') id: string, @Body() body) {
     try {
       const data = await this.transportsService.update(id, body);

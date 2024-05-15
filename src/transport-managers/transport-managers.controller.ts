@@ -1,7 +1,15 @@
-import { Body, Controller, HttpException, Logger, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpException,
+  Logger,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { TransportManagersService } from './transport-managers.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ServerResponse } from '../utils';
+import { StaffGuard } from '@/guards/staff.guard';
 
 @ApiTags('Transport Managers')
 @Controller('transport/managers')
@@ -13,6 +21,7 @@ export class TransportManagersController {
   ) {}
 
   @Post('')
+  @UseGuards(StaffGuard)
   async store(@Body() body) {
     try {
       await this.transportManagersService.store(body);

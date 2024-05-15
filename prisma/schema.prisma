@@ -9,6 +9,7 @@ datasource db {
 
 enum AccessLevel {
   User
+  TransportManager
   Staff
   DistributionCenter
   Admin

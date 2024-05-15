@@ -15,4 +15,10 @@ const CreateTransportSchema = TransportSchema.omit({
   updatedAt: true,
 });
 
-export { CreateTransportSchema };
+const UpdateTransportSchema = TransportSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+
+export { CreateTransportSchema, UpdateTransportSchema };

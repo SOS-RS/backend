@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { z } from 'zod';
-import { CreateTransportSchema } from './types';
+import { CreateTransportSchema, UpdateTransportSchema } from './types';
 
 @Injectable()
 export class TransportsService {
@@ -14,6 +14,19 @@ export class TransportsService {
       data: {
         ...payload,
         createdAt: new Date().toISOString(),
+      },
+    });
+  }
+
+  async update(id: string, body: z.infer<typeof UpdateTransportSchema>) {
+    const payload = UpdateTransportSchema.parse(body);
+    await this.prismaService.transport.update({
+      where: {
+        id,
+      },
+      data: {
+        ...payload,
+        updatedAt: new Date().toISOString(),
       },
     });
   }

@@ -44,10 +44,6 @@ docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backu
 
 Para desenvolvedores de frontend que não precisam executar localmente a API e o banco, siga estes passos:
 
-   ```bash
-   cp .env.local .env
-   ```
-
 1. Clone o arquivo `.env` de exemplo:
    ```bash
    cp .env.local .env

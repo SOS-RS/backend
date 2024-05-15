@@ -1,3 +1,10 @@
+
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/SOS-RS/backend)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SOS-RS/backend/deploy.yml)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SOS-RS/backend/ci.yml?label=ci%20build)
+![GitHub commits difference between two branches/tags/commits](https://img.shields.io/github/commits-difference/SOS-RS/backend?base=develop&head=main&label=commits%20a%20frente%20da%20main)
+![GitHub License](https://img.shields.io/github/license/SOS-RS/backend)
+
 # 🌊 Backend para App de Ajuda em Enchentes 🌊
 
 Este repositório contém o backend de um aplicativo projetado para ajudar na organização e distribuição de suprimentos,

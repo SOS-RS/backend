@@ -12,6 +12,7 @@ import { SupplyCategoriesModule } from './supply-categories/supply-categories.mo
 import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { TransportsModule } from './transports/transports.module';
+import { TransportManagersModule } from './transport-managers/transport-managers.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TransportsModule } from './transports/transports.module';
     ShelterManagersModule,
     ShelterSupplyModule,
     TransportsModule,
+    TransportManagersModule,
   ],
   controllers: [],
   providers: [

@@ -37,7 +37,6 @@ Se estiver usando Docker, você pode usar o comando `make dev-db-load-dump` para
 
 Para desenvolvedores de frontend que não precisam executar localmente a API e o banco, siga estes passos:
 
-
 1. Clone o arquivo `.env` de exemplo:
    ```bash
    cp .env.local .env

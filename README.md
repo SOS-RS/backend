@@ -17,7 +17,7 @@ Discord [aqui](https://discord.gg/vjZS6BQXvM).
 
 ## 🗂 Dump do Banco de Dados
 
-Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/migration/dev_dump.sql`. Este arquivo
+Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/dev_dump.sql`. Este arquivo
 pode ser executado após as migrations estarem aplicadas.
 
 Se estiver usando Docker, os comandos para carregar o dump são:

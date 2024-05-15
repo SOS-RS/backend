@@ -157,8 +157,8 @@ model Trip {
   id                  String    @id @default(uuid())
   transportId         String    @map("transport_id")
   shelterId           String    @map("shelter_id")
-  departure_city      String
-  departure_datetime  String
+  departureCity       String    @map("departure_city")
+  departureDatetime   String    @map("departure_datetime")
   contact             String
   createdAt           String    @map("created_at") @db.VarChar(32)
   updatedAt           String?   @map("updated_at") @db.VarChar(32)

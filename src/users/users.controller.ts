@@ -26,7 +26,10 @@ export class UsersController {
   @Post('')
   @UseGuards(AdminGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Cria um novo usuário', description: 'Esta rota é usada para criar um novo usuário no sistema.' })
+  @ApiOperation({
+    summary: 'Cria um novo usuário',
+    description: 'Esta rota é usada para criar um novo usuário no sistema.',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -60,7 +63,11 @@ export class UsersController {
   @Put(':id')
   @UseGuards(AdminGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Atualiza um usuário pelo ID', description: 'Esta rota é usada para atualizar um usuário específico no sistema, podendo ser informado um ou mais campos.' })
+  @ApiOperation({
+    summary: 'Atualiza um usuário pelo ID',
+    description:
+      'Esta rota é usada para atualizar um usuário específico no sistema, podendo ser informado um ou mais campos.',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -98,7 +105,11 @@ export class UsersController {
   @Put('')
   @UseGuards(UserGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Atualiza o seu próprio usuário', description: 'Esta rota é usada para atualizar o próprio usuário no sistema, podendo ser informado um ou mais campos.' })
+  @ApiOperation({
+    summary: 'Atualiza o seu próprio usuário',
+    description:
+      'Esta rota é usada para atualizar o próprio usuário no sistema, podendo ser informado um ou mais campos.',
+  })
   @ApiBody({
     schema: {
       type: 'object',

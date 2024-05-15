@@ -160,6 +160,7 @@ model Trip {
   departureCity       String    @map("departure_city")
   departureDatetime   String    @map("departure_datetime")
   contact             String
+  canceled            Boolean   @default(value: false)
   createdAt           String    @map("created_at") @db.VarChar(32)
   updatedAt           String?   @map("updated_at") @db.VarChar(32)
 

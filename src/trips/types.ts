@@ -18,4 +18,11 @@ const CreateTripSchema = TripSchema.omit({
   updatedAt: true,
 });
 
-export { CreateTripSchema };
+const UpdateTripSchema = TripSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  transportId: true,
+}).partial();
+
+export { CreateTripSchema, UpdateTripSchema };

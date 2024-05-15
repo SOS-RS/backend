@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { z } from 'zod';
-import { CreateTripSchema } from './types';
+import { CreateTripSchema, UpdateTripSchema } from './types';
 
 @Injectable()
 export class TripsService {
@@ -32,6 +32,30 @@ export class TripsService {
       data: {
         ...payload,
         createdAt: new Date().toISOString(),
+      },
+    });
+  }
+
+  async update(id: string, body: z.infer<typeof UpdateTripSchema>) {
+    const payload = UpdateTripSchema.parse(body);
+
+    if (payload.shelterId)
+      await this.prismaService.shelter.findFirstOrThrow({
+        where: {
+          id: payload.shelterId,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+    await this.prismaService.trip.update({
+      where: {
+        id,
+      },
+      data: {
+        ...payload,
+        updatedAt: new Date().toISOString(),
       },
     });
   }

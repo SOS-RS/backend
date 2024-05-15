@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@fastify/static": "^7.0.3",
+    "@google/generative-ai": "^0.11.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/jwt": "^10.2.0",
@@ -34,6 +35,7 @@
     "@nestjs/swagger": "^7.3.1",
     "@prisma/client": "^5.13.0",
     "bcrypt": "^5.1.1",
+    "csv": "^6.3.9",
     "date-fns": "^3.6.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.0",

@@ -59,4 +59,17 @@ export class TripsService {
       },
     });
   }
+
+  async cancel(id: string) {
+    await this.prismaService.trip.update({
+      where: {
+        id,
+        canceled: false,
+      },
+      data: {
+        canceled: true,
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  }
 }

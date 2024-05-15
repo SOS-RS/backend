@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpException,
   Logger,
   Param,
@@ -36,6 +37,17 @@ export class TripsController {
       return new ServerResponse(200, 'Successfully updated trip', data);
     } catch (err: any) {
       this.logger.error(`Failed update trip: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
+  @Delete(':id')
+  async cancel(@Param('id') id: string) {
+    try {
+      const data = await this.tripsService.cancel(id);
+      return new ServerResponse(200, 'Successfully canceled trip', data);
+    } catch (err: any) {
+      this.logger.error(`Failed canceled trip: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }

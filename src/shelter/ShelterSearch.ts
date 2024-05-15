@@ -63,6 +63,7 @@ class ShelterSearch {
       },
       unavailable: {
         lte: this.prismaService.shelter.fields.shelteredPeople,
+        not: 0,
       },
     };
 

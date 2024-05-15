@@ -7,6 +7,17 @@ autenticação de usuários, gerenciamento de abrigos e suprimentos, e muito mai
 Se você quiser discutir ideias, problemas ou contribuições, sinta-se à vontade para se juntar ao nosso servidor do
 Discord [aqui](https://discord.gg/vjZS6BQXvM).
 
+## Workspace Dependencies
+- [Node 18.18](https://nodejs.org/)
+- [Docker](https://www.docker.com/get-started/)
+- Make
+  - [Windows](https://gnuwin32.sourceforge.net/packages/make.htm)
+  - Linux
+  ```bash
+  sudo apt update
+  sudo apt install make
+  ```
+
 ## 🛠 Tecnologias Utilizadas
 
 - **🟢 Node.js**: Ambiente de execução para JavaScript.
@@ -33,6 +44,10 @@ docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backu
 
 Para desenvolvedores de frontend que não precisam executar localmente a API e o banco, siga estes passos:
 
+   ```bash
+   cp .env.local .env
+   ```
+
 1. Clone o arquivo `.env` de exemplo:
    ```bash
    cp .env.local .env
@@ -50,6 +65,11 @@ ports:
   - '5432:5432'
   - '4000:4000'
 ```
+Usando make:
+
+ ```bash
+   make setupDocker
+```
 
 ## 🚀 Configuração Inicial Local
 
@@ -58,7 +78,12 @@ ports:
    git clone https://github.com/seuusuario/projeto-enchentes-backend.git
    ```
 2. Instale as dependências:
+
    ```bash
+   make setup
+
+   # ou sem make 
+
    npm install 
    npx prisma generate 
    npx prisma migrate dev 
@@ -66,6 +91,10 @@ ports:
    ```
 3. Inicie o servidor:
    ```bash
+   make up
+
+   # ou sem make
+
    npm start
    ```
    A API estará disponível em `http://localhost:4000`.
@@ -99,6 +128,14 @@ ports:
 
 - **📝 POST /supply-categories** - Registra uma nova categoria de suprimentos.
 - **🔧 PUT /supply-categories/:categoryId** - Atualiza uma categoria.
+
+## Make commands
+### Using Docker
+- Inicia Projeto sem docker: `make setup`.
+- Inicia Projeto com docker: `make setupDocker`. 
+- Start Projeto sem docker: `make up`
+- Start Projeto com docker: `make upDockerDev`
+- Acessar container bash: `make bash`
 
 ## 🤝 Contribuição
 

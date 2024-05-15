@@ -13,6 +13,7 @@ import { ShelterManagersModule } from './shelter-managers/shelter-managers.modul
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { TransportsModule } from './transports/transports.module';
 import { TransportManagersModule } from './transport-managers/transport-managers.module';
+import { TripsModule } from './trips/trips.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TransportManagersModule } from './transport-managers/transport-managers
     ShelterSupplyModule,
     TransportsModule,
     TransportManagersModule,
+    TripsModule,
   ],
   controllers: [],
   providers: [

@@ -25,8 +25,9 @@ model User {
   createdAt   String      @map("created_at") @db.VarChar(32)
   updatedAt   String?     @map("updated_at") @db.VarChar(32)
 
-  sessions        Session[]
-  shelterManagers ShelterManagers[]
+  sessions          Session[]
+  shelterManagers   ShelterManagers[]
+  transportManagers TransportManager[]
 
   @@map("users")
 }
@@ -107,6 +108,7 @@ model Shelter {
 
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
+  trips           Trip[]
 
   @@map("shelters")
 }
@@ -122,4 +124,47 @@ model ShelterManagers {
 
   @@id([shelterId, userId])
   @@map("shelter_managers")
+}
+
+model Transport {
+  id                        String  @id @default(uuid())
+  vehicleType               String  @map("vehicle_type")
+  vehicleRegistrationPlate  String? @map("vehicle_registration_plate")
+  contact                   String?
+  createdAt                 String  @map("created_at") @db.VarChar(32)
+  updatedAt                 String? @map("updated_at") @db.VarChar(32)
+
+  transportManagers TransportManager[]
+  trips Trip[]
+
+  @@map("transports")
+}
+
+model TransportManager {
+  transportId   String  @map("transport_id")
+  userId        String  @map("user_id")
+  createdAt     String  @map("created_at") @db.VarChar(32)
+  updatedAt     String? @map("updated_at") @db.VarChar(32)
+
+  transport   Transport   @relation(fields: [transportId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+
+  @@id([transportId, userId])
+  @@map("transport_managers")
+}
+
+model Trip {
+  id                  String    @id @default(uuid())
+  transportId         String    @map("transport_id")
+  shelterId           String    @map("shelter_id")
+  departure_city      String
+  departure_datetime  String
+  contact             String
+  createdAt           String    @map("created_at") @db.VarChar(32)
+  updatedAt           String?   @map("updated_at") @db.VarChar(32)
+
+  transport   Transport   @relation(fields: [transportId], references: [id])
+  shelter     Shelter     @relation(fields: [shelterId], references: [id])
+
+  @@map("trips")
 }

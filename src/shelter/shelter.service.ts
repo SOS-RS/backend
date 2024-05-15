@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+import { subDays } from 'date-fns';
 import * as qs from 'qs';
 import { z } from 'zod';
 
@@ -14,7 +15,6 @@ import {
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types/types';
-import { subDays } from 'date-fns';
 
 @Injectable()
 export class ShelterService implements OnModuleInit {

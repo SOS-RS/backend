@@ -187,6 +187,11 @@ export class ShelterService implements OnModuleInit {
 
   async getCities() {
     const cities = await this.prismaService.shelter.groupBy({
+      where: {
+        city: {
+          not: null,
+        },
+      },
       by: ['city'],
       _count: {
         id: true,
@@ -199,7 +204,7 @@ export class ShelterService implements OnModuleInit {
     });
 
     return cities.map(({ city, _count: { id: sheltersCount } }) => ({
-      city: city || 'Cidade não informada',
+      city,
       sheltersCount,
     }));
   }

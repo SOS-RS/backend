@@ -24,9 +24,9 @@ Se estiver usando Docker, os comandos para carregar o dump são:
 
 ```bash
 # Copiar o dump para a pasta temporária do Docker
-docker exec -it cp backup.sql POSTGRES_CONTAINER_ID:/tmp/backup.sql
+docker cp ./prisma/dev_dump.sql sos-rs-db:/tmp/backup.sql
 # Importar o dump para o banco
-docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backup.sql
+docker exec -i sos-rs-db psql -U root -d sos_rs -f /tmp/backup.sql
 ```
 
 ## 🐳 Configuração com Docker

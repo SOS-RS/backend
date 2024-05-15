@@ -198,10 +198,12 @@ export class ShelterService implements OnModuleInit {
       },
     });
 
-    return cities.map(({ city, _count: { id: sheltersCount } }) => ({
-      city: city || 'Cidade não informada',
-      sheltersCount,
-    }));
+    return cities
+      .filter((c) => c.city)
+      .map(({ city, _count: { id: sheltersCount } }) => ({
+        city,
+        sheltersCount,
+      }));
   }
 
   private loadVoluntaryIds() {

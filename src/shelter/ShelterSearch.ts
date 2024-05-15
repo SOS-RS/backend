@@ -54,7 +54,7 @@ class ShelterSearch {
       ShelterStatus,
       Prisma.ShelterWhereInput['capacity'] | null
     > = {
-      waiting: null || 0,
+      waiting: null,
       available: {
         gt: this.prismaService.shelter.fields.shelteredPeople,
       },

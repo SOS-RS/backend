@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -22,6 +23,17 @@ export class TripsController {
   private logger = new Logger(TripsController.name);
 
   constructor(private readonly tripsService: TripsService) {}
+
+  @Get('')
+  async index(@Query() query) {
+    try {
+      const data = await this.tripsService.index(query);
+      return new ServerResponse(200, 'Successfully get trips', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get trips: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
 
   @Get(':id')
   async show(@Param('id') id: string) {

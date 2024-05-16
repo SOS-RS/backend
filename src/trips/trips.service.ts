@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
-import { CreateTripSchema, UpdateTripSchema } from './types';
+import { CreateTripSchema, UpdateTripSchema } from './types/types';
 import { TripsDao } from './TripsDao';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { TripSearchPropsSchema } from './types/search.types';
+import { TripsSearch } from './TripsSearch';
+import { Prisma } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
+import * as qs from 'qs';
 
 @Injectable()
 export class TripsService {
@@ -12,6 +17,39 @@ export class TripsService {
   constructor(prismaService: PrismaService) {
     this.prismaService = prismaService;
     this.tripsDao = new TripsDao(prismaService);
+  }
+
+  async index(query: any) {
+    const { order, orderBy, page, perPage, ...queryData } =
+      TripSearchPropsSchema.parse(qs.parse(query));
+
+    const { query: where } = new TripsSearch(queryData);
+    const count = await this.prismaService.trip.count({ where });
+
+    const take = perPage;
+    const skip = perPage * (page - 1);
+
+    const whereData: Prisma.TripFindManyArgs<DefaultArgs> = {
+      take,
+      skip,
+      orderBy: { [orderBy]: order },
+      where,
+    };
+
+    const results = await this.prismaService.trip.findMany({
+      ...whereData,
+      include: {
+        transport: true,
+        shelter: true,
+      },
+    });
+
+    return {
+      page,
+      perPage,
+      count,
+      results,
+    };
   }
 
   async show(id: string) {

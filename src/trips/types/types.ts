@@ -1,5 +1,5 @@
 import z from 'zod';
-import { capitalize } from '../utils';
+import { capitalize } from '../../utils';
 
 const TripSchema = z.object({
   id: z.string(),

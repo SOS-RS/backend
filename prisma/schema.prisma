@@ -15,6 +15,36 @@ enum AccessLevel {
   Admin
 }
 
+enum State {
+  AC
+  AL
+  AP
+  AM
+  BA
+  CE
+  DF
+  ES
+  GO
+  MA
+  MT
+  MS
+  MG
+  PA
+  PB
+  PR
+  PE
+  PI
+  RJ
+  RN
+  RS
+  RO
+  RR
+  SC
+  SP
+  SE
+  TO
+}
+
 model User {
   id          String      @id @default(uuid())
   name        String
@@ -158,8 +188,9 @@ model Trip {
   id                    String    @id @default(uuid())
   transportId           String    @map("transport_id")
   shelterId             String    @map("shelter_id")
-  departureCity         String    @map("departure_city")
   departureNeighborhood String?   @map("departure_neighborhood")
+  departureCity         String    @map("departure_city")
+  departureState        State     @map("departure_state")
   departureDatetime     DateTime  @map("departure_datetime")
   contact               String
   canceled              Boolean   @default(value: false)

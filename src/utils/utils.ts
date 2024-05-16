@@ -36,6 +36,10 @@ function capitalize(input: string): string {
     .join(' ');
 }
 
+function uppercase(input: string): string {
+  return input.trim().toUpperCase();
+}
+
 function getSessionData(token?: string): { userId: string; sessionId: string } {
   try {
     if (token) {
@@ -114,6 +118,7 @@ export {
   ServerResponse,
   calculateGeolocationBounds,
   capitalize,
+  uppercase,
   deepMerge,
   getSessionData,
   removeNotNumbers,

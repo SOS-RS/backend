@@ -6,7 +6,8 @@ export const TripSearchPropsSchema = SearchSchema.omit({
 }).merge(
   z.object({
     departureCity: z.string().optional(),
-    departureDatetime: z.string().optional(),
+    departureDatetimeStart: z.string().optional(),
+    departureDatetimeEnd: z.string().optional(),
     transportId: z.string().optional(),
     shelterIds: z.array(z.string()).optional(),
     userId: z.string().optional(),

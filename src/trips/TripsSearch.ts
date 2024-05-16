@@ -19,11 +19,23 @@ class TripsSearch {
     };
   }
 
-  get departureDatetime(): Prisma.TripWhereInput {
-    if (!this.formProps.departureDatetime) return {};
+  get departureDatetimeStart(): Prisma.TripWhereInput {
+    if (!this.formProps.departureDatetimeStart) return {};
 
     return {
-      departureDatetime: this.formProps.departureDatetime, //
+      departureDatetime: {
+        gte: new Date(this.formProps.departureDatetimeStart),
+      },
+    };
+  }
+
+  get departureDatetimeEnd(): Prisma.TripWhereInput {
+    if (!this.formProps.departureDatetimeEnd) return {};
+
+    return {
+      departureDatetime: {
+        lte: new Date(this.formProps.departureDatetimeEnd),
+      },
     };
   }
 
@@ -65,7 +77,8 @@ class TripsSearch {
     const queryData = {
       AND: [
         this.departureCity,
-        this.departureDatetime,
+        this.departureDatetimeStart,
+        this.departureDatetimeEnd,
         this.transportId,
         this.shelterIds,
         this.userId,

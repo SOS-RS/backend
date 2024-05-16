@@ -23,6 +23,9 @@ export class SessionsService {
 
     await this.prismaService.session.updateMany({
       where: {
+        user: {
+          login,
+        },
         active: true,
       },
       data: {

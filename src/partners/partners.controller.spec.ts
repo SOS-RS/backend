@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ShelterController } from './shelter.controller';
-import { ShelterService } from './shelter.service';
+import { PartnersController } from './partners.controller';
+import { PartnersService } from './partners.service';
+import { PrismaService } from '../prisma/prisma.service';
 
-describe('ShelterController', () => {
-  let controller: ShelterController;
+describe('PartnersController', () => {
+  let controller: PartnersController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [ShelterController],
-      providers: [ShelterService],
+      controllers: [PartnersController],
+      providers: [PartnersService],
     })
       .useMocker((token) => {
         if (token === PrismaService) {
@@ -20,7 +20,7 @@ describe('ShelterController', () => {
       })
       .compile();
 
-    controller = module.get<ShelterController>(ShelterController);
+    controller = module.get<PartnersController>(PartnersController);
   });
 
   it('should be defined', () => {

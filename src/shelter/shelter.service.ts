@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+import { subDays } from 'date-fns';
 import * as qs from 'qs';
 import { z } from 'zod';
 
@@ -16,10 +17,12 @@ import {
 } from './types/types';
 
 @Injectable()
-export class ShelterService {
+export class ShelterService implements OnModuleInit {
   private voluntaryIds: string[] = [];
 
-  constructor(private readonly prismaService: PrismaService) {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  onModuleInit() {
     this.loadVoluntaryIds();
   }
 
@@ -30,6 +33,7 @@ export class ShelterService {
       data: {
         ...payload,
         createdAt: new Date().toISOString(),
+        updatedAt: subDays(new Date(), 1).toISOString(),
       },
     });
   }
@@ -183,6 +187,11 @@ export class ShelterService {
 
   async getCities() {
     const cities = await this.prismaService.shelter.groupBy({
+      where: {
+        city: {
+          not: null,
+        },
+      },
       by: ['city'],
       _count: {
         id: true,
@@ -195,7 +204,7 @@ export class ShelterService {
     });
 
     return cities.map(({ city, _count: { id: sheltersCount } }) => ({
-      city: city || 'Cidade não informada',
+      city,
       sheltersCount,
     }));
   }

@@ -6,7 +6,7 @@ export class DashboardService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async index() {
-    const allShelters = await this.prismaService.shelter.findMany({});
+    const allShelters = await this.prismaService.shelter.findMany({ include: { shelterSupplies: true }});
 
     const allPeopleSheltered = allShelters.reduce((accumulator, current) => {
       return accumulator + (current.shelteredPeople ?? 0);
@@ -27,6 +27,7 @@ export class DashboardService {
         shelterWithoutInformation++;
       }
     });
+
 
     return {
       allShelters: allShelters.length,

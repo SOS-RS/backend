@@ -1,6 +1,15 @@
-import { Controller, Get, HttpException, Logger } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  Logger,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { PartnersService } from './partners.service';
 import { ServerResponse } from '../utils';
+import { AdminGuard } from '@/guards/admin.guard';
 
 @Controller('partners')
 export class PartnersController {
@@ -15,6 +24,18 @@ export class PartnersController {
       return new ServerResponse(200, 'Successfully get partners', data);
     } catch (err: any) {
       this.logger.error(`Failed to get partners: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
+  @Post('')
+  @UseGuards(AdminGuard)
+  async store(@Body() body) {
+    try {
+      await this.partnersService.store(body);
+      return new ServerResponse(200, 'Successfully created partner');
+    } catch (err: any) {
+      this.logger.error(`Failed to create partner: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }

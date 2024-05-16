@@ -46,6 +46,17 @@ export class TripsController {
     }
   }
 
+  @Get('cities')
+  async cities() {
+    try {
+      const data = await this.tripsService.getCities();
+      return new ServerResponse(200, 'Successfully get trip cities', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get trip cities: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
   @Post('')
   @UseGuards(TransportManagerGuard)
   async store(@Body() body, @Request() req) {

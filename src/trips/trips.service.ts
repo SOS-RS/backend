@@ -66,6 +66,25 @@ export class TripsService {
     return result;
   }
 
+  async getCities() {
+    const cities = await this.prismaService.trip.groupBy({
+      by: ['departureCity'],
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        _count: {
+          id: 'desc',
+        },
+      },
+    });
+
+    return cities.map(({ departureCity, _count: { id: tripsCount } }) => ({
+      departureCity: departureCity || 'Cidade não informada',
+      tripsCount,
+    }));
+  }
+
   async store(body: z.infer<typeof CreateTripSchema>, userId: string) {
     const payload = CreateTripSchema.parse(body);
     await this.tripsDao.checkIfUserManagesTransport(

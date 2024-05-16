@@ -1,14 +1,13 @@
+import { Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { TransformStream } from 'node:stream/web';
 import { CreateShelterSchema } from '../shelter/types/types';
 import { AtomicCounter } from './shelter-csv-importer.helpers';
-import { COLON_REGEX, CSV_DEFAULT_HEADERS } from './types';
 import {
-  EnhancedTransformArgs,
+  COLON_REGEX, EnhancedTransformArgs,
   ShelterColumHeader,
-  ShelterInput,
+  ShelterInput
 } from './types';
-import { Logger } from '@nestjs/common';
 
 /**
  * JSON -> ShelterInput
@@ -23,12 +22,7 @@ export class CsvToShelterTransformStream extends TransformStream<
    * Espera um Ojeto contento a assinatura da entidade esperada
    * @param columnNames dicionário com nomes das colunas a serem mapeadas
    */
-  constructor(columnNames: Partial<ShelterColumHeader> = CSV_DEFAULT_HEADERS) {
-    const efffectiveColumnNames = {} as ShelterColumHeader;
-    Object.entries(CSV_DEFAULT_HEADERS).forEach(([key, value]) => {
-      efffectiveColumnNames[key] =
-        typeof columnNames[key] === 'string' ? columnNames[key] : value;
-    });
+  constructor(columnNames: ShelterColumHeader) {
 
     super({
       transform: async (chunk, controller) => {
@@ -39,9 +33,9 @@ export class CsvToShelterTransformStream extends TransformStream<
         let supplies: string[] = [];
 
         if (
-          typeof chunk[efffectiveColumnNames.shelterSuppliesField] === 'string'
+          typeof chunk[columnNames.shelterSuppliesField] === 'string'
         ) {
-          supplies = (<string>chunk[efffectiveColumnNames.shelterSuppliesField])
+          supplies = (<string>chunk[columnNames.shelterSuppliesField])
             .split(COLON_REGEX)
             .filter(Boolean)
             .map((s) => s.trim());
@@ -54,7 +48,7 @@ export class CsvToShelterTransformStream extends TransformStream<
         };
 
         Object.keys(Prisma.ShelterScalarFieldEnum).forEach((key) => {
-          shelter[key] ??= chunk[efffectiveColumnNames[`${key}Field`]];
+          shelter[key] ??= chunk[columnNames[`${key}Field`]];
         });
 
         controller.enqueue(shelter);
@@ -108,6 +102,7 @@ export class ShelterEnhancedStreamTransformer extends TransformStream<
             if (indexFound !== -1) {
               toCreate.push({
                 supplyId: suppliesAvailable.get(supplyName.toLowerCase())!,
+                createdAt: new Date().toISOString(),
                 supply: {
                   connect: {
                     id: suppliesAvailable.get(supplyName.toLowerCase())!,
@@ -119,6 +114,7 @@ export class ShelterEnhancedStreamTransformer extends TransformStream<
                     },
                     create: {
                       name: supplyName,
+                      createdAt: new Date().toISOString(),
                       supplyCategory: {
                         connect: {
                           name: categoryName,

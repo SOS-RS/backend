@@ -164,15 +164,15 @@ export class AtomicCounter {
     return this._failureCount;
   }
 
-  incrementSuccess() {
-    this._successCount += 1;
+  incrementSuccess(amount?: number) {
+    this._successCount += amount ?? 1;
   }
 
-  increment() {
-    this._totalCount += 1;
+  increment(amount?: number) {
+    this._totalCount += amount ?? 1;
   }
 
-  incrementFailure() {
-    this._failureCount += 1;
+  incrementFailure(amount?: number) {
+    this._failureCount += amount ?? 1;
   }
 }

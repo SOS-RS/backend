@@ -26,6 +26,10 @@ interface ParseCsvArgsBaseArgs<T = Record<string, string>> {
    * mapeamento de quais cabeçalhos do csv serão usados como colunas da tabela.
    */
   headers?: Partial<T>;
+  /**
+   * se true, não salvará nada no banco
+   */
+  dryRun?: boolean
 }
 
 export type ParseCsvArgs<T> =

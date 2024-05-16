@@ -1,9 +1,9 @@
 import { generateMock } from '@anatine/zod-mock';
 import { Test, TestingModule } from '@nestjs/testing';
+import { Readable } from 'node:stream';
 import { ShelterSchema } from 'src/shelter/types/types';
 import { SupplyCategorySchema } from 'src/supply-categories/types';
 import { SupplySchema } from 'src/supply/types';
-import { Readable } from 'node:stream';
 import { PrismaService } from '../prisma/prisma.service';
 import * as helpers from './shelter-csv-importer.helpers';
 import { ShelterCsvImporterService } from './shelter-csv-importer.service';
@@ -44,7 +44,7 @@ describe('ShelterCsvImporterService', () => {
   });
 
   test('test_shelterToCsv_withoutRequiredInputs', async () => {
-    await expect(service.shelterToCsv({ headers: {} } as any)).rejects.toThrow(
+    await expect(service.execute({ headers: {} } as any)).rejects.toThrow(
       'Um dos campos `csvUrl` ou `fileStream` é obrigatório',
     );
   });
@@ -65,7 +65,7 @@ describe('ShelterCsvImporterService', () => {
         require('examples/gemini_prompt_response_example.json'),
       );
 
-    const result = await service.shelterToCsv({
+    const result = await service.execute({
       fileStream: mockFileStream,
       headers: {
         nameField: 'name',
@@ -97,7 +97,7 @@ describe('ShelterCsvImporterService', () => {
       UnknownSupply: ['NewCategory'],
     });
 
-    const result = await service.shelterToCsv({
+    const result = await service.execute({
       fileStream: mockFileStream,
       headers: {
         nameField: 'name',

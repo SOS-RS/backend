@@ -3,6 +3,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { Readable, Transform } from 'node:stream';
 import { TransformStream } from 'node:stream/web';
 
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateShelterSchema } from '../shelter/types/types';
 import {
@@ -16,7 +17,12 @@ import {
   CsvToShelterTransformStream,
   ShelterEnhancedStreamTransformer,
 } from './shelter-csv.transformer';
-import { ParseCsvArgs, ShelterColumHeader, ShelterInput } from './types';
+import {
+  CSV_DEFAULT_HEADERS,
+  ParseCsvArgs,
+  ShelterColumHeader,
+  ShelterInput,
+} from './types';
 
 @Injectable()
 export class ShelterCsvImporterService {
@@ -34,32 +40,171 @@ export class ShelterCsvImporterService {
    * ```
    *
    */
-  async shelterToCsv({
-    headers,
+  async execute({
+    headers = CSV_DEFAULT_HEADERS,
     csvUrl,
     fileStream,
-  }: ParseCsvArgs<ShelterColumHeader>) {
+    dryRun = false,
+    useIAToPredictSupplyCategories = true,
+    useBatchTransaction = false,
+    onEntity,
+  }: ParseCsvArgs<ShelterColumHeader> & {
+    /**
+     * Se deverá usar alguma LLM para tentar categorizar as categorias dos suprimentos
+     * @implNote por enquanto apenas `Gemini` foi implementada.
+     */
+    useIAToPredictSupplyCategories?: boolean;
+    /**
+     *
+     * callback executado após cada entidade ser criada ou ser validada (caso `dryRun` seja true)
+     *
+     * ** NÃO será executada caso `useBatchTransaction` seja true
+     */
+    onEntity?: (
+      shelter: ReturnType<
+        (typeof CreateShelterSchema)['parse'] & { id?: string }
+      >,
+    ) => void;
+    /**
+     * Se true, guardará todas as criações em memória e executará elas em um batch `$transaction`
+     *  [Prisma $transaction docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+     */
+    useBatchTransaction?: boolean;
+  }) {
+    this.validateInput(csvUrl, fileStream);
+
+    const efffectiveColumnNames = this.getEffectiveColumnNames(headers);
+
+    const atomicCounter = new AtomicCounter();
+
+    const output: Record<string, any>[] = [];
+
+    let csvSourceStream = csvUrl
+      ? responseToReadable(await fetch(csvUrl))
+      : fileStream!;
+
+    const {
+      entitiesToCreate,
+      categoriesAvailable,
+      shelterSupliesByCategory,
+      suppliesAvailable,
+    } = await this.preProcessPipeline(
+      csvSourceStream,
+      efffectiveColumnNames,
+      atomicCounter,
+      useIAToPredictSupplyCategories,
+    );
+
+    // const transactionArgs: ReturnType<ShelterCsvImporter['wrapCreateShelter']>[] = []
+    const transactionArgs: Prisma.ShelterCreateArgs[] = [];
+
+    await Readable.toWeb(Readable.from(entitiesToCreate))
+      .pipeThrough(
+        new ShelterEnhancedStreamTransformer({
+          categoriesAvailable,
+          shelterSupliesByCategory,
+          suppliesAvailable,
+          counter: atomicCounter,
+        }),
+      )
+      .pipeThrough(
+        new TransformStream({
+          // transform(chunk,controller){
+          // }
+        }),
+      )
+      .pipeTo(
+        new WritableStream({
+          write: async (
+            shelter: ReturnType<(typeof CreateShelterSchema)['parse']>,
+          ) => {
+            if (dryRun) {
+              onEntity?.(shelter);
+              atomicCounter.incrementSuccess();
+              return;
+            }
+
+            if (useBatchTransaction) {
+              transactionArgs.push(this.getShelterCreateArgs(shelter));
+              return;
+            }
+
+            await this.prismaService.shelter
+              .create(this.getShelterCreateArgs(shelter))
+              .then((d) => {
+                atomicCounter.incrementSuccess();
+                onEntity?.(d);
+                output.push(d);
+              })
+              .catch((e: Error) => {
+                atomicCounter.incrementFailure();
+                if (e instanceof PrismaClientKnownRequestError) {
+                  this.logger.error(translatePrismaError(e));
+                } else {
+                  this.logger.error(e);
+                }
+              });
+          },
+          close: async () => {
+            if (useBatchTransaction && !dryRun) {
+              try {
+                const transactionResult = await this.prismaService.$transaction(
+                  transactionArgs.map(this.prismaService.shelter.create),
+                );
+                output.push(...transactionResult);
+                atomicCounter.incrementSuccess(transactionResult.length);
+                atomicCounter.incrementFailure(
+                  transactionResult.length - transactionArgs.length,
+                );
+              } catch (err) {
+                this.logger.error('Erro ao executar transaction', err);
+              }
+            }
+            this.logger.log(
+              `${atomicCounter.successCount} de ${atomicCounter.totalCount} entidades processadas com sucesso. ${atomicCounter.failureCount} com erro.`,
+            );
+          },
+        }),
+      );
+
+    return {
+      successCount: atomicCounter.successCount,
+      totalCount: atomicCounter.totalCount,
+      failureCount: atomicCounter.failureCount,
+      data: output,
+    };
+  }
+
+  private getEffectiveColumnNames(headers: Partial<ShelterColumHeader>) {
+    const efffectiveColumnNames = {} as ShelterColumHeader;
+    Object.entries(CSV_DEFAULT_HEADERS).forEach(([key, value]) => {
+      efffectiveColumnNames[key] =
+        typeof headers[key] === 'string' ? headers[key] : value;
+    });
+    return efffectiveColumnNames;
+  }
+
+  private validateInput(csvUrl?: string, fileStream?: Readable) {
     const validInput = (csvUrl && URL.canParse(csvUrl)) || fileStream != null;
 
     if (!validInput) {
       this.logger.warn('Um dos campos `csvUrl` ou `fileStream` é obrigatório');
       throw new Error('Um dos campos `csvUrl` ou `fileStream` é obrigatório');
     }
-    const atomicCounter = new AtomicCounter();
-    const shelters: ShelterInput[] = [];
+  }
 
-    let csvSourceStream: Readable;
-    if (csvUrl) {
-      csvSourceStream = responseToReadable(await fetch(csvUrl));
-    } else {
-      csvSourceStream = fileStream!;
-    }
-
+  private async preProcessPipeline(
+    csvSourceStream: Readable,
+    headers: ShelterColumHeader,
+    atomicCounter: AtomicCounter,
+    useIAToPredictSupplyCategories: boolean,
+  ) {
     const [categories, supplies] = await this.prismaService.$transaction([
       this.prismaService.supplyCategory.findMany({}),
       this.prismaService.supply.findMany({ distinct: ['name'] }),
     ]);
 
+    const entitiesToCreate: ShelterInput[] = [];
     const missingShelterSupplies = new Set<string>();
 
     const suppliesAvailable = supplies.reduce((acc, item) => {
@@ -90,7 +235,7 @@ export class ShelterCsvImporterService {
                 }
               }
             }
-            shelters.push(shelter);
+            entitiesToCreate.push(shelter);
             controller.enqueue(shelter);
           },
         }),
@@ -98,6 +243,9 @@ export class ShelterCsvImporterService {
       .pipeTo(
         new WritableStream({
           async close() {
+            if (!useIAToPredictSupplyCategories) {
+              return;
+            }
             const missingSheltersString = Array.from(
               missingShelterSupplies,
             ).join(', ');
@@ -108,48 +256,39 @@ export class ShelterCsvImporterService {
           },
         }),
       );
-
-    await Readable.toWeb(Readable.from(shelters))
-      .pipeThrough(
-        new ShelterEnhancedStreamTransformer({
-          categoriesAvailable,
-          shelterSupliesByCategory,
-          suppliesAvailable,
-          counter: atomicCounter,
-        }),
-      )
-      .pipeTo(
-        new WritableStream({
-          write: async (
-            shelter: ReturnType<(typeof CreateShelterSchema)['parse']>,
-          ) => {
-            await this.prismaService.shelter
-              .create({ data: shelter, select: { name: true, id: true } })
-              .then((d) => {
-                atomicCounter.incrementSuccess();
-                this.logger.debug?.(d);
-              })
-              .catch((e: Error) => {
-                atomicCounter.incrementFailure();
-                if (e instanceof PrismaClientKnownRequestError) {
-                  this.logger.error(translatePrismaError(e));
-                } else {
-                  this.logger.error(e);
-                }
-              });
-          },
-          close: () => {
-            this.logger.log(
-              `${atomicCounter.successCount} de ${atomicCounter.totalCount} processados. ${atomicCounter.failureCount} com erro.`,
-            );
-          },
-        }),
-      );
-
     return {
-      successCount: atomicCounter.successCount,
-      totalCount: atomicCounter.totalCount,
-      failureCount: atomicCounter.failureCount,
+      entitiesToCreate,
+      categoriesAvailable,
+      shelterSupliesByCategory,
+      suppliesAvailable,
+    };
+  }
+
+  private getShelterCreateArgs(
+    shelter: ReturnType<(typeof CreateShelterSchema)['parse']>,
+  ): Prisma.ShelterCreateArgs {
+    return {
+      data: Object.assign(shelter, {
+        createdAt: new Date().toISOString(),
+      }),
+      include: {
+        shelterSupplies: {
+          select: {
+            supply: {
+              select: {
+                id: true,
+                name: true,
+                supplyCategory: {
+                  select: {
+                    name: true,
+                    id: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     };
   }
 }

@@ -150,8 +150,17 @@ class ShelterSearch {
     };
   }
 
+  get showDisabled(): Prisma.ShelterWhereInput {
+    if (this.formProps.showDisabled) return {};
+
+    return {
+      enabled: true,
+    };
+  }
+
   get query(): Prisma.ShelterWhereInput {
-    if (Object.keys(this.formProps).length === 0) return {};
+    if (Object.keys(this.formProps).length === 0)
+      return { ...this.showDisabled };
     const queryData = {
       AND: [
         this.cities,
@@ -160,6 +169,7 @@ class ShelterSearch {
         { OR: this.shelterStatus },
         this.priority(this.formProps.supplyIds),
         this.supplyCategoryIds(this.formProps.priority),
+        this.showDisabled,
       ],
     };
 

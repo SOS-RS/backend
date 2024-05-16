@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   Logger,
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -19,6 +21,17 @@ export class TransportsController {
   private logger = new Logger(TransportsController.name);
 
   constructor(private readonly transportsService: TransportsService) {}
+
+  @Get('')
+  async index(@Query() query) {
+    try {
+      const data = await this.transportsService.index(query);
+      return new ServerResponse(200, 'Successfully get transports', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get transports: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
 
   @Post('')
   @UseGuards(StaffGuard)

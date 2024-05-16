@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { GeolocationFilter } from 'src/shelter/types/search.types';
+import { State } from 'src/types';
 
 class ServerResponse<T> {
   readonly message: string;
@@ -36,8 +37,8 @@ function capitalize(input: string): string {
     .join(' ');
 }
 
-function uppercase(input: string): string {
-  return input.trim().toUpperCase();
+function state(input: string): string {
+  return State.parse(input.trim().toUpperCase());
 }
 
 function getSessionData(token?: string): { userId: string; sessionId: string } {
@@ -118,7 +119,7 @@ export {
   ServerResponse,
   calculateGeolocationBounds,
   capitalize,
-  uppercase,
+  state,
   deepMerge,
   getSessionData,
   removeNotNumbers,

@@ -1,6 +1,6 @@
 import z from 'zod';
 import { capitalize } from '../../utils';
-import { uppercase } from '@/utils/utils';
+import { state } from '@/utils/utils';
 
 const TripSchema = z.object({
   id: z.string(),
@@ -8,7 +8,7 @@ const TripSchema = z.object({
   shelterId: z.string(),
   departureNeighborhood: z.string().transform(capitalize).optional(),
   departureCity: z.string().transform(capitalize),
-  departureState: z.string().transform(uppercase),
+  departureState: z.string().transform(state),
   departureDatetime: z.string(),
   contact: z.string(),
   createdAt: z.string(),

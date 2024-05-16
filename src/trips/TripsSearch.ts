@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { TripSearchProps } from './types/search.types';
+import { State } from 'src/types';
 
 class TripsSearch {
   private formProps: Partial<TripSearchProps>;
@@ -16,6 +17,14 @@ class TripsSearch {
         contains: this.formProps.departureCity,
         mode: 'insensitive',
       },
+    };
+  }
+
+  get departureState(): Prisma.TripWhereInput {
+    if (!this.formProps.departureState) return {};
+
+    return {
+      departureState: State.parse(this.formProps.departureState),
     };
   }
 
@@ -77,6 +86,7 @@ class TripsSearch {
     const queryData = {
       AND: [
         this.departureCity,
+        this.departureState,
         this.departureDatetimeStart,
         this.departureDatetimeEnd,
         this.transportId,

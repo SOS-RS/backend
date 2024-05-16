@@ -1,3 +1,4 @@
+import { state } from '@/utils/utils';
 import { SearchSchema } from 'src/types';
 import { z } from 'zod';
 
@@ -6,6 +7,7 @@ export const TripSearchPropsSchema = SearchSchema.omit({
 }).merge(
   z.object({
     departureCity: z.string().optional(),
+    departureState: z.string().transform(state).optional(),
     departureDatetimeStart: z.string().optional(),
     departureDatetimeEnd: z.string().optional(),
     transportId: z.string().optional(),

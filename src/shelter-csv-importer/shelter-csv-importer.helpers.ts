@@ -4,105 +4,22 @@ import {
   HarmCategory,
 } from '@google/generative-ai';
 import { Logger } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { parse as createParser } from 'csv';
-import { ReadStream } from 'node:fs';
-import * as path from 'node:path';
-import { Readable, Transform } from 'node:stream';
-import { TransformStream, WritableStream } from 'node:stream/web';
+import { Readable } from 'node:stream';
 
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateShelterSchema } from '../shelter/types/types';
-import { responseToReadable } from '../utils/utils';
+const logger = new Logger('ShelterCsvImporterHelpers');
 
-type ShelterKey = Exclude<
-  Prisma.ShelterScalarFieldEnum,
-  'createdAt' | 'updatedAt' | 'prioritySum' | 'verified' | 'id'
->;
-type ShelterColumHeader = Record<`${ShelterKey}Field`, string> & {
-  shelterSuppliesField: string;
-};
-interface ParseCsvArgsBaseArgs<T = Record<string, string>> {
-  /**
-   * link do arquivo CSV
-   */
-  csvUrl?: string;
-  /**
-   *  stream proveniente de algum arquivo CSV
-   */
-  fileStream?: ReadStream;
-  /**
-   * mapeamento de quais cabeçalhos do csv serão usados como colunas da tabela.
-   */
-  headers?: Partial<T>;
-}
+export const createCsvParser = () =>
+  createParser({ columns: true, relaxColumnCount: true }, function (err, data) {
+    if (err) {
+      logger.error(err);
+      return null;
+    }
+    return data;
+  });
 
-export type ParseCsvArgs<T> =
-  | (ParseCsvArgsBaseArgs<T> & { csvUrl: string })
-  | (ParseCsvArgsBaseArgs<T> & { fileStream: ReadStream });
-
-interface EnhancedTransformArgs {
-  /**
-   * KeyValue contento as categorias e os supplies contidos naquela categorias (detectados por IA)
-   */
-  shelterSupliesByCategory: Record<string, string[]>;
-  /**
-   * KeyValue com Suprimentos já encontrados na base atual que podem ser utilizadas em relações
-   * @example
-   * { "Óleo de cozinha": "eb1d5056-8b9b-455d-a179-172a747e3f20",
-   *   "Álcool em gel": "a3e3bdf8-0be4-4bdc-a3b0-b40ba931be5f"
-   *  }
-   */
-  suppliesAvailable: Map<string, string>;
-  /**
-   * KeyValue com Categorias já encontradas na base atual que podem ser utilizadas em relações
-   * @example
-   * { "Higiene Pessoal": "718d5be3-69c3-4216-97f1-12b690d0eb97",
-   *   "Alimentos e Água": "a3e3bdf8-0be4-4bdc-a3b0-b40ba931be5f"
-   *  }
-   */
-  categoriesAvailable: Map<string, string>;
-  counter?: AtomicCounter;
-}
-const CSV_DEFAULT_HEADERS: ShelterColumHeader = {
-  nameField: 'nome_do_local',
-  addressField: 'endereco',
-  contactField: 'whatsapp',
-  latitudeField: 'lat',
-  longitudeField: 'lng',
-  shelterSuppliesField: 'itens_em_falta',
-  capacityField: 'capacidade',
-  cityField: 'cidade',
-  neighbourhoodField: 'bairro',
-  petFriendlyField: 'pet_friendly',
-  pixField: 'pix',
-  shelteredPeopleField: 'pessoas_abrigadas',
-  streetField: 'rua',
-  streetNumberField: 'numero',
-  zipCodeField: 'cep',
-};
-
-type ShelterInput = Partial<Prisma.ShelterCreateInput & { supplies: string[] }>;
-/**
- * Padrão utilizado
- * `nome_do_local, endereco, whatsapp, lat, lng, itens_disponiveis, itens_em_falta`
- */
-
-// Regex que ignora vírgulas dentro de parenteses no split
-const COLON_REGEX = /(?<!\([^)]*),(?![^(]*\))/g;
-
-const logger = new Logger(shelterToCsv.name);
-
-const csvParser = createParser({ columns: true }, function (err, data) {
-  if (err) {
-    logger.error(err);
-    throw err;
-  }
-  return data;
-});
-
-function translatePrismaError(err: PrismaClientKnownRequestError) {
+export function translatePrismaError(err: PrismaClientKnownRequestError) {
   switch (err.code) {
     case 'P2002':
     case 'P2003':
@@ -127,165 +44,7 @@ function translatePrismaError(err: PrismaClientKnownRequestError) {
   }
 }
 
-/**
- * JSON -> ShelterInput
- * @see ShelterInput
- */
-class CsvToShelterTransformStream extends TransformStream<
-  unknown,
-  ShelterInput
-> {
-  /**
-   * Espera um Ojeto contento a assinatura da entidade esperada
-   * @param columnNames dicionário com nomes das colunas a serem mapeadas
-   */
-  constructor(columnNames: Partial<ShelterColumHeader> = CSV_DEFAULT_HEADERS) {
-    const efffectiveColumnNames = {} as ShelterColumHeader;
-    Object.entries(CSV_DEFAULT_HEADERS).forEach(([key, value]) => {
-      efffectiveColumnNames[key] =
-        typeof columnNames[key] === 'string' ? columnNames[key] : value;
-    });
-
-    super({
-      async transform(chunk, controller) {
-        if (!chunk || (chunk && typeof chunk !== 'object')) {
-          return;
-        }
-        let supplies: string[] = [];
-
-        if (
-          typeof chunk[efffectiveColumnNames.shelterSuppliesField] === 'string'
-        ) {
-          supplies = (<string>chunk[efffectiveColumnNames.shelterSuppliesField])
-            .split(COLON_REGEX)
-            .filter(Boolean)
-            .map((s) => s.trim());
-        }
-
-        const shelter: ShelterInput = {
-          verified: false,
-          // Removendo duplicidades
-          supplies: [...new Set(supplies)],
-        };
-
-        Object.keys(Prisma.ShelterScalarFieldEnum).forEach((key) => {
-          shelter[key] ??= chunk[efffectiveColumnNames[`${key}Field`]];
-        });
-
-        controller.enqueue(shelter);
-        logger.verbose(
-          '🚀 ~ CsvToShelterTransformStream ~ constructor ~ shelter:',
-          shelter,
-        );
-      },
-    });
-  }
-}
-
-/**
- * Valida o schema do Input, enriquece o modelo e adicionas as relações encontradas
- */
-class ShelterEnhancedStreamTransformer extends TransformStream<
-  ShelterInput,
-  ReturnType<typeof CreateShelterSchema.parse>
-> {
-  private counter!: AtomicCounter;
-
-  /**
-   *
-   */
-  constructor({
-    shelterSupliesByCategory,
-    suppliesAvailable,
-    categoriesAvailable,
-    counter,
-  }: EnhancedTransformArgs) {
-    super({
-      transform: async (shelter: ShelterInput, controller) => {
-        this.counter ??= counter || new AtomicCounter();
-        if (!shelter.supplies) {
-          try {
-            controller.enqueue(CreateShelterSchema.parse(shelter));
-          } catch (error) {
-            this.counter.incrementFailure();
-            logger.error(error, shelter);
-          }
-          return;
-        }
-
-        const missingSupplyNames = new Set<string>();
-
-        const toCreate: Prisma.ShelterSupplyCreateNestedManyWithoutShelterInput['create'] =
-          [];
-
-        for (const supplyName of missingSupplyNames.values()) {
-          for (const [categoryName, values] of Object.entries(
-            shelterSupliesByCategory,
-          )) {
-            const indexFound = values.findIndex(
-              (item) => item.toLowerCase() === supplyName.toLowerCase(),
-            );
-            if (indexFound !== -1) {
-              toCreate.push({
-                supplyId: suppliesAvailable.get(supplyName.toLowerCase())!,
-                supply: {
-                  connect: {
-                    id: suppliesAvailable.get(supplyName.toLowerCase())!,
-                    name: supplyName,
-                  },
-                  connectOrCreate: {
-                    where: {
-                      id: suppliesAvailable.get(supplyName.toLowerCase()),
-                    },
-                    create: {
-                      name: supplyName,
-                      supplyCategory: {
-                        connect: {
-                          name: categoryName,
-                          id: categoriesAvailable.get(
-                            categoryName.toLowerCase(),
-                          ),
-                        },
-                      },
-                    },
-                  },
-                },
-              });
-            }
-          }
-        }
-        shelter.shelterSupplies = {
-          create: toCreate,
-        };
-
-        if (shelter.latitude) {
-          shelter.latitude = Number.parseFloat(`${shelter.latitude}`);
-        }
-        if (shelter.longitude) {
-          shelter.longitude = Number.parseFloat(`${shelter.longitude}`);
-        }
-
-        Object.keys(shelter).forEach((key) => {
-          if (
-            typeof shelter[key] === 'string' &&
-            shelter[key].trim().length === 0
-          ) {
-            shelter[key] = null;
-          }
-        });
-
-        await CreateShelterSchema.parseAsync(shelter)
-          .then((s) => controller.enqueue(s))
-          .catch((e) => {
-            this.counter.incrementFailure();
-            logger.error(e.message, shelter);
-          });
-      },
-    });
-  }
-}
-
-async function detectSupplyCategoryUsingAI(
+export async function detectSupplyCategoryUsingAI(
   input: unknown,
   categoriesAvailable: string[],
 ): Promise<Record<string, string[]>> {
@@ -296,10 +55,7 @@ async function detectSupplyCategoryUsingAI(
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    const res = require(
-      path.resolve(__dirname, '..', '..', 'promp_response.json'),
-    );
-    return res;
+    throw new Error('Required ENV variable: GEMINI_API_KEY');
   }
   const genAI = new GoogleGenerativeAI(apiKey);
 
@@ -359,6 +115,7 @@ async function detectSupplyCategoryUsingAI(
       },
     ],
   });
+
   let promptOutput: Record<string, string[]> = {};
   try {
     const result = await chatSession.sendMessage(input);
@@ -371,7 +128,28 @@ async function detectSupplyCategoryUsingAI(
   return promptOutput;
 }
 
-class AtomicCounter {
+export function responseToReadable(response: Response) {
+  const reader = response.body?.getReader();
+  if (!reader) {
+    return new Readable();
+  }
+
+  return new Readable({
+    async read() {
+      const result = await reader.read();
+      if (!result.done) {
+        this.push(Buffer.from(result.value));
+      } else {
+        this.push(null);
+        return;
+      }
+    },
+  });
+}
+/**
+ * Classe utilitária apenas com propósito de facilitar logging de processamento em stream
+ */
+export class AtomicCounter {
   private _successCount = 0;
   private _totalCount = 0;
   private _failureCount = 0;
@@ -397,138 +175,4 @@ class AtomicCounter {
   incrementFailure() {
     this._failureCount += 1;
   }
-}
-
-/**
- * ```js
- *  // Pode ser uma stream de arquivo
- *  const fileSourceStream = createReadStream(__dirname + '/planilha_porto_alegre - comida.csv');
- *  // Ou uma url de um arquivo CSV
- *  const csvUrl = 'https://docs.google.com/spreadsheets/d/18hY52i65lIdLE2UsugjnKdnE_ubrBCI6nCR0XQurSBk/gviz/tq?tqx=out:csv&sheet=planilha_porto_alegre';
- * // passar os headers
- *  parseCsv({fileStream: fileSourceStream, csvUrl,headers:{ nameField:'nome' ,addressField:'endereco',latitudeField:'lat'}})
- * ```
- * 
-
- */
-export async function shelterToCsv({
-  headers,
-  csvUrl,
-  fileStream,
-}: ParseCsvArgs<ShelterColumHeader>) {
-  const validInput = (csvUrl && URL.canParse(csvUrl)) || fileStream != null;
-  const atomicCounter = new AtomicCounter();
-  if (!validInput) {
-    logger.warn('Um dos campos `csvUrl` ou `fileStream` é obrigatório');
-    throw new Error('Um dos campos `csvUrl` ou `fileStream` é obrigatório');
-  }
-
-  const shelters: ShelterInput[] = [];
-
-  let csvSourceStream: Readable;
-  if (csvUrl) {
-    csvSourceStream = responseToReadable(await fetch(csvUrl));
-  } else {
-    csvSourceStream = fileStream!;
-  }
-
-  const prismaService = new PrismaService();
-
-  const [categories, supplies] = await prismaService.$transaction([
-    prismaService.supplyCategory.findMany({}),
-    prismaService.supply.findMany({ distinct: ['name'] }),
-  ]);
-
-  const missingShelterSupplies = new Set<string>();
-
-  const suppliesAvailable = supplies.reduce((acc, item) => {
-    acc.set(item.name.trim().toLowerCase(), item.id);
-    return acc;
-  }, new Map<string, string>());
-
-  const categoriesAvailable = categories.reduce((acc, item) => {
-    acc.set(item.name.trim().toLowerCase(), item.id);
-    return acc;
-  }, new Map<string, string>());
-
-  let shelterSupliesByCategory: Record<string, string[]> = {};
-  await Readable.toWeb(csvSourceStream)
-    .pipeThrough(Transform.toWeb(csvParser))
-    .pipeThrough(new CsvToShelterTransformStream(headers))
-    .pipeThrough(
-      new TransformStream({
-        transform(shelter, controller) {
-          atomicCounter.increment();
-          if (shelter?.supplies?.length) {
-            for (const supply of shelter.supplies) {
-              if (suppliesAvailable.has(supply)) {
-                continue;
-              }
-              if (!missingShelterSupplies.has(supply)) {
-                missingShelterSupplies.add(supply);
-              }
-            }
-          }
-          shelters.push(shelter);
-          controller.enqueue(shelter);
-        },
-      }),
-    )
-    .pipeTo(
-      new WritableStream({
-        async close() {
-          const missingSheltersString = Array.from(missingShelterSupplies).join(
-            ', ',
-          );
-          shelterSupliesByCategory = await detectSupplyCategoryUsingAI(
-            missingSheltersString,
-            Array.from(categoriesAvailable.keys()),
-          );
-        },
-      }),
-    );
-
-  await Readable.toWeb(Readable.from(shelters))
-    .pipeThrough(
-      new ShelterEnhancedStreamTransformer({
-        categoriesAvailable,
-        shelterSupliesByCategory,
-        suppliesAvailable,
-        counter: atomicCounter,
-      }),
-    )
-
-    .pipeTo(
-      new WritableStream({
-        async write(
-          shelter: ReturnType<(typeof CreateShelterSchema)['parse']>,
-        ) {
-          await prismaService.shelter
-            .create({ data: shelter, select: { name: true, id: true } })
-            .then((d) => {
-              atomicCounter.incrementSuccess();
-              logger.debug(d);
-            })
-            .catch((e: Error) => {
-              atomicCounter.incrementFailure();
-              if (e instanceof PrismaClientKnownRequestError) {
-                logger.error(translatePrismaError(e));
-              } else {
-                logger.error(e);
-              }
-            });
-        },
-        close() {
-          logger.log(
-            `${atomicCounter.successCount} de ${atomicCounter.totalCount} processados. ${atomicCounter.failureCount} com erro.`,
-          );
-        },
-      }),
-    );
-
-  return {
-    successCount: atomicCounter.successCount,
-    totalCount: atomicCounter.totalCount,
-    failureCount: atomicCounter.failureCount,
-  };
 }

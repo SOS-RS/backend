@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -23,9 +24,10 @@ export class TripsController {
 
   @Post('')
   @UseGuards(TransportManagerGuard)
-  async store(@Body() body) {
+  async store(@Body() body, @Request() req) {
     try {
-      const data = await this.tripsService.store(body);
+      const { userId } = req.user;
+      const data = await this.tripsService.store(body, userId);
       return new ServerResponse(200, 'Successfully created trip', data);
     } catch (err: any) {
       this.logger.error(`Failed to create trip: ${err}`);
@@ -35,9 +37,10 @@ export class TripsController {
 
   @Put(':id')
   @UseGuards(TransportManagerGuard)
-  async update(@Param('id') id: string, @Body() body) {
+  async update(@Param('id') id: string, @Body() body, @Request() req) {
     try {
-      const data = await this.tripsService.update(id, body);
+      const { userId } = req.user;
+      const data = await this.tripsService.update(id, body, userId);
       return new ServerResponse(200, 'Successfully updated trip', data);
     } catch (err: any) {
       this.logger.error(`Failed update trip: ${err}`);
@@ -47,9 +50,10 @@ export class TripsController {
 
   @Delete(':id')
   @UseGuards(TransportManagerGuard)
-  async cancel(@Param('id') id: string) {
+  async cancel(@Param('id') id: string, @Request() req) {
     try {
-      const data = await this.tripsService.cancel(id);
+      const { userId } = req.user;
+      const data = await this.tripsService.cancel(id, userId);
       return new ServerResponse(200, 'Successfully canceled trip', data);
     } catch (err: any) {
       this.logger.error(`Failed canceled trip: ${err}`);

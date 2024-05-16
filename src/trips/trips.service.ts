@@ -1,75 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { z } from 'zod';
 import { CreateTripSchema, UpdateTripSchema } from './types';
+import { TripsDao } from './TripsDao';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TripsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  private readonly tripsDao: TripsDao;
 
-  async store(body: z.infer<typeof CreateTripSchema>) {
+  constructor(prismaService: PrismaService) {
+    this.tripsDao = new TripsDao(prismaService);
+  }
+
+  async store(body: z.infer<typeof CreateTripSchema>, userId: string) {
     const payload = CreateTripSchema.parse(body);
-
-    await this.prismaService.transport.findFirstOrThrow({
-      where: {
-        id: payload.transportId,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    await this.prismaService.shelter.findFirstOrThrow({
-      where: {
-        id: payload.shelterId,
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    await this.prismaService.trip.create({
-      data: {
-        ...payload,
-        createdAt: new Date().toISOString(),
-      },
-    });
+    await this.tripsDao.checkIfUserManagesTransport(
+      payload.transportId,
+      userId,
+    );
+    await this.tripsDao.checkIfShelterExists(payload.shelterId);
+    await this.tripsDao.create(payload);
   }
 
-  async update(id: string, body: z.infer<typeof UpdateTripSchema>) {
+  async update(
+    id: string,
+    body: z.infer<typeof UpdateTripSchema>,
+    userId: string,
+  ) {
     const payload = UpdateTripSchema.parse(body);
-
-    if (payload.shelterId)
-      await this.prismaService.shelter.findFirstOrThrow({
-        where: {
-          id: payload.shelterId,
-        },
-        select: {
-          id: true,
-        },
-      });
-
-    await this.prismaService.trip.update({
-      where: {
-        id,
-      },
-      data: {
-        ...payload,
-        updatedAt: new Date().toISOString(),
-      },
-    });
+    if (payload.shelterId) {
+      await this.tripsDao.checkIfShelterExists(payload.shelterId);
+    }
+    await this.tripsDao.udpateOnlyIfUserManagesTrip(id, userId, payload);
   }
 
-  async cancel(id: string) {
-    await this.prismaService.trip.update({
-      where: {
-        id,
-        canceled: false,
-      },
-      data: {
-        canceled: true,
-        updatedAt: new Date().toISOString(),
-      },
-    });
+  async cancel(id: string, userId: string) {
+    const payload = { canceled: true };
+    await this.tripsDao.udpateOnlyIfUserManagesTrip(id, userId, payload);
   }
 }

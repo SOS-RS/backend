@@ -44,7 +44,6 @@ describe('ShelterCsvImporterService', () => {
   });
 
   test('test_shelterToCsv_withoutRequiredInputs', async () => {
-   
     await expect(service.shelterToCsv({ headers: {} } as any)).rejects.toThrow(
       'Um dos campos `csvUrl` ou `fileStream` é obrigatório',
     );
@@ -59,6 +58,12 @@ describe('ShelterCsvImporterService', () => {
     jest.spyOn(global, 'fetch').mockResolvedValueOnce({
       body: mockFileStream,
     } as any);
+
+    jest
+      .spyOn(helpers, 'detectSupplyCategoryUsingAI')
+      .mockResolvedValueOnce(
+        require('examples/gemini_prompt_response_example.json'),
+      );
 
     const result = await service.shelterToCsv({
       fileStream: mockFileStream,
@@ -83,7 +88,7 @@ describe('ShelterCsvImporterService', () => {
     mockFileStream.push('name,address,lat,lng,supplies, UnknownSupply\n');
     mockFileStream.push('name,address,1.0214,1.54525, UnknownSupply');
     mockFileStream.push(null);
-    
+
     jest.spyOn(global, 'fetch').mockResolvedValueOnce({
       body: mockFileStream,
     } as any);

@@ -51,6 +51,11 @@ Usando make:
  ```bash
    make setup-docker
 ```
+Usando make:
+
+ ```bash
+   make setupDocker
+```
 
 ## 🚀 Configuração Inicial Local
 Se você estiver recebendo algum erro relacionado a PORT da DATABASE_URL, tem uma linha comentada no .env que pode ser

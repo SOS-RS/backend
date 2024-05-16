@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SupplyController } from './supply.controller';
+import { SupplyService } from './supply.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('SupplyController', () => {
   let controller: SupplyController;
@@ -7,7 +9,14 @@ describe('SupplyController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SupplyController],
-    }).compile();
+      providers: [SupplyService],
+    })
+      .useMocker((token) => {
+        if (token === PrismaService) {
+          return {};
+        }
+      })
+      .compile();
 
     controller = module.get<SupplyController>(SupplyController);
   });

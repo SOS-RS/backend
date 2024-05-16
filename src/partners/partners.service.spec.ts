@@ -1,26 +1,25 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ShelterService } from './shelter.service';
-import { PrismaService } from 'src/prisma/prisma.service';
 
-describe('ShelterService', () => {
-  let service: ShelterService;
+import { PartnersService } from './partners.service';
+import { PrismaService } from '../prisma/prisma.service';
+
+describe('PartnersService', () => {
+  let service: PartnersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ShelterService],
+      providers: [PartnersService],
     })
       .useMocker((token) => {
         if (token === PrismaService) {
           return {
-            supplyCategory: {
-              findMany: jest.fn().mockResolvedValue([]),
-            },
+            supplyCategory: { findMany: jest.fn().mockResolvedValue(0) },
           };
         }
       })
       .compile();
 
-    service = module.get<ShelterService>(ShelterService);
+    service = module.get<PartnersService>(PartnersService);
   });
 
   it('should be defined', () => {

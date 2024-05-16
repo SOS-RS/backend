@@ -27,7 +27,7 @@ export class TripsDao {
         id: true,
       },
     });
-    if (!result) throw new Error('Transporte não encontrado.');
+    if (!result) throw new Error('Abrigo não encontrado.');
   }
 
   async create(payload: any) {
@@ -44,22 +44,26 @@ export class TripsDao {
     userId: string,
     payload: any,
   ) {
-    await this.prismaService.trip.update({
-      where: {
-        id: tripId,
-        canceled: false,
-        transport: {
-          transportManagers: {
-            some: {
-              userId,
+    try {
+      await this.prismaService.trip.update({
+        where: {
+          id: tripId,
+          canceled: false,
+          transport: {
+            transportManagers: {
+              some: {
+                userId,
+              },
             },
           },
         },
-      },
-      data: {
-        ...payload,
-        updatedAt: new Date().toISOString(),
-      },
-    });
+        data: {
+          ...payload,
+          updatedAt: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      throw new Error('Viagem não encontrada.');
+    }
   }
 }

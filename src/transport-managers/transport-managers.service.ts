@@ -10,7 +10,7 @@ export class TransportManagersService {
   async store(body: z.infer<typeof CreateTransportManagerSchema>) {
     const { transportId, userId } = CreateTransportManagerSchema.parse(body);
 
-    await this.prismaService.transport.findFirstOrThrow({
+    let result = await this.prismaService.transport.findFirst({
       where: {
         id: transportId,
       },
@@ -18,8 +18,9 @@ export class TransportManagersService {
         id: true,
       },
     });
+    if (!result) throw new Error('Transporte não encontrado.');
 
-    await this.prismaService.user.findFirstOrThrow({
+    result = await this.prismaService.user.findFirst({
       where: {
         id: userId,
       },
@@ -27,6 +28,7 @@ export class TransportManagersService {
         id: true,
       },
     });
+    if (!result) throw new Error('Usuário não encontrado.');
 
     await this.prismaService.transportManager.create({
       data: {

@@ -159,7 +159,7 @@ model Trip {
   transportId         String    @map("transport_id")
   shelterId           String    @map("shelter_id")
   departureCity       String    @map("departure_city")
-  departureDatetime   String    @map("departure_datetime")
+  departureDatetime   DateTime  @map("departure_datetime")
   contact             String
   canceled            Boolean   @default(value: false)
   createdAt           String    @map("created_at") @db.VarChar(32)

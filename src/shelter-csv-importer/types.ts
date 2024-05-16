@@ -1,8 +1,8 @@
 import { AtomicCounter } from './shelter-csv-importer.helpers';
 
 import { Prisma } from '@prisma/client';
-import { ReadStream } from 'fs';
 import { Readable } from 'node:stream';
+import { CreateShelterSchema } from '../shelter/types/types';
 
 type ShelterKey = Exclude<
   Prisma.ShelterScalarFieldEnum,
@@ -29,7 +29,7 @@ interface ParseCsvArgsBaseArgs<T = Record<string, string>> {
   /**
    * se true, não salvará nada no banco
    */
-  dryRun?: boolean
+  dryRun?: boolean;
 }
 
 export type ParseCsvArgs<T> =
@@ -88,3 +88,27 @@ export const CSV_DEFAULT_HEADERS: ShelterColumHeader = {
  *  Regex que ignora vírgulas dentro de parenteses no split
  */
 export const COLON_REGEX = /(?<!\([^)]*),(?![^(]*\))/g;
+export interface ShelterValidInput
+  extends ReturnType<(typeof CreateShelterSchema)['parse']> {
+  id?: string;
+}
+export type ShelterCsvImporterExecutionArgs =
+  ParseCsvArgs<ShelterColumHeader> & {
+    /**
+     * Se deverá usar alguma LLM para tentar categorizar as categorias dos suprimentos
+     * @implNote por enquanto apenas `Gemini` foi implementada.
+     */
+    useIAToPredictSupplyCategories?: boolean;
+    /**
+     *
+     * callback executado após cada entidade ser criada ou ser validada (caso `dryRun` seja true)
+     *
+     * ** NÃO será executada caso `useBatchTransaction` seja true
+     */
+    onEntity?: (shelter: ShelterValidInput) => void;
+    /**
+     * Se true, guardará todas as criações em memória e executará elas em um batch `$transaction`
+     *  [Prisma $transaction docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+     */
+    useBatchTransaction?: boolean;
+  };

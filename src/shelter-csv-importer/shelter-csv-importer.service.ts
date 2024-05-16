@@ -5,7 +5,6 @@ import { TransformStream } from 'node:stream/web';
 
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateShelterSchema } from '../shelter/types/types';
 import {
   AtomicCounter,
   createCsvParser,
@@ -17,12 +16,8 @@ import {
   CsvToShelterTransformStream,
   ShelterEnhancedStreamTransformer,
 } from './shelter-csv.transformer';
-import {
-  CSV_DEFAULT_HEADERS,
-  ParseCsvArgs,
-  ShelterColumHeader,
-  ShelterInput,
-} from './types';
+import { CSV_DEFAULT_HEADERS, ShelterColumHeader, ShelterInput } from './types';
+import { ShelterCsvImporterExecutionArgs, ShelterValidInput } from './types';
 
 @Injectable()
 export class ShelterCsvImporterService {
@@ -48,29 +43,7 @@ export class ShelterCsvImporterService {
     useIAToPredictSupplyCategories = true,
     useBatchTransaction = false,
     onEntity,
-  }: ParseCsvArgs<ShelterColumHeader> & {
-    /**
-     * Se deverá usar alguma LLM para tentar categorizar as categorias dos suprimentos
-     * @implNote por enquanto apenas `Gemini` foi implementada.
-     */
-    useIAToPredictSupplyCategories?: boolean;
-    /**
-     *
-     * callback executado após cada entidade ser criada ou ser validada (caso `dryRun` seja true)
-     *
-     * ** NÃO será executada caso `useBatchTransaction` seja true
-     */
-    onEntity?: (
-      shelter: ReturnType<
-        (typeof CreateShelterSchema)['parse'] & { id?: string }
-      >,
-    ) => void;
-    /**
-     * Se true, guardará todas as criações em memória e executará elas em um batch `$transaction`
-     *  [Prisma $transaction docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
-     */
-    useBatchTransaction?: boolean;
-  }) {
+  }: ShelterCsvImporterExecutionArgs) {
     this.validateInput(csvUrl, fileStream);
 
     const efffectiveColumnNames = this.getEffectiveColumnNames(headers);
@@ -115,9 +88,7 @@ export class ShelterCsvImporterService {
       )
       .pipeTo(
         new WritableStream({
-          write: async (
-            shelter: ReturnType<(typeof CreateShelterSchema)['parse']>,
-          ) => {
+          write: async (shelter: ShelterValidInput) => {
             if (dryRun) {
               onEntity?.(shelter);
               atomicCounter.incrementSuccess();
@@ -265,7 +236,7 @@ export class ShelterCsvImporterService {
   }
 
   private getShelterCreateArgs(
-    shelter: ReturnType<(typeof CreateShelterSchema)['parse']>,
+    shelter: ShelterValidInput,
   ): Prisma.ShelterCreateArgs {
     return {
       data: Object.assign(shelter, {

@@ -102,6 +102,7 @@ model Shelter {
   latitude        Float?
   longitude       Float?
   verified        Boolean  @default(value: false)
+  enabled         Boolean  @default(value: true)
   createdAt       String   @map("created_at") @db.VarChar(32)
   updatedAt       String?  @map("updated_at") @db.VarChar(32)
 

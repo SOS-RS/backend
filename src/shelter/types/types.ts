@@ -1,6 +1,7 @@
 import z from 'zod';
 
 import { capitalize } from '../../utils';
+import { removeEmptyStrings } from '@/utils/utils';
 
 export interface DefaultSupplyProps {
   category: string;
@@ -44,7 +45,9 @@ const FullUpdateShelterSchema = ShelterSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-}).partial();
+})
+  .partial()
+  .transform(removeEmptyStrings);
 
 export {
   ShelterSchema,

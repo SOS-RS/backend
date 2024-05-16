@@ -123,3 +123,13 @@ model ShelterManagers {
   @@id([shelterId, userId])
   @@map("shelter_managers")
 }
+
+model Partners {
+  id        String  @id @default(uuid())
+  name      String  @unique
+  link      String
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
+
+  @@map("partners")
+}

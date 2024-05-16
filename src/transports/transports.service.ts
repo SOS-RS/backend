@@ -40,6 +40,16 @@ export class TransportsService {
     };
   }
 
+  async show(id: string) {
+    const result = await this.prismaService.transport.findFirst({
+      where: {
+        id,
+      },
+    });
+    if (!result) throw new Error('Transporte não encontrado.');
+    return result;
+  }
+
   async store(body: z.infer<typeof CreateTransportSchema>) {
     const payload = CreateTransportSchema.parse(body);
 

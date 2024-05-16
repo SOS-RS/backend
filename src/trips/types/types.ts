@@ -6,6 +6,7 @@ const TripSchema = z.object({
   transportId: z.string(),
   shelterId: z.string(),
   departureCity: z.string().transform(capitalize),
+  departureNeighborhood: z.string().transform(capitalize).optional(),
   departureDatetime: z.string(),
   contact: z.string(),
   createdAt: z.string(),

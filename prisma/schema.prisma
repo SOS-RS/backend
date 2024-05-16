@@ -155,15 +155,16 @@ model TransportManager {
 }
 
 model Trip {
-  id                  String    @id @default(uuid())
-  transportId         String    @map("transport_id")
-  shelterId           String    @map("shelter_id")
-  departureCity       String    @map("departure_city")
-  departureDatetime   DateTime  @map("departure_datetime")
-  contact             String
-  canceled            Boolean   @default(value: false)
-  createdAt           String    @map("created_at") @db.VarChar(32)
-  updatedAt           String?   @map("updated_at") @db.VarChar(32)
+  id                    String    @id @default(uuid())
+  transportId           String    @map("transport_id")
+  shelterId             String    @map("shelter_id")
+  departureCity         String    @map("departure_city")
+  departureNeighborhood String?   @map("departure_neighborhood")
+  departureDatetime     DateTime  @map("departure_datetime")
+  contact               String
+  canceled              Boolean   @default(value: false)
+  createdAt             String    @map("created_at") @db.VarChar(32)
+  updatedAt             String?   @map("updated_at") @db.VarChar(32)
 
   transport   Transport   @relation(fields: [transportId], references: [id])
   shelter     Shelter     @relation(fields: [shelterId], references: [id])

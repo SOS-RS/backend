@@ -57,6 +57,17 @@ export class TripsController {
     }
   }
 
+  @Get('states')
+  async states() {
+    try {
+      const data = await this.tripsService.getStates();
+      return new ServerResponse(200, 'Successfully get trip states', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get trip states: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
   @Post('')
   @UseGuards(TransportManagerGuard)
   async store(@Body() body, @Request() req) {

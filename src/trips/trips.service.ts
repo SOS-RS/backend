@@ -6,10 +6,26 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TripsService {
+  private readonly prismaService: PrismaService;
   private readonly tripsDao: TripsDao;
 
   constructor(prismaService: PrismaService) {
+    this.prismaService = prismaService;
     this.tripsDao = new TripsDao(prismaService);
+  }
+
+  async show(id: string) {
+    const result = await this.prismaService.trip.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        transport: true,
+        shelter: true,
+      },
+    });
+    if (!result) throw new Error('Viagem não encontrada.');
+    return result;
   }
 
   async store(body: z.infer<typeof CreateTripSchema>, userId: string) {

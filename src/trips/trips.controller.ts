@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpException,
   Logger,
   Param,
@@ -21,6 +22,17 @@ export class TripsController {
   private logger = new Logger(TripsController.name);
 
   constructor(private readonly tripsService: TripsService) {}
+
+  @Get(':id')
+  async show(@Param('id') id: string) {
+    try {
+      const data = await this.tripsService.show(id);
+      return new ServerResponse(200, 'Successfully get trip', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get trip: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
 
   @Post('')
   @UseGuards(TransportManagerGuard)

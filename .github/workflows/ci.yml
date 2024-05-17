@@ -6,7 +6,7 @@ on:
     branches:
       - main
     tags:
-      - "*"
+      - '*'
   pull_request:
     branches:
       - main
@@ -21,10 +21,10 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
       # Setup node.js and cache
-      - name: "Setup node.js"
+      - name: 'Setup node.js'
         uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: '18.x'
           cache: 'npm'
           cache-dependency-path: ./package-lock.json
       # Install dependencies

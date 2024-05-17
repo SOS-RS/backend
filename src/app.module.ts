@@ -13,6 +13,7 @@ import { ShelterManagersModule } from './shelter-managers/shelter-managers.modul
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { PartnersModule } from './partners/partners.module';
 import { ShelterCsvImporterModule } from './shelter-csv-importer/shelter-csv-importer.module';
+import { SupportersModule } from './supporters/supporters.module';
 
 @Module({
   imports: [
@@ -20,12 +21,13 @@ import { ShelterCsvImporterModule } from './shelter-csv-importer/shelter-csv-imp
     UsersModule,
     SessionsModule,
     ShelterModule,
-    ShelterCsvImporterModule,
     SupplyModule,
     SupplyCategoriesModule,
     ShelterManagersModule,
     ShelterSupplyModule,
     PartnersModule,
+    SupportersModule,
+    ShelterCsvImporterModule,
   ],
   controllers: [],
   providers: [

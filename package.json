@@ -80,6 +80,13 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^@/decorators/(.*)$": "<rootDir>/decorators/$1",
+      "^@/interceptors/(.*)$": "<rootDir>/interceptors/$1",
+      "^@/middlewares/(.*)$": "<rootDir>/middlewares/$1",
+      "^@/utils/(.*)$": "<rootDir>/utils/$1",
+      "^@/guards/(.*)$": "<rootDir>/guards/$1"
+    }
   }
 }

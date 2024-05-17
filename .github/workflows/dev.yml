@@ -1,0 +1,34 @@
+name: Deploy Backend in Development Enviroment
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  build:
+    runs-on: dev
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: |
+          touch .env
+          echo TZ=${{ secrets.TZ }} >> .env
+          echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+          echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+          echo DB_USER=${{ secrets.DB_USER }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo DB_DATABASE_NAME=${{ secrets.DEV_DB_DATABASE_NAME }} >> .env
+          echo DATABASE_URL=postgresql://${{ secrets.DB_USER }}:${{ secrets.DB_PASSWORD }}@${{ secrets.DB_HOST }}:${{ secrets.DB_PORT }}/${{ secrets.DEV_DB_DATABASE_NAME }}?schema=public >> .env
+          echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+          echo HOST=${{ secrets.HOST }} >> .env
+          echo PORT=${{ secrets.PORT }} >> .env
+          echo SERVER_USER_PASSWORD=${{ secrets.SERVER_USER_PASSWORD }} >> .env
+          cat .env
+
+      - name: Remove old docker image
+        run: echo ${{ secrets.SERVER_USER_PASSWORD }} | sudo -S docker compose down --rmi all
+
+      - name: Create new docker image
+        run: echo ${{ secrets.SERVER_USER_PASSWORD }} | sudo -S docker compose up -d --force-recreate

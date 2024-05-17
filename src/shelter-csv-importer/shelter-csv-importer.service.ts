@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
-import { Readable, Transform } from 'node:stream';
+import { Duplex, Readable, Transform, Writable } from 'node:stream';
 import { TransformStream } from 'node:stream/web';
 
 import { Prisma } from '@prisma/client';
@@ -9,7 +9,7 @@ import {
   AtomicCounter,
   createCsvParser,
   detectSupplyCategoryUsingAI,
-  responseToReadable,
+  csvResponseToReadable,
   translatePrismaError,
 } from './shelter-csv-importer.helpers';
 import {
@@ -53,7 +53,7 @@ export class ShelterCsvImporterService {
     const output: Record<string, any>[] = [];
 
     let csvSourceStream = csvUrl
-      ? responseToReadable(await fetch(csvUrl))
+      ? csvResponseToReadable(await fetch(csvUrl))
       : fileStream!;
 
     const {
@@ -129,6 +129,9 @@ export class ShelterCsvImporterService {
                 );
               } catch (err) {
                 this.logger.error('Erro ao executar transaction', err);
+                atomicCounter.incrementFailure(
+                  transactionArgs.length - atomicCounter.successCount,
+                );
               }
             }
             this.logger.log(

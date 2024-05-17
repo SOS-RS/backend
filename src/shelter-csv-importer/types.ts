@@ -33,8 +33,8 @@ interface ParseCsvArgsBaseArgs<T = Record<string, string>> {
 }
 
 export type ParseCsvArgs<T> =
-  | (ParseCsvArgsBaseArgs<T> & { csvUrl: string })
-  | (ParseCsvArgsBaseArgs<T> & { fileStream: Readable });
+  | (ParseCsvArgsBaseArgs<T> & { csvUrl: string; fileStream?: Readable })
+  | (ParseCsvArgsBaseArgs<T> & { fileStream: Readable; csvUrl?: string });
 export interface EnhancedTransformArgs {
   /**
    * KeyValue contento as categorias e os supplies contidos naquela categorias (detectados por IA)

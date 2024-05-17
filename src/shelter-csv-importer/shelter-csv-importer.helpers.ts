@@ -146,10 +146,30 @@ export async function detectSupplyCategoryUsingAI(
   return promptOutput;
 }
 
-export function responseToReadable(response: Response) {
+export const emptyReadable = () =>
+  new Readable({
+    read() {
+      this.push(null);
+    },
+  });
+
+export function csvResponseToReadable(response: Response) {
+  const contentType = response.headers.get('content-type');
+  console.log(
+    '🚀 ~ ShelterCsvImporterService ~ awaitfetch ~ contentType:',
+    contentType,
+  );
   const reader = response.body?.getReader();
-  if (!reader) {
-    return new Readable();
+
+  if (
+    !reader ||
+    !contentType ||
+    !contentType.toLowerCase().includes('text/csv')
+  ) {
+    logger.warn(
+      `reader não encontrado ou content-type não permitido. "${contentType}"`,
+    );
+    return emptyReadable();
   }
 
   return new Readable({

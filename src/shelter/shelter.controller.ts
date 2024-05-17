@@ -15,19 +15,20 @@ import {
 } from '@nestjs/common';
 import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 
-import { ShelterService } from './shelter.service';
-import { ServerResponse } from '../utils';
-import { StaffGuard } from '@/guards/staff.guard';
-import { ApplyUser } from '@/guards/apply-user.guard';
 import { UserDecorator } from '@/decorators/UserDecorator/user.decorator';
-import { AdminGuard } from '@/guards/admin.guard';
+import { ApplyUser } from '@/guards/apply-user.guard';
+import { StaffGuard } from '@/guards/staff.guard';
 import { FastifyFileInterceptor } from '@/interceptors/file-upload.interceptor';
+import { ServerResponse } from '../utils';
+import { ShelterService } from './shelter.service';
 
+import { AdminGuard } from '@/guards/admin.guard';
 import { createReadStream, rmSync } from 'fs';
 import { diskStorage } from 'multer';
 import { FileDtoStub } from 'src/shelter-csv-importer/dto/file.dto';
-import { ShelterCsvImporterService } from 'src/shelter-csv-importer/shelter-csv-importer.service';
 import { csvImporterFilter } from 'src/shelter-csv-importer/shelter-csv-importer.helpers';
+import { ShelterCsvImporterService } from 'src/shelter-csv-importer/shelter-csv-importer.service';
+import { Readable } from 'stream';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -121,20 +122,27 @@ export class ShelterController {
       fileFilter: csvImporterFilter,
     }),
   )
-  async single(
+  async importFromCsv(
     @Req() _req: Request,
     @UploadedFile() file: Express.Multer.File,
-    // empty body. Usado apenas para facilitar testes / upload usando swagger
-    @Body() _body: FileDtoStub,
+    @Body() body: FileDtoStub,
   ) {
-    const fileStream = createReadStream(file.path);
+    let fileStream!: Readable;
+    if (file?.path) {
+      fileStream = createReadStream(file.path);
+    }
+
     const res = await this.shelterCsvImporter.execute({
       fileStream,
+      csvUrl: body?.csvUrl,
       // dryRun: true,
       onEntity: console.log,
+      useBatchTransaction: true,
       useIAToPredictSupplyCategories: false,
     });
-    rmSync(file.path);
+    if (file?.path) {
+      rmSync(file.path);
+    }
 
     return res;
   }

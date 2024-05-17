@@ -9,7 +9,7 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
-    'plugin:jest/recommended'
+    'plugin:jest/recommended',
   ],
   root: true,
   env: {
@@ -25,14 +25,14 @@ module.exports = {
     'jest/expect-expect': [
       'warn',
       {
-        'assertFunctionNames': ['expect', 'request.**.expect'],
-      }
+        assertFunctionNames: ['expect', 'request.**.expect'],
+      },
     ],
     'prettier/prettier': [
       'error',
       {
-        'endOfLine': 'auto'
-      }
-    ]
+        endOfLine: 'auto',
+      },
+    ],
   },
 };

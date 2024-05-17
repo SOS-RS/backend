@@ -12,6 +12,7 @@ import { SupplyCategoriesModule } from './supply-categories/supply-categories.mo
 import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { PartnersModule } from './partners/partners.module';
+import { SupportersModule } from './supporters/supporters.module';
 import { HealthModule } from './health/health.module';
 
 @Module({
@@ -25,6 +26,7 @@ import { HealthModule } from './health/health.module';
     ShelterManagersModule,
     ShelterSupplyModule,
     PartnersModule,
+    SupportersModule,
     HealthModule,
   ],
   controllers: [],

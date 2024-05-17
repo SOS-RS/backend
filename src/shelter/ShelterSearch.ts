@@ -27,6 +27,7 @@ class ShelterSearch {
   ) {
     this.prismaService = prismaService;
     this.formProps = { ...props };
+    this.getQuery = this.getQuery.bind(this);
   }
 
   priority(supplyIds: string[] = []): Prisma.ShelterWhereInput {
@@ -102,23 +103,20 @@ class ShelterSearch {
     };
   }
 
-  get search(): Prisma.ShelterWhereInput[] {
-    if (!this.formProps.search) return [];
+  async getSearch(): Promise<Prisma.ShelterWhereInput> {
+    if (!this.formProps.search) return {};
 
-    return [
-      {
-        address: {
-          contains: this.formProps.search,
-          mode: 'insensitive',
-        },
+    const search = `${this.formProps.search.toLowerCase()}`;
+
+    const results = await this.prismaService.$queryRaw<{ id: string }[]>(
+      Prisma.sql`SELECT id, name FROM shelters WHERE lower(unaccent(address)) LIKE '%' || unaccent(${search}) || '%' OR lower(unaccent(name)) LIKE '%' || unaccent(${search}) || '%';`,
+    );
+
+    return {
+      id: {
+        in: results.map((r) => r.id),
       },
-      {
-        name: {
-          contains: this.formProps.search,
-          mode: 'insensitive',
-        },
-      },
-    ];
+    };
   }
 
   get cities(): Prisma.ShelterWhereInput {
@@ -150,13 +148,15 @@ class ShelterSearch {
     };
   }
 
-  get query(): Prisma.ShelterWhereInput {
+  async getQuery(): Promise<Prisma.ShelterWhereInput> {
     if (Object.keys(this.formProps).length === 0) return {};
+
+    const search = await this.getSearch();
     const queryData = {
       AND: [
         this.cities,
         this.geolocation,
-        { OR: this.search },
+        search,
         { OR: this.shelterStatus },
         this.priority(this.formProps.supplyIds),
         this.supplyCategoryIds(this.formProps.priority),

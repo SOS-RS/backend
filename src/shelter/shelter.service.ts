@@ -125,7 +125,9 @@ export class ShelterService implements OnModuleInit {
       search: searchQuery,
     } = SearchSchema.parse(query);
     const queryData = ShelterSearchPropsSchema.parse(qs.parse(searchQuery));
-    const { query: where } = new ShelterSearch(this.prismaService, queryData);
+    const { getQuery } = new ShelterSearch(this.prismaService, queryData);
+    const where = await getQuery();
+
     const count = await this.prismaService.shelter.count({ where });
 
     const take = perPage;

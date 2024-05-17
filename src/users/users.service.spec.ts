@@ -36,12 +36,12 @@ describe('UsersService', () => {
       name: 'matheus', lastName: 'silva', phone:'44999998311'
     }
 
-    it(`deve chamar a funcao store 1 vez`, async () => {
+    it('shold call the store function 1 time', async () => {
       userService.store(userPayload)
       expect(mockPrismaService.user.create).toHaveBeenCalledTimes(1)
     });
 
-    it(`deve chamar a funcao store com os parametros`, async () => {
+    it('shold call the store function with the parameters', async () => {
       userService.store(userPayload)
       const data = {
         ...userPayload,
@@ -61,7 +61,7 @@ describe('UsersService', () => {
         phone:'44999998311',
       };
 
-    it(`deve chamar a funcao store 1 vez`, async () => {
+    it('shuld call the store function 1 time', async () => {
       userService.update(id, body)
       expect(mockPrismaService.user.update).toHaveBeenCalledTimes(1)
     });

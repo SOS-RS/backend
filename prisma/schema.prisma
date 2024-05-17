@@ -168,12 +168,12 @@ model Partners {
 }
 
 model Transport {
-  id                        String  @id @default(uuid())
-  vehicleType               String  @map("vehicle_type")
-  vehicleRegistrationPlate  String? @map("vehicle_registration_plate")
+  id                        String    @id @default(uuid())
+  vehicleType               String    @map("vehicle_type")
+  vehicleRegistrationPlate  String?   @map("vehicle_registration_plate")
   contact                   String?
-  createdAt                 String  @map("created_at") @db.VarChar(32)
-  updatedAt                 String? @map("updated_at") @db.VarChar(32)
+  createdAt                 DateTime  @default(value: now())  @map("created_at")  @db.Timestamptz()
+  updatedAt                 DateTime? @map("updated_at") @db.Timestamptz()
 
   transportManagers TransportManager[]
   trips Trip[]
@@ -182,10 +182,10 @@ model Transport {
 }
 
 model TransportManager {
-  transportId   String  @map("transport_id")
-  userId        String  @map("user_id")
-  createdAt     String  @map("created_at") @db.VarChar(32)
-  updatedAt     String? @map("updated_at") @db.VarChar(32)
+  transportId   String    @map("transport_id")
+  userId        String    @map("user_id")
+  createdAt     DateTime  @default(value: now())  @map("created_at")  @db.Timestamptz()
+  updatedAt     DateTime? @map("updated_at") @db.Timestamptz()
 
   transport   Transport   @relation(fields: [transportId], references: [id])
   user        User        @relation(fields: [userId], references: [id])
@@ -204,8 +204,8 @@ model Trip {
   departureDatetime     DateTime  @map("departure_datetime")
   contact               String
   canceled              Boolean   @default(value: false)
-  createdAt             String    @map("created_at") @db.VarChar(32)
-  updatedAt             String?   @map("updated_at") @db.VarChar(32)
+  createdAt             DateTime  @default(value: now())  @map("created_at")  @db.Timestamptz()
+  updatedAt             DateTime? @map("updated_at") @db.Timestamptz()
 
   transport   Transport   @relation(fields: [transportId], references: [id])
   shelter     Shelter     @relation(fields: [shelterId], references: [id])

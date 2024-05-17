@@ -87,6 +87,8 @@ export class ShelterService implements OnModuleInit {
         latitude: true,
         longitude: true,
         verified: true,
+        actived: true,
+        category: true,
         shelterSupplies: {
           select: {
             priority: true,
@@ -159,6 +161,8 @@ export class ShelterService implements OnModuleInit {
         verified: true,
         latitude: true,
         longitude: true,
+        actived: true,
+        category: true,
         createdAt: true,
         updatedAt: true,
         shelterSupplies: {

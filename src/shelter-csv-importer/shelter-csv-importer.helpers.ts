@@ -3,22 +3,40 @@ import {
   HarmBlockThreshold,
   HarmCategory,
 } from '@google/generative-ai';
-import { Logger } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { parse as createParser } from 'csv';
+import { FileFilterCallback } from 'fastify-multer/lib/interfaces';
 import { Readable } from 'node:stream';
 
 const logger = new Logger('ShelterCsvImporterHelpers');
 
-export const createCsvParser = () =>
-  createParser({ columns: true, relaxColumnCount: true }, function (err, data) {
-    if (err) {
-      logger.error(err);
-      return null;
-    }
-    return data;
-  });
+export function createCsvParser() {
+  return createParser(
+    { columns: true, relaxColumnCount: true },
+    function (err, data) {
+      if (err) {
+        logger.error(err);
+        return null;
+      }
+      return data;
+    },
+  );
+}
 
+export function csvImporterFilter(
+  _req: Express.Request,
+  file: Express.Multer.File,
+  callback: FileFilterCallback,
+) {
+  if (!file.originalname.match(/\.(csv)$/)) {
+    return callback(
+      new BadRequestException('Apenas arquivos .csv são aceitos no momento!'),
+      false,
+    );
+  }
+  callback(null, true);
+}
 export function translatePrismaError(err: PrismaClientKnownRequestError) {
   switch (err.code) {
     case 'P2002':

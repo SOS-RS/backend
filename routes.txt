@@ -1,0 +1,300 @@
+{
+    "Comment": "aaa",
+    "Changes": [
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "guedder.com.",
+                "Type": "A",
+                "TTL": 60,
+                "ResourceRecords": [
+                    {
+                        "Value": "35.86.23.115"
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "guedder.com.",
+                "Type": "MX",
+                "TTL": 3600,
+                "ResourceRecords": [
+                    {
+                        "Value": "1\tASPMX.L.GOOGLE.COM"
+                    },
+                    {
+                        "Value": "5\tALT1.ASPMX.L.GOOGLE.COM"
+                    },
+                    {
+                        "Value": "5\tALT2.ASPMX.L.GOOGLE.COM"
+                    },
+                    {
+                        "Value": "10\tALT3.ASPMX.L.GOOGLE.COM"
+                    },
+                    {
+                        "Value": "10\tALT4.ASPMX.L.GOOGLE.COM"
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "guedder.com.",
+                "Type": "TXT",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "\"v=spf1 include:_spf.google.com ~all\""
+                    },
+                    {
+                        "Value": "\"google-site-verification=6IGUHktwmqB1RHvTIZJlKsFkmqF1iqBwaiWvtB3PdbQ\""
+                    },
+                    {
+                        "Value": "\"facebook-domain-verification=7b5s07221rinif6iso3tvajh34nxtz\""
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "_cc98d301c046cc32d416b9eb5632c6f1.guedder.com.",
+                "Type": "CNAME",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "_5f0fadf5c4885a67410f7f601135d9bc.dhzvlrndnj.acm-validations.aws."
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "google._domainkey.guedder.com.",
+                "Type": "TXT",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "\"v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj35YXTEgL69Tj85RBFy6oNIu2q1gyXzWrfiW9DSWdBlxe6eqhq56bQVv7mRyoVVxW9IWPX4+Ut8InIEJFWam95SXlPx2O+l/\" \"CJ7TjcRtNe+ykIl+d0zpgkqZyXEPbiZYIsaU+O0nb/I0gtiGE4bYqb96S6OHN+6G4gTIpm5CPkC68DS2OsteOmzPUO7QKKWau4lG/\" \"oIROlcDPdNWucanF513VEdnRJsKHXk097JHq+YUhLyCjwDBpPJBq2H/0L6Usf9GZ9/jw9EI55NtnGOiuMPxBXncYeRVXXoyhlLkY5r7Bz7G8/\" \"XagO24b5Z5CGIJF3v5vDmOExGLwNZziYKC7QIDAQAB\""
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "lwdgihpjz4zecxghfjlwi5kk3wwepgb7._domainkey.guedder.com.",
+                "Type": "CNAME",
+                "TTL": 1800,
+                "ResourceRecords": [
+                    {
+                        "Value": "lwdgihpjz4zecxghfjlwi5kk3wwepgb7.dkim.amazonses.com"
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "ntit4w7do46e5gt4kndaznfvft2dhz4c._domainkey.guedder.com.",
+                "Type": "CNAME",
+                "TTL": 1800,
+                "ResourceRecords": [
+                    {
+                        "Value": "ntit4w7do46e5gt4kndaznfvft2dhz4c.dkim.amazonses.com"
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "woinkreggvmnukmv6m73vf762ghtdf4x._domainkey.guedder.com.",
+                "Type": "CNAME",
+                "TTL": 1800,
+                "ResourceRecords": [
+                    {
+                        "Value": "woinkreggvmnukmv6m73vf762ghtdf4x.dkim.amazonses.com"
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "api-loadbalance.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z1H1FL5HABSF5",
+                    "DNSName": "guedder-load-balancer-2-737976362.us-west-2.elb.amazonaws.com.",
+                    "EvaluateTargetHealth": true
+                }
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "api.guedder.com.",
+                "Type": "CNAME",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "api-loadbalance.guedder.com"
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "app.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z2FDTNDATAQYW2",
+                    "DNSName": "d1p99rujyyi7pk.cloudfront.net.",
+                    "EvaluateTargetHealth": false
+                }
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "beta.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z2FDTNDATAQYW2",
+                    "DNSName": "d6gohgvl1bk0m.cloudfront.net.",
+                    "EvaluateTargetHealth": false
+                }
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "crux.guedder.com.",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "35.85.65.26"
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "d4sign.guedder.com.",
+                "Type": "TXT",
+                "TTL": 3600,
+                "ResourceRecords": [
+                    {
+                        "Value": "\"d4sign-domain-verification=e1455ea6-ad7e-436f-80f0-36bcb1634172\""
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "dev-api.guedder.com.",
+                "Type": "A",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "34.221.192.181"
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "_6eddddbbfb6bf75cbbe96037e6451c9e.dev-api.guedder.com.",
+                "Type": "CNAME",
+                "TTL": 300,
+                "ResourceRecords": [
+                    {
+                        "Value": "_df81fbb08064f9efa2917c1d25de75f6.dqxlbvzbzt.acm-validations.aws."
+                    }
+                ]
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "institucional.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z2FDTNDATAQYW2",
+                    "DNSName": "d2jp1q4t2zduz8.cloudfront.net.",
+                    "EvaluateTargetHealth": false
+                }
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "portal.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z2FDTNDATAQYW2",
+                    "DNSName": "d142ydjmx8obeg.cloudfront.net.",
+                    "EvaluateTargetHealth": false
+                }
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "staging-portal.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z2FDTNDATAQYW2",
+                    "DNSName": "d1tydsuuoy2nar.cloudfront.net.",
+                    "EvaluateTargetHealth": false
+                }
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "staging.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z2FDTNDATAQYW2",
+                    "DNSName": "d31p8c3qwfzi7x.cloudfront.net.",
+                    "EvaluateTargetHealth": false
+                }
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "webapp.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z06176872A9AQ4DNUVAT0",
+                    "DNSName": "guedder.com.",
+                    "EvaluateTargetHealth": true
+                }
+            }
+        },
+        {
+            "Action": "CREATE",
+            "ResourceRecordSet": {
+                "Name": "www.guedder.com.",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z06176872A9AQ4DNUVAT0",
+                    "DNSName": "guedder.com.",
+                    "EvaluateTargetHealth": true
+                }
+            }
+        }
+    ]
+}

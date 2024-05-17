@@ -8,22 +8,36 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiTags } from '@nestjs/swagger';
 
 import { ShelterService } from './shelter.service';
 import { ServerResponse } from '../utils';
 import { StaffGuard } from '@/guards/staff.guard';
 import { ApplyUser } from '@/guards/apply-user.guard';
 import { UserDecorator } from '@/decorators/UserDecorator/user.decorator';
+import { AdminGuard } from '@/guards/admin.guard';
+import { FastifyFileInterceptor } from '@/interceptors/file-upload.interceptor';
+
+import { createReadStream, rmSync } from 'fs';
+import { diskStorage } from 'multer';
+import { FileDtoStub } from 'src/shelter-csv-importer/dto/file.dto';
+import { ShelterCsvImporterService } from 'src/shelter-csv-importer/shelter-csv-importer.service';
+import { csvImporterFilter } from 'src/shelter-csv-importer/shelter-csv-importer.helpers';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
 export class ShelterController {
   private logger = new Logger(ShelterController.name);
 
-  constructor(private readonly shelterService: ShelterService) {}
+  constructor(
+    private readonly shelterService: ShelterService,
+    private readonly shelterCsvImporter: ShelterCsvImporterService,
+  ) {}
 
   @Get('')
   async index(@Query() query) {
@@ -94,5 +108,34 @@ export class ShelterController {
       this.logger.error(`Failed to update shelter: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
+  }
+
+  @UseGuards(AdminGuard)
+  @Post('import-csv')
+  @ApiConsumes('multipart/form-data', 'text/csv')
+  @UseInterceptors(
+    FastifyFileInterceptor('file', {
+      storage: diskStorage({
+        filename: (_req, file, cb) => cb(null, file.originalname),
+      }),
+      fileFilter: csvImporterFilter,
+    }),
+  )
+  async single(
+    @Req() _req: Request,
+    @UploadedFile() file: Express.Multer.File,
+    // empty body. Usado apenas para facilitar testes / upload usando swagger
+    @Body() _body: FileDtoStub,
+  ) {
+    const fileStream = createReadStream(file.path);
+    const res = await this.shelterCsvImporter.execute({
+      fileStream,
+      // dryRun: true,
+      onEntity: console.log,
+      useIAToPredictSupplyCategories: false,
+    });
+    rmSync(file.path);
+
+    return res;
   }
 }

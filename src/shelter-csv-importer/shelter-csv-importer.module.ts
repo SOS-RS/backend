@@ -5,5 +5,6 @@ import { ShelterCsvImporterService } from './shelter-csv-importer.service';
 @Module({
   imports: [PrismaModule],
   providers: [ShelterCsvImporterService],
+  exports: [ShelterCsvImporterService],
 })
 export class ShelterCsvImporterModule {}

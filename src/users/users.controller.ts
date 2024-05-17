@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { UserGuard } from '@/guards/user.guard';
+import { UserGuard } from '../guards/user.guard';
 import { ServerResponse } from '../utils';
 import { UsersService } from './users.service';
-import { AdminGuard } from '@/guards/admin.guard';
+import { AdminGuard } from '../guards/admin.guard';
 
 @ApiTags('Usuários')
 @Controller('users')

@@ -133,3 +133,14 @@ model Partners {
 
   @@map("partners")
 }
+
+model Supporters {
+  id        String  @id @default(uuid())
+  name      String  @unique
+  imageUrl  String  @map("image_url")
+  link      String
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
+
+  @@map("supporters")
+}

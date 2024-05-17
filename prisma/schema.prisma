@@ -201,7 +201,7 @@ model Trip {
   departureNeighborhood String?   @map("departure_neighborhood")
   departureCity         String    @map("departure_city")
   departureState        State     @map("departure_state")
-  departureDatetime     DateTime  @map("departure_datetime")
+  departureDatetime     String  @map("departure_datetime")
   contact               String
   canceled              Boolean   @default(value: false)
   createdAt             DateTime  @default(value: now())  @map("created_at")  @db.Timestamptz()

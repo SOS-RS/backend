@@ -109,7 +109,7 @@ class ShelterSearch {
     const search = `${this.formProps.search.toLowerCase()}`;
 
     const results = await this.prismaService.$queryRaw<{ id: string }[]>(
-      Prisma.sql`SELECT id, name FROM shelters WHERE lower(unaccent(address)) LIKE '%' || unaccent(${search}) || '%' OR lower(unaccent(name)) LIKE '%' || unaccent(${search}) || '%';`,
+      Prisma.sql`SELECT id FROM shelters WHERE lower(unaccent(address)) LIKE '%' || unaccent(${search}) || '%' OR lower(unaccent(name)) LIKE '%' || unaccent(${search}) || '%';`,
     );
 
     return {

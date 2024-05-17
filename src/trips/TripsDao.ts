@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 export class TripsDao {
@@ -15,7 +16,7 @@ export class TripsDao {
         transportId: true,
       },
     });
-    if (!result) throw new Error('Transporte não encontrado.');
+    if (!result) throw new NotFoundException('Transporte não encontrado.');
   }
 
   async checkIfShelterExists(shelterId: string) {
@@ -27,7 +28,7 @@ export class TripsDao {
         id: true,
       },
     });
-    if (!result) throw new Error('Abrigo não encontrado.');
+    if (!result) throw new NotFoundException('Abrigo não encontrado.');
   }
 
   async create(payload: any) {
@@ -63,7 +64,7 @@ export class TripsDao {
         },
       });
     } catch (error) {
-      throw new Error('Viagem não encontrada.');
+      throw new NotFoundException('Viagem não encontrada.');
     }
   }
 }

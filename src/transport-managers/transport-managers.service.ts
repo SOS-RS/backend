@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { z } from 'zod';
 import { CreateTransportManagerSchema } from './types';
@@ -18,7 +18,7 @@ export class TransportManagersService {
         id: true,
       },
     });
-    if (!result) throw new Error('Transporte não encontrado.');
+    if (!result) throw new NotFoundException('Transporte não encontrado.');
 
     result = await this.prismaService.user.findFirst({
       where: {
@@ -28,7 +28,7 @@ export class TransportManagersService {
         id: true,
       },
     });
-    if (!result) throw new Error('Usuário não encontrado.');
+    if (!result) throw new NotFoundException('Usuário não encontrado.');
 
     await this.prismaService.transportManager.create({
       data: {

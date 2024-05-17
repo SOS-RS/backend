@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { z } from 'zod';
 import { CreateTransportSchema, UpdateTransportSchema } from './types/types';
@@ -46,7 +46,7 @@ export class TransportsService {
         id,
       },
     });
-    if (!result) throw new Error('Transporte não encontrado.');
+    if (!result) throw new NotFoundException('Transporte não encontrado.');
     return result;
   }
 

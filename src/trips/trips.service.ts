@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { z } from 'zod';
 import { CreateTripSchema, UpdateTripSchema } from './types/types';
 import { TripsDao } from './TripsDao';
@@ -62,7 +62,7 @@ export class TripsService {
         shelter: true,
       },
     });
-    if (!result) throw new Error('Viagem não encontrada.');
+    if (!result) throw new NotFoundException('Viagem não encontrada.');
     return result;
   }
 

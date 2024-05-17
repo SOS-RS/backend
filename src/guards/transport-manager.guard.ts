@@ -1,4 +1,4 @@
-import { ExecutionContext, HttpException, Injectable } from '@nestjs/common';
+import { ExecutionContext, HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AccessLevel } from '@prisma/client';
 
@@ -18,6 +18,6 @@ export class TransportManagerGuard extends AuthGuard('jwt') {
       AccessLevel.Admin,
     ]);
     if (ok) return true;
-    throw new HttpException('Acesso não autorizado', 401);
+    throw new UnauthorizedException('Acesso não autorizado');
   }
 }

@@ -12,6 +12,7 @@ import { SupplyCategoriesModule } from './supply-categories/supply-categories.mo
 import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { PartnersModule } from './partners/partners.module';
+import { SupportersModule } from './supporters/supporters.module';
 import { TransportsModule } from './transports/transports.module';
 import { TransportManagersModule } from './transport-managers/transport-managers.module';
 import { TripsModule } from './trips/trips.module';
@@ -27,6 +28,7 @@ import { TripsModule } from './trips/trips.module';
     ShelterManagersModule,
     ShelterSupplyModule,
     PartnersModule,
+    SupportersModule,
     TransportsModule,
     TransportManagersModule,
     TripsModule,

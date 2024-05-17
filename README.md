@@ -5,7 +5,7 @@ bem como na coordenação de voluntários durante enchentes no Rio Grande do Sul
 autenticação de usuários, gerenciamento de abrigos e suprimentos, e muito mais.
 
 Se você quiser discutir ideias, problemas ou contribuições, sinta-se à vontade para se juntar ao nosso servidor do
-Discord [aqui](https://discord.gg/sosrs).
+Discord [aqui](https://discord.gg/vjZS6BQXvM).
 
 ## 🛠 Tecnologias Utilizadas
 

@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { GeolocationFilter } from 'src/shelter/types/search.types';
 
 class ServerResponse<T> {
   readonly message: string;
@@ -75,10 +76,45 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   }
 }
 
+interface Coordinates {
+  maxLat: number;
+  minLat: number;
+  maxLong: number;
+  minLong: number;
+}
+
+function calculateGeolocationBounds({
+  latitude,
+  longitude,
+  radiusInMeters,
+}: GeolocationFilter): Coordinates {
+  const earthRadius = 6371000;
+
+  const latRad = (latitude * Math.PI) / 180;
+
+  const radiusRad = radiusInMeters / earthRadius;
+
+  const maxLat = latitude + radiusRad * (180 / Math.PI);
+  const minLat = latitude - radiusRad * (180 / Math.PI);
+
+  const deltaLong = Math.asin(Math.sin(radiusRad) / Math.cos(latRad));
+
+  const maxLong = longitude + deltaLong * (180 / Math.PI);
+  const minLong = longitude - deltaLong * (180 / Math.PI);
+
+  return {
+    maxLat,
+    minLat,
+    maxLong,
+    minLong,
+  };
+}
+
 export {
   ServerResponse,
-  removeNotNumbers,
-  getSessionData,
-  deepMerge,
+  calculateGeolocationBounds,
   capitalize,
+  deepMerge,
+  getSessionData,
+  removeNotNumbers,
 };

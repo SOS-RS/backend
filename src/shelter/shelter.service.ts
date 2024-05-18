@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+import { subDays } from 'date-fns';
 import * as qs from 'qs';
 import { z } from 'zod';
 
@@ -14,13 +15,14 @@ import {
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types/types';
-import { subDays } from 'date-fns';
 
 @Injectable()
-export class ShelterService {
+export class ShelterService implements OnModuleInit {
   private voluntaryIds: string[] = [];
 
-  constructor(private readonly prismaService: PrismaService) {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  onModuleInit() {
     this.loadVoluntaryIds();
   }
 
@@ -85,6 +87,8 @@ export class ShelterService {
         latitude: true,
         longitude: true,
         verified: true,
+        actived: true,
+        category: true,
         shelterSupplies: {
           select: {
             priority: true,
@@ -123,7 +127,9 @@ export class ShelterService {
       search: searchQuery,
     } = SearchSchema.parse(query);
     const queryData = ShelterSearchPropsSchema.parse(qs.parse(searchQuery));
-    const { query: where } = new ShelterSearch(this.prismaService, queryData);
+    const { getQuery } = new ShelterSearch(this.prismaService, queryData);
+    const where = await getQuery();
+
     const count = await this.prismaService.shelter.count({ where });
 
     const take = perPage;
@@ -155,6 +161,8 @@ export class ShelterService {
         verified: true,
         latitude: true,
         longitude: true,
+        actived: true,
+        category: true,
         createdAt: true,
         updatedAt: true,
         shelterSupplies: {
@@ -185,6 +193,11 @@ export class ShelterService {
 
   async getCities() {
     const cities = await this.prismaService.shelter.groupBy({
+      where: {
+        city: {
+          not: null,
+        },
+      },
       by: ['city'],
       _count: {
         id: true,
@@ -197,7 +210,7 @@ export class ShelterService {
     });
 
     return cities.map(({ city, _count: { id: sheltersCount } }) => ({
-      city: city || 'Cidade não informada',
+      city,
       sheltersCount,
     }));
   }

@@ -17,6 +17,8 @@ Discord [aqui](https://discord.gg/vjZS6BQXvM).
 
 ## 🗂 Dump do Banco de Dados
 
+| Caso seu banco de dados tenha sido criado com o docker-compose.dev, siga a etapa de **Configuração com Docker**
+
 Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/migration/dev_dump.sql`. Este arquivo
 pode ser executado após as migrations estarem aplicadas.
 
@@ -40,7 +42,15 @@ Para desenvolvedores de frontend que não precisam executar localmente a API e o
 
 2. Use o seguinte comando para criar e iniciar o banco via Docker:
     ```bash
-    docker-compose -f docker-compose.dev.yml up
+    docker-compose -f docker-compose.dev.yml up -d --build
+    ```
+3. Crie os dados de exemplo do banco: 
+   
+   | Aguarde um tempo (15 segundos) após subir o docker do banco para rodar esse comando abaixo, processadores mais lentos podem demorar um pouco para subir o 
+   
+   banco de fato.
+    ```base
+    docker exec -i sos-rs-db psql -U root -d sos_rs -f /tmp/dev_dump.sql 
     ```
 
 Adicione a porta do serviço de banco no `docker-compose.dev.yml` para acessos externos:

@@ -109,8 +109,8 @@ model Shelter {
   verified        Boolean         @default(value: false)
   category        ShelterCategory @default(value: Shelter)
   actived         Boolean         @default(value: true)
-  createdAt       String          @map("created_at") @db.VarChar(32)
-  updatedAt       String?         @map("updated_at") @db.VarChar(32)
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime?       @updatedAt @map("updated_at") @db.Timestamptz()
 
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
@@ -132,22 +132,22 @@ model ShelterManagers {
 }
 
 model Partners {
-  id        String  @id @default(uuid())
-  name      String  @unique
+  id        String    @id @default(uuid())
+  name      String    @unique
   link      String
-  createdAt String  @map("created_at") @db.VarChar(32)
-  updatedAt String? @map("updated_at") @db.VarChar(32)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("partners")
 }
 
 model Supporters {
-  id        String  @id @default(uuid())
-  name      String  @unique
-  imageUrl  String  @map("image_url")
+  id        String    @id @default(uuid())
+  name      String    @unique
+  imageUrl  String    @map("image_url")
   link      String
-  createdAt String  @map("created_at") @db.VarChar(32)
-  updatedAt String? @map("updated_at") @db.VarChar(32)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("supporters")
 }

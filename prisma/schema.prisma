@@ -22,8 +22,8 @@ model User {
   password    String
   phone       String      @unique
   accessLevel AccessLevel @default(value: User)
-  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt   DateTime?   @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt   String      @map("created_at") @db.VarChar(32)
+  updatedAt   String?     @map("updated_at") @db.VarChar(32)
 
   sessions        Session[]
   shelterManagers ShelterManagers[]
@@ -32,13 +32,13 @@ model User {
 }
 
 model Session {
-  id        String    @id @default(uuid())
-  userId    String    @map("user_id")
+  id        String  @id @default(uuid())
+  userId    String  @map("user_id")
   ip        String?
-  userAgent String?   @map("user_agent")
-  active    Boolean   @default(value: true)
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
+  userAgent String? @map("user_agent")
+  active    Boolean @default(value: true)
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
 
   user User @relation(fields: [userId], references: [id])
 
@@ -46,10 +46,10 @@ model Session {
 }
 
 model SupplyCategory {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
+  id        String  @id @default(uuid())
+  name      String  @unique
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
 
   supplies Supply[]
 
@@ -57,12 +57,12 @@ model SupplyCategory {
 }
 
 model ShelterSupply {
-  shelterId String    @map("shelter_id")
-  supplyId  String    @map("supply_id")
-  priority  Int       @default(value: 0)
+  shelterId String  @map("shelter_id")
+  supplyId  String  @map("supply_id")
+  priority  Int     @default(value: 0)
   quantity  Int?
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
 
   shelter Shelter @relation(fields: [shelterId], references: [id])
   supply  Supply  @relation(fields: [supplyId], references: [id])
@@ -72,11 +72,11 @@ model ShelterSupply {
 }
 
 model Supply {
-  id               String    @id @default(uuid())
-  supplyCategoryId String    @map("supply_category_id")
+  id               String  @id @default(uuid())
+  supplyCategoryId String  @map("supply_category_id")
   name             String
-  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt        DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
+  createdAt        String  @map("created_at") @db.VarChar(32)
+  updatedAt        String? @map("updated_at") @db.VarChar(32)
 
   supplyCategory  SupplyCategory  @relation(fields: [supplyCategoryId], references: [id])
   shelterSupplies ShelterSupply[]
@@ -85,25 +85,25 @@ model Supply {
 }
 
 model Shelter {
-  id              String    @id @default(uuid())
-  name            String    @unique
-  pix             String?   @unique
+  id              String   @id @default(uuid())
+  name            String   @unique
+  pix             String?  @unique
   address         String
   street          String?
   neighbourhood   String?
   city            String?
   streetNumber    String?  @map("street_number")
   zipCode         String?  @map("zip_code")
-  petFriendly     Boolean?  @map("pet_friendly")
-  shelteredPeople Int?      @map("sheltered_people")
+  petFriendly     Boolean? @map("pet_friendly")
+  shelteredPeople Int?     @map("sheltered_people")
   capacity        Int?
   contact         String?
-  prioritySum     Int       @default(value: 0) @map("priority_sum")
+  prioritySum     Int      @default(value: 0) @map("priority_sum")
   latitude        Float?
   longitude       Float?
-  verified        Boolean   @default(value: false)
-  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt       DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
+  verified        Boolean  @default(value: false)
+  createdAt       String   @map("created_at") @db.VarChar(32)
+  updatedAt       String?  @map("updated_at") @db.VarChar(32)
 
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
@@ -112,10 +112,10 @@ model Shelter {
 }
 
 model ShelterManagers {
-  shelterId String    @map("shelter_id")
-  userId    String    @map("user_id")
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
+  shelterId String  @map("shelter_id")
+  userId    String  @map("user_id")
+  createdAt String  @map("created_at") @db.VarChar(32)
+  updatedAt String? @map("updated_at") @db.VarChar(32)
 
   user    User    @relation(fields: [userId], references: [id])
   shelter Shelter @relation(fields: [shelterId], references: [id])

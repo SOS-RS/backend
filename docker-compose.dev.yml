@@ -23,6 +23,7 @@ services:
       - PORT=${PORT}
     command: >
       sh -c "npm install &&
+      apk add --no-cache make && 
       npx prisma generate &&
       npx prisma migrate dev &&
       npm run start:dev -- --preserveWatchOutput"
@@ -34,3 +35,4 @@ services:
     environment:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_USER=${DB_USER}
+

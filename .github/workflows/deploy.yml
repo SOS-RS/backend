@@ -28,7 +28,7 @@ jobs:
           cat .env
 
       - name: Remove old docker image
-        run: echo ${{ secrets.SERVER_USER_PASSWORD }} | sudo -S docker compose down --rmi all
+        run: echo ${{ secrets.SERVER_USER_PASSWORD }} | sudo -S make prod-down
 
       - name: Create new docker image
-        run: echo ${{ secrets.SERVER_USER_PASSWORD }} | sudo -S docker compose up -d --force-recreate
+        run: echo ${{ secrets.SERVER_USER_PASSWORD }} | sudo -S make prod-up

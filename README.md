@@ -126,105 +126,35 @@ Claro, aqui está a documentação para esses comandos:
 
 ### Comandos Make
 
-#### Instalação e Configuração do Projeto
 
-- **install:**
-  - `make install`
-  - Instala as dependências do projeto usando o npm.
 
-- **prisma:**
-  - `make prisma`
-  - Gera os artefatos do Prisma executando `npx prisma generate` e aplica as migrações do banco de dados executando `npx run migrations:dev`.
+  
+### Comandos Make
 
-- **setup:**
-  - `make setup`
-  - Configura o ambiente de desenvolvimento, desativando o `fileMode` do Git, criando um arquivo `.env` se ele não existir e executando os comandos `install` e `prisma`.
+Command | Docker | Locally | Description
+---- | ------- | ------- | -------
+install | - | `make install` | Instala as dependências do projeto usando o npm.
+prisma | - | `make prisma` | Gera os artefatos do Prisma executando `npx prisma generate` e aplica as migrações do banco de dados executando `npx run migrations:dev`.
+setup |  `make setup-docker` | `make setup` | Configura o ambiente de desenvolvimento, desativando o `fileMode` do Git, criando um arquivo `.env` se ele não existir e executando os comandos `install` e `prisma`.
+file-mode | - | `make file-mode` | Configura o Git para desativar o `fileMode`.
+create.env.file | - | `make create.env.file` | Cria um arquivo `.env` a partir de `.env.local` se o arquivo `.env` ainda não existir.
+start | - | `make start` | Inicia o projeto em modo de desenvolvimento executando `npm run start:dev`, após configurar o ambiente com `setup`.
+start-debug | - | `make start-debug` | Inicia o projeto em modo de depuração executando `npm run start:debug`, após configurar o ambiente com `setup`.
+build | - | `make build` | Compila o projeto executando `npm run build`.
+test | - | `make test` | Executa os testes do projeto.
+test-coverage | - | `make test-coverage` | Executa os testes com cobertura.
+test-debug | - | `make test-debug` | Executa os testes em modo de depuração.
+test-e2e | - | `make test-e2e` | Executa os testes end-to-end.
+dev-up | `make dev-up` | - | Inicia os serviços de desenvolvimento usando Docker Compose (`docker-compose.dev.yml`).
+dev-down | `make dev-down` | - | Desliga os serviços de desenvolvimento iniciados com Docker Compose.
+bash | `make bash` | - | Acessa o terminal do contêiner específico `sos-rs-api` para execução de comandos específicos.
+dev-logs | `make dev-logs` | - | Exibe os logs dos serviços de desenvolvimento iniciados com Docker Compose.
+dev-db-load-dump | `make dev-db-load-dump` | - | Carrega um dump no banco de dados de desenvolvimento.
+docker-build | `make docker-build` | - | Constrói a imagem Docker do projeto.
+docker-tag | `make docker-tag` | - | Adiciona tags à imagem Docker para identificação.
+prod-up | `make prod-up` | - | Inicia os serviços de produção usando Docker Compose.
+prod-down | `make prod-down` | - | Desliga os serviços de produção e remove as imagens Docker.
 
-- **file-mode:**
-  - `make file-mode`
-  - Configura o Git para desativar o `fileMode`.
-
-- **create.env.file:**
-  - `make create.env.file`
-  - Cria um arquivo `.env` a partir de `.env.local` se o arquivo `.env` ainda não existir.
-
-#### Inicialização e Execução do Projeto
-
-- **start:**
-  - `make start`
-  - Inicia o projeto em modo de desenvolvimento executando `npm run start:dev`, após configurar o ambiente com `setup`.
-
-- **start-debug:**
-  - `make start-debug`
-  - Inicia o projeto em modo de depuração executando `npm run start:debug`, após configurar o ambiente com `setup`.
-
-- **build:**
-  - `make build`
-  - Compila o projeto executando `npm run build`.
-
-#### Testes e Verificação
-
-- **test:**
-  - `make test`
-  - Executa os testes do projeto.
-
-- **test-coverage:**
-  - `make test-coverage`
-  - Executa os testes com cobertura.
-
-- **test-debug:**
-  - `make test-debug`
-  - Executa os testes em modo de depuração.
-
-- **test-e2e:**
-  - `make test-e2e`
-  - Executa os testes end-to-end.
-
-#### Docker e Ambiente de Desenvolvimento
-
-- **dev-up:**
-  - `make dev-up`
-  - Inicia os serviços de desenvolvimento usando Docker Compose (`docker-compose.dev.yml`).
-
-- **setup-docker:**
-  - `make setup-docker`
-  - Configura o ambiente de desenvolvimento com Docker, desativando o `fileMode` do Git, criando um arquivo `.env` se ele não existir e iniciando os serviços de desenvolvimento.
-
-- **dev-down:**
-  - `make dev-down`
-  - Desliga os serviços de desenvolvimento iniciados com Docker Compose.
-
-- **bash:**
-  - `make bash`
-  - Acessa o terminal do contêiner específico `sos-rs-api` para execução de comandos específicos.
-
-- **dev-logs:**
-  - `make dev-logs`
-  - Exibe os logs dos serviços de desenvolvimento iniciados com Docker Compose.
-
-- **dev-db-load-dump:**
-  - `make dev-db-load-dump`
-  - Carrega um dump no banco de dados de desenvolvimento.
-
-#### Docker Builds e Tags
-
-- **docker-build:**
-  - `make docker-build`
-  - Constrói a imagem Docker do projeto.
-
-- **docker-tag:**
-  - `make docker-tag`
-  - Adiciona tags à imagem Docker para identificação.
-
-#### Produção
-
-- **prod-up:**
-  - `make prod-up`
-  - Inicia os serviços de produção usando Docker Compose.
-
-- **prod-down:**
-  - `make prod-down`
-  - Desliga os serviços de produção e remove as imagens Docker.
 
 ---
 

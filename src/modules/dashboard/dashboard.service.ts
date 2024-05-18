@@ -4,13 +4,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { ShelterSearchPropsSchema } from 'src/shelter/types/search.types';
 import { SearchSchema } from 'src/types';
 import { ShelterSearch } from 'src/shelter/ShelterSearch';
-import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class DashboardService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  @Cron(CronExpression.EVERY_6_HOURS)
   async index(query: any) {
     const {
       order,

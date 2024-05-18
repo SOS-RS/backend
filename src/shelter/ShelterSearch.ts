@@ -11,12 +11,6 @@ import {
   ShelterTagType,
 } from './types/search.types';
 
-const defaultTagsData: ShelterTagInfo = {
-  NeedDonations: 10,
-  NeedVolunteers: 10,
-  RemainingSupplies: 10,
-};
-
 class ShelterSearch {
   private formProps: Partial<ShelterSearchProps>;
   private prismaService: PrismaService;
@@ -27,7 +21,6 @@ class ShelterSearch {
   ) {
     this.prismaService = prismaService;
     this.formProps = { ...props };
-    this.getQuery = this.getQuery.bind(this);
   }
 
   priority(supplyIds: string[] = []): Prisma.ShelterWhereInput {
@@ -103,20 +96,23 @@ class ShelterSearch {
     };
   }
 
-  async getSearch(): Promise<Prisma.ShelterWhereInput> {
-    if (!this.formProps.search) return {};
+  get search(): Prisma.ShelterWhereInput[] {
+    if (!this.formProps.search) return [];
 
-    const search = `${this.formProps.search.toLowerCase()}`;
-
-    const results = await this.prismaService.$queryRaw<{ id: string }[]>(
-      Prisma.sql`SELECT id FROM shelters WHERE lower(unaccent(address)) LIKE '%' || unaccent(${search}) || '%' OR lower(unaccent(name)) LIKE '%' || unaccent(${search}) || '%';`,
-    );
-
-    return {
-      id: {
-        in: results.map((r) => r.id),
+    return [
+      {
+        address: {
+          contains: this.formProps.search,
+          mode: 'insensitive',
+        },
       },
-    };
+      {
+        name: {
+          contains: this.formProps.search,
+          mode: 'insensitive',
+        },
+      },
+    ];
   }
 
   get cities(): Prisma.ShelterWhereInput {
@@ -148,15 +144,13 @@ class ShelterSearch {
     };
   }
 
-  async getQuery(): Promise<Prisma.ShelterWhereInput> {
+  get query(): Prisma.ShelterWhereInput {
     if (Object.keys(this.formProps).length === 0) return {};
-
-    const search = await this.getSearch();
     const queryData = {
       AND: [
         this.cities,
         this.geolocation,
-        search,
+        { OR: this.search },
         { OR: this.shelterStatus },
         this.priority(this.formProps.supplyIds),
         this.supplyCategoryIds(this.formProps.priority),
@@ -180,32 +174,21 @@ function parseTagResponse(
   voluntaryIds: string[],
 ): SearchShelterTagResponse[] {
   const tags: ShelterTagInfo = {
-    ...defaultTagsData,
     ...(tagProps?.tags ?? {}),
   };
 
   const parsed = results.map((result) => {
-    const qtd: Required<ShelterTagInfo> = {
-      NeedDonations: 0,
-      NeedVolunteers: 0,
-      RemainingSupplies: 0,
-    };
     return {
       ...result,
       shelterSupplies: result.shelterSupplies.reduce((prev, shelterSupply) => {
         const supplyTags: ShelterTagType[] = [];
-        let tagged: boolean = false;
         if (
           tags.NeedDonations &&
           [SupplyPriority.Needing, SupplyPriority.Urgent].includes(
             shelterSupply.priority,
           )
         ) {
-          if (qtd.NeedDonations < tags.NeedDonations) {
-            qtd.NeedDonations++;
-            tagged = true;
-            supplyTags.push('NeedDonations');
-          }
+          supplyTags.push('NeedDonations');
         }
         if (
           tags.NeedVolunteers &&
@@ -214,24 +197,15 @@ function parseTagResponse(
             shelterSupply.priority,
           )
         ) {
-          if (qtd.NeedVolunteers < tags.NeedVolunteers) {
-            qtd.NeedVolunteers++;
-            tagged = true;
-            supplyTags.push('NeedVolunteers');
-          }
+          supplyTags.push('NeedVolunteers');
         }
         if (
           tags.RemainingSupplies &&
           [SupplyPriority.Remaining].includes(shelterSupply.priority)
         ) {
-          if (qtd.RemainingSupplies < tags.RemainingSupplies) {
-            qtd.RemainingSupplies++;
-            tagged = true;
-            supplyTags.push('RemainingSupplies');
-          }
+          supplyTags.push('RemainingSupplies');
         }
-        if (tagged) return [...prev, { ...shelterSupply, tags: supplyTags }];
-        else return prev;
+        return [...prev, { ...shelterSupply, tags: supplyTags }];
       }, [] as any),
     };
   });

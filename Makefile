@@ -10,7 +10,7 @@ install:
 
 prisma:
 	@npx prisma generate 
-	@npx run migrations:dev 
+	@npm run migrations:dev 
 
 setup:
 	make file-mode

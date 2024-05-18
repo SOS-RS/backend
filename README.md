@@ -152,7 +152,7 @@ dev-logs | `make dev-logs` | - | Exibe os logs dos serviços de desenvolvimento 
 dev-db-load-dump | `make dev-db-load-dump` | - | Carrega um dump no banco de dados de desenvolvimento.
 docker-build | `make docker-build` | - | Constrói a imagem Docker do projeto.
 docker-tag | `make docker-tag` | - | Adiciona tags à imagem Docker para identificação.
-prod-up | `make prod-up` | - | Inicia os serviços de produção usando Docker Compose.
+prod-up | `make prod-up` | - | Inicia os serviços de produção usando Docker Compose.make 
 prod-down | `make prod-down` | - | Desliga os serviços de produção e remove as imagens Docker.
 
 

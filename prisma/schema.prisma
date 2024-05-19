@@ -72,8 +72,24 @@ model ShelterSupply {
   shelter Shelter @relation(fields: [shelterId], references: [id])
   supply  Supply  @relation(fields: [supplyId], references: [id])
 
+  ShelterSupplyLog ShelterSupplyLog[]
+
   @@id([shelterId, supplyId])
   @@map("shelter_supplies")
+}
+
+model ShelterSupplyLog {
+  id                     String @id @default(uuid())
+  shelterSupplyShelterId String @map("shelter_suply_shelter_id")
+  shelterSupplySupplyId  String @map("shelter_suply_supply_id")
+  priority               Int?
+  quantity               Int?
+  createdAt              String @map("created_at") @db.VarChar(32)
+
+  shelterSupply ShelterSupply @relation(fields: [shelterSupplyShelterId, shelterSupplySupplyId], references: [shelterId, supplyId])
+
+  @@index([shelterSupplyShelterId, shelterSupplySupplyId])
+  @@map("shelter_supply_logs")
 }
 
 model Supply {

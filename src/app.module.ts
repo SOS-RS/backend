@@ -1,18 +1,19 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
-import { PrismaModule } from './prisma/prisma.module';
-import { ShelterModule } from './shelter/shelter.module';
-import { SupplyModule } from './supply/supply.module';
 import { ServerResponseInterceptor } from './interceptors';
 import { LoggingMiddleware } from './middlewares/logging.middleware';
-import { UsersModule } from './users/users.module';
-import { SessionsModule } from './sessions/sessions.module';
-import { SupplyCategoriesModule } from './supply-categories/supply-categories.module';
-import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
-import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { PartnersModule } from './partners/partners.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { SessionsModule } from './sessions/sessions.module';
+import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
+import { ShelterSupplyLogsModule } from './shelter-supply-logs/shelter-supply-log.module';
+import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
+import { ShelterModule } from './shelter/shelter.module';
+import { SupplyCategoriesModule } from './supply-categories/supply-categories.module';
+import { SupplyModule } from './supply/supply.module';
 import { SupportersModule } from './supporters/supporters.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SupportersModule } from './supporters/supporters.module';
     SupplyCategoriesModule,
     ShelterManagersModule,
     ShelterSupplyModule,
+    ShelterSupplyLogsModule,
     PartnersModule,
     SupportersModule,
   ],

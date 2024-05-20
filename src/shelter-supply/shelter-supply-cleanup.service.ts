@@ -6,7 +6,7 @@ import { SupplyPriority } from 'src/supply/types';
 
 @Injectable()
 export class ShelterSupplyCleanupService {
-  private logger = new Logger('ItemCleanupService');
+  private logger = new Logger('ShelterSupplyCleanupService');
   constructor(private readonly prismaService: PrismaService) {}
 
   @Cron('0 0 */2 * *')
@@ -23,34 +23,33 @@ export class ShelterSupplyCleanupService {
         `Verificando necessidade de exclusão de itens no abrigo ${shelterSupply.shelter.name}`,
       );
 
-      const { supply } = shelterSupply;
-
       if (
-        this.canRemoveSupply(
-          supply.createdAt,
-          supply.updatedAt,
+        this.canRemoveShelterSupply(
+          shelterSupply.createdAt,
+          shelterSupply.updatedAt,
           shelterSupply.priority,
         )
       ) {
-        await this.removeSupply(
-          supply.id,
+        await this.removeShelterSupply(
+          shelterSupply.supply.id,
           shelterSupply.shelterId,
-          supply.name,
+          shelterSupply.supply.name,
         );
       }
     }
   }
 
-  private hasPassed48Hours(
+  hasPassed48Hours(
     createdAt: string | null,
     updatedAt: string | null,
   ): boolean {
-    let targetDate: Date;
-    if (updatedAt !== null) {
-      targetDate = parseISO(updatedAt);
-    } else if (createdAt !== null) {
-      targetDate = parseISO(createdAt);
-    } else {
+    const targetDate = updatedAt
+      ? parseISO(updatedAt)
+      : createdAt
+        ? parseISO(createdAt)
+        : null;
+
+    if (!targetDate) {
       return false;
     }
 
@@ -59,7 +58,7 @@ export class ShelterSupplyCleanupService {
     return hoursDifference >= 48;
   }
 
-  private async removeSupply(
+  private async removeShelterSupply(
     supplyId: string,
     shelterId: string,
     supplyName: string,
@@ -100,7 +99,7 @@ export class ShelterSupplyCleanupService {
     }
   }
 
-  private canRemoveSupply(
+  private canRemoveShelterSupply(
     createdAt: string | null,
     updatedAt: string | null,
     priority: SupplyPriority,

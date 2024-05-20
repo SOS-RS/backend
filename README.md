@@ -17,16 +17,17 @@ Discord [aqui](https://discord.gg/vjZS6BQXvM).
 
 ## 🗂 Dump do Banco de Dados
 
-Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/migration/dev_dump.sql`. Este arquivo
+Para iniciar com dados de exemplo, utilize o dump do banco disponível em `prisma/dev_dump.sql`. Este arquivo
 pode ser executado após as migrations estarem aplicadas.
 
 Se estiver usando Docker, os comandos para carregar o dump são:
 
 ```bash
 # Copiar o dump para a pasta temporária do Docker
-docker exec -it cp backup.sql POSTGRES_CONTAINER_ID:/tmp/backup.sql
+docker cp prisma/dev_dump.sql sos-rs-db:/tmp/dump.sql
+
 # Importar o dump para o banco
-docker exec -i POSTGRES_CONTAINER_ID psql -U root -d DATABASE_NAME -f /tmp/backup.sql
+docker exec -i sos-rs-db psql -U root -d sos_rs -f /tmp/dump.sql
 ```
 
 ## 🐳 Configuração com Docker
@@ -44,14 +45,6 @@ Para desenvolvedores de frontend que não precisam executar localmente a API e o
     ```bash
     docker-compose -f docker-compose.dev.yml up
     ```
-
-Adicione a porta do serviço de banco no `docker-compose.dev.yml` para acessos externos:
-
-```yaml
-ports:
-  - '5432:5432'
-  - '4000:4000'
-```
 
 ## 🚀 Configuração Inicial Local
 

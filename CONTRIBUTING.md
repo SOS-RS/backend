@@ -34,9 +34,9 @@ marcará você como a pessoa responsável por aquele issue, e marcará o item co
 
 A partir daí você já pode trabalhar no item que escolheu.
 
-Você também pode mandar a contribuição diretamente, sem avisar, mas corre o
+Você também pode mandar a contribuição diretamente sem avisar, mas corre o
 risco de alguém solicitar para trabalhar no item e entregá-lo junto ou antes de
-você, desperdiçando esforços. Faça isso só se a correção for bem rápida, para
+você, desperdiçando assim esforços. Somente faça isso se a correção for bem rápida e pontual para
 evitar o desperdício.
 
 ⚠️ **Importante**: Itens de alta prioridade precisam ser entregues o mais rápido possível,

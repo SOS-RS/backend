@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PartnersService } from './partners.service';
 import { PrismaService } from '../prisma/prisma.service';
 
-jest.mock('../prisma/prisma.service'); // Mock PrismaService
+jest.mock('../prisma/prisma.service');
 
 describe('PartnersService', () => {
   let service: PartnersService;
@@ -11,15 +11,14 @@ describe('PartnersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PartnersService,
-        { provide: PrismaService, useClass: PrismaService }, // Provide PrismaService
+        { provide: PrismaService, useClass: PrismaService },
       ],
     })
       .overrideProvider(PrismaService)
       .useValue({
-        // Use value for PrismaService
         partners: {
-          findMany: jest.fn().mockResolvedValue([]), // Mock findMany to return an empty array
-          create: jest.fn().mockResolvedValue({}), // Mock create to return an empty object
+          findMany: jest.fn().mockResolvedValue([]),
+          create: jest.fn().mockResolvedValue({}),
         },
       })
       .compile();
@@ -33,7 +32,7 @@ describe('PartnersService', () => {
 
   it('should return all partners', async () => {
     const partners = await service.index();
-    expect(partners).toEqual([]); // Adjusted to check against an empty array
+    expect(partners).toEqual([]);
   });
 
   it('should create a partner', async () => {

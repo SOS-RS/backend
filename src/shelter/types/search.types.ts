@@ -41,7 +41,7 @@ export const ShelterSearchPropsSchema = z.object({
   tags: ShelterTagInfoSchema.nullable().optional(),
   cities: z.array(z.string()).optional(),
   geolocation: GeolocationFilterSchema.optional(),
-  showDisabled: z
+  showDeactivated: z
     .string()
     .refine((value) => value === 'true' || value === 'false')
     .transform((value) => value === 'true')

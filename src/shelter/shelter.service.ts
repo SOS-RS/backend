@@ -87,7 +87,8 @@ export class ShelterService implements OnModuleInit {
         latitude: true,
         longitude: true,
         verified: true,
-        enabled: true,
+        actived: true,
+        category: true,
         shelterSupplies: {
           select: {
             priority: true,
@@ -126,7 +127,9 @@ export class ShelterService implements OnModuleInit {
       search: searchQuery,
     } = SearchSchema.parse(query);
     const queryData = ShelterSearchPropsSchema.parse(qs.parse(searchQuery));
-    const { query: where } = new ShelterSearch(this.prismaService, queryData);
+    const { getQuery } = new ShelterSearch(this.prismaService, queryData);
+    const where = await getQuery();
+
     const count = await this.prismaService.shelter.count({ where });
 
     const take = perPage;
@@ -156,9 +159,10 @@ export class ShelterService implements OnModuleInit {
         shelteredPeople: true,
         prioritySum: true,
         verified: true,
-        enabled: true,
         latitude: true,
         longitude: true,
+        actived: true,
+        category: true,
         createdAt: true,
         updatedAt: true,
         shelterSupplies: {

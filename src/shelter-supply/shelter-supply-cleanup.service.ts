@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { ShelterSupply } from '@prisma/client';
 import { differenceInHours, parseISO } from 'date-fns';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SupplyPriority } from 'src/supply/types';
@@ -23,19 +24,7 @@ export class ShelterSupplyCleanupService {
         `Verificando necessidade de exclusão de itens no abrigo ${shelterSupply.shelter.name}`,
       );
 
-      if (
-        this.canRemoveShelterSupply(
-          shelterSupply.createdAt,
-          shelterSupply.updatedAt,
-          shelterSupply.priority,
-        )
-      ) {
-        await this.removeShelterSupply(
-          shelterSupply.supply.id,
-          shelterSupply.shelterId,
-          shelterSupply.supply.name,
-        );
-      }
+      await this.removeShelterSupply(shelterSupply);
     }
   }
 
@@ -58,33 +47,30 @@ export class ShelterSupplyCleanupService {
     return hoursDifference >= 48;
   }
 
-  private async removeShelterSupply(
-    supplyId: string,
-    shelterId: string,
-    supplyName: string,
-  ) {
+  private async removeShelterSupply(shelterSupply: ShelterSupply) {
     this.logger.log(
-      `Suprimento ${supplyName} já está há 48 horas com baixa movimentação e não é urgente. Removendo relação com o abrigo ${shelterId}`,
+      `Suprimento ${shelterSupply.supplyId} já está há 48 horas com baixa movimentação e não é urgente. Removendo relação com o abrigo ${shelterSupply.shelterId}`,
     );
 
+    if (!this.canRemoveShelterSupply(shelterSupply)) return;
     try {
       await this.prismaService.$transaction([
         this.prismaService.shelterSupply.deleteMany({
           where: {
-            supplyId,
-            shelterId,
+            supplyId: shelterSupply.supplyId,
+            shelterId: shelterSupply.shelterId,
           },
         }),
         this.prismaService.supplyAutoRemoveLog.create({
           data: {
             supply: {
               connect: {
-                id: supplyId,
+                id: shelterSupply.supplyId,
               },
             },
             shelter: {
               connect: {
-                id: shelterId,
+                id: shelterSupply.shelterId,
               },
             },
             removedAt: new Date().toISOString(),
@@ -93,20 +79,19 @@ export class ShelterSupplyCleanupService {
       ]);
     } catch (error) {
       this.logger.error(
-        `Erro ao tentar remover o suprimento ${supplyId} do abrigo ${shelterId}`,
+        `Erro ao tentar remover o suprimento ${shelterSupply.supplyId} do abrigo ${shelterSupply.shelterId}`,
         (error as Error).stack,
       );
     }
   }
 
-  private canRemoveShelterSupply(
-    createdAt: string | null,
-    updatedAt: string | null,
-    priority: SupplyPriority,
-  ): boolean {
-    const hasPassedTime = this.hasPassed48Hours(createdAt, updatedAt);
+  private canRemoveShelterSupply(shelterSupply: ShelterSupply): boolean {
+    const hasPassedTime = this.hasPassed48Hours(
+      shelterSupply.createdAt,
+      shelterSupply.updatedAt,
+    );
 
-    const isNotUrgent = priority !== SupplyPriority.Urgent;
+    const isNotUrgent = shelterSupply.priority !== SupplyPriority.Urgent;
 
     return isNotUrgent && hasPassedTime;
   }

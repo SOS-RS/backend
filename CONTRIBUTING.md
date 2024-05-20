@@ -8,8 +8,8 @@ Para se inteirar do projeto, entre no
 
 ## 🤝 Contribuindo com atividades que não são de código
 
-O projeto precisa de ajuda em diversas frentes diferentes, como QA, produto,
-design e gestão. Entre no servidor do Discord, onde há canais específicos para
+O projeto precisa de ajuda em diversas frentes diferentes como: QA, produto,
+design e gestão. Entre no servidor do Discord onde há canais específicos para
 essas atividades.
 
 Se você encontrou um bug, vá nas

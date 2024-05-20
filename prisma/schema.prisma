@@ -85,6 +85,7 @@ model Supply {
 
   supplyCategory  SupplyCategory  @relation(fields: [supplyCategoryId], references: [id])
   shelterSupplies ShelterSupply[]
+  supplyAutoRemoveLogs SupplyAutoRemoveLog[]
 
   @@map("supplies")
 }
@@ -114,6 +115,7 @@ model Shelter {
 
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
+  supplyAutoRemoveLogs SupplyAutoRemoveLog[]
 
   @@map("shelters")
 }
@@ -150,4 +152,19 @@ model Supporters {
   updatedAt String? @map("updated_at") @db.VarChar(32)
 
   @@map("supporters")
+}
+
+
+model SupplyAutoRemoveLog {
+  id        String  @id @default(uuid())
+  supplyId  String  @map("supply_id")
+  shelterId String  @map("shelter_id")
+  removedAt String  @map("removed_at") @db.VarChar(32)
+  
+
+
+  shelter Shelter @relation(fields: [shelterId], references: [id])
+  supply Supply @relation(fields: [supplyId], references: [id])
+
+  @@map("supply_auto_remove_logs")
 }

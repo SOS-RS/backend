@@ -13,6 +13,9 @@ import { ShelterManagersModule } from './shelter-managers/shelter-managers.modul
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { PartnersModule } from './partners/partners.module';
 import { SupportersModule } from './supporters/supporters.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ItemCleanupService } from './schedule/item-cleanup.service';
+
 
 @Module({
   imports: [
@@ -26,6 +29,7 @@ import { SupportersModule } from './supporters/supporters.module';
     ShelterSupplyModule,
     PartnersModule,
     SupportersModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [
@@ -33,6 +37,7 @@ import { SupportersModule } from './supporters/supporters.module';
       provide: APP_INTERCEPTOR,
       useClass: ServerResponseInterceptor,
     },
+    ItemCleanupService
   ],
 })
 export class AppModule implements NestModule {

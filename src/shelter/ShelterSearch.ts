@@ -1,10 +1,12 @@
 import { Prisma } from '@prisma/client';
 
-import { PrismaService } from '../prisma/prisma.service';
+import { calculateGeolocationBounds } from '@/utils/utils';
 import { SupplyPriority } from 'src/supply/types';
+import { PrismaService } from '../prisma/prisma.service';
 import {
-  IFilterFormProps,
   SearchShelterTagResponse,
+  ShelterSearchProps,
+  ShelterStatus,
   ShelterTagInfo,
   ShelterTagType,
 } from './types/search.types';
@@ -16,57 +18,56 @@ const defaultTagsData: ShelterTagInfo = {
 };
 
 class ShelterSearch {
-  private formProps: Partial<IFilterFormProps>;
+  private formProps: Partial<ShelterSearchProps>;
   private prismaService: PrismaService;
 
   constructor(
     prismaService: PrismaService,
-    props: Partial<IFilterFormProps> = {},
+    props: Partial<ShelterSearchProps> = {},
   ) {
     this.prismaService = prismaService;
     this.formProps = { ...props };
+    this.getQuery = this.getQuery.bind(this);
   }
 
   priority(supplyIds: string[] = []): Prisma.ShelterWhereInput {
-    if (this.formProps.priority) {
-      return {
-        shelterSupplies: {
-          some: {
-            priority: +this.formProps.priority,
-            supplyId:
-              supplyIds.length > 0
-                ? {
-                    in: supplyIds,
-                  }
-                : undefined,
-          },
+    if (!this.formProps.priority) return {};
+
+    return {
+      shelterSupplies: {
+        some: {
+          priority: +this.formProps.priority,
+          supplyId:
+            supplyIds.length > 0
+              ? {
+                  in: supplyIds,
+                }
+              : undefined,
         },
-      };
-    } else return {};
+      },
+    };
   }
 
   get shelterStatus(): Prisma.ShelterWhereInput[] {
     if (!this.formProps.shelterStatus) return [];
-    else {
-      return this.formProps.shelterStatus.map((status) => {
-        if (status === 'waiting')
-          return {
-            capacity: null,
-          };
-        else if (status === 'available')
-          return {
-            capacity: {
-              gt: this.prismaService.shelter.fields.shelteredPeople,
-            },
-          };
-        else
-          return {
-            capacity: {
-              lte: this.prismaService.shelter.fields.shelteredPeople,
-            },
-          };
-      });
-    }
+
+    const clausesFromStatus: Record<
+      ShelterStatus,
+      Prisma.ShelterWhereInput['capacity'] | null
+    > = {
+      waiting: null,
+      available: {
+        gt: this.prismaService.shelter.fields.shelteredPeople,
+      },
+      unavailable: {
+        lte: this.prismaService.shelter.fields.shelteredPeople,
+        not: 0,
+      },
+    };
+
+    return this.formProps.shelterStatus.map((status) => ({
+      capacity: clausesFromStatus[status],
+    }));
   }
 
   supplyCategoryIds(
@@ -102,30 +103,60 @@ class ShelterSearch {
     };
   }
 
-  get search(): Prisma.ShelterWhereInput[] {
-    if (!this.formProps.search) return [];
-    else
-      return [
-        {
-          address: {
-            contains: this.formProps.search,
-            mode: 'insensitive',
-          },
-        },
-        {
-          name: {
-            contains: this.formProps.search,
-            mode: 'insensitive',
-          },
-        },
-      ];
+  async getSearch(): Promise<Prisma.ShelterWhereInput> {
+    if (!this.formProps.search) return {};
+
+    const search = `${this.formProps.search.toLowerCase()}`;
+
+    const results = await this.prismaService.$queryRaw<{ id: string }[]>(
+      Prisma.sql`SELECT id FROM shelters WHERE lower(unaccent(address)) LIKE '%' || unaccent(${search}) || '%' OR lower(unaccent(name)) LIKE '%' || unaccent(${search}) || '%';`,
+    );
+
+    return {
+      id: {
+        in: results.map((r) => r.id),
+      },
+    };
   }
 
-  get query(): Prisma.ShelterWhereInput {
+  get cities(): Prisma.ShelterWhereInput {
+    if (!this.formProps.cities) return {};
+
+    return {
+      city: {
+        in: this.formProps.cities,
+      },
+    };
+  }
+
+  get geolocation(): Prisma.ShelterWhereInput {
+    if (!this.formProps.geolocation) return {};
+
+    const { minLat, maxLat, minLong, maxLong } = calculateGeolocationBounds(
+      this.formProps.geolocation,
+    );
+
+    return {
+      latitude: {
+        gte: minLat,
+        lte: maxLat,
+      },
+      longitude: {
+        gte: minLong,
+        lte: maxLong,
+      },
+    };
+  }
+
+  async getQuery(): Promise<Prisma.ShelterWhereInput> {
     if (Object.keys(this.formProps).length === 0) return {};
+
+    const search = await this.getSearch();
     const queryData = {
       AND: [
-        { OR: this.search },
+        this.cities,
+        this.geolocation,
+        search,
         { OR: this.shelterStatus },
         this.priority(this.formProps.supplyIds),
         this.supplyCategoryIds(this.formProps.priority),
@@ -144,7 +175,7 @@ class ShelterSearch {
  * @returns Retorna a lista de resultados, adicionando o campo tags em cada supply para assim categoriza-los corretamente e limitar a quantidade de cada retornada respeitando os parametros em formProps
  */
 function parseTagResponse(
-  tagProps: Partial<Pick<IFilterFormProps, 'tags'>> = {},
+  tagProps: Partial<Pick<ShelterSearchProps, 'tags'>> = {},
   results: SearchShelterTagResponse[],
   voluntaryIds: string[],
 ): SearchShelterTagResponse[] {

@@ -1,25 +1,28 @@
-import { z } from 'zod';
-import { Injectable } from '@nestjs/common';
-import * as qs from 'qs';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
+import { subDays } from 'date-fns';
+import * as qs from 'qs';
+import { z } from 'zod';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { SupplyPriority } from '../supply/types';
+import { SearchSchema } from '../types';
+import { ShelterSearch, parseTagResponse } from './ShelterSearch';
+import { ShelterSearchPropsSchema } from './types/search.types';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
   UpdateShelterSchema,
 } from './types/types';
-import { SearchSchema } from '../types';
-import { ShelterSearch, parseTagResponse } from './ShelterSearch';
-import { SupplyPriority } from '../supply/types';
-import { IFilterFormProps } from './types/search.types';
 
 @Injectable()
-export class ShelterService {
+export class ShelterService implements OnModuleInit {
   private voluntaryIds: string[] = [];
 
-  constructor(private readonly prismaService: PrismaService) {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  onModuleInit() {
     this.loadVoluntaryIds();
   }
 
@@ -30,6 +33,7 @@ export class ShelterService {
       data: {
         ...payload,
         createdAt: new Date().toISOString(),
+        updatedAt: subDays(new Date(), 1).toISOString(),
       },
     });
   }
@@ -60,7 +64,7 @@ export class ShelterService {
     });
   }
 
-  async show(id: string) {
+  async show(id: string, shouldShowContact: boolean) {
     const data = await this.prismaService.shelter.findFirst({
       where: {
         id,
@@ -69,15 +73,22 @@ export class ShelterService {
         id: true,
         name: true,
         address: true,
+        street: true,
+        neighbourhood: true,
+        city: true,
+        streetNumber: true,
+        zipCode: true,
         pix: true,
         shelteredPeople: true,
         capacity: true,
-        contact: true,
+        contact: shouldShowContact,
         petFriendly: true,
         prioritySum: true,
         latitude: true,
         longitude: true,
         verified: true,
+        actived: true,
+        category: true,
         shelterSupplies: {
           select: {
             priority: true,
@@ -115,8 +126,10 @@ export class ShelterService {
       perPage,
       search: searchQuery,
     } = SearchSchema.parse(query);
-    const queryData = qs.parse(searchQuery) as unknown as IFilterFormProps;
-    const { query: where } = new ShelterSearch(this.prismaService, queryData);
+    const queryData = ShelterSearchPropsSchema.parse(qs.parse(searchQuery));
+    const { getQuery } = new ShelterSearch(this.prismaService, queryData);
+    const where = await getQuery();
+
     const count = await this.prismaService.shelter.count({ where });
 
     const take = perPage;
@@ -136,14 +149,20 @@ export class ShelterService {
         name: true,
         pix: true,
         address: true,
+        street: true,
+        neighbourhood: true,
+        city: true,
+        streetNumber: true,
+        zipCode: true,
         capacity: true,
-        contact: true,
         petFriendly: true,
         shelteredPeople: true,
         prioritySum: true,
         verified: true,
         latitude: true,
         longitude: true,
+        actived: true,
+        category: true,
         createdAt: true,
         updatedAt: true,
         shelterSupplies: {
@@ -172,7 +191,31 @@ export class ShelterService {
     };
   }
 
-  loadVoluntaryIds() {
+  async getCities() {
+    const cities = await this.prismaService.shelter.groupBy({
+      where: {
+        city: {
+          not: null,
+        },
+      },
+      by: ['city'],
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        _count: {
+          id: 'desc',
+        },
+      },
+    });
+
+    return cities.map(({ city, _count: { id: sheltersCount } }) => ({
+      city,
+      sheltersCount,
+    }));
+  }
+
+  private loadVoluntaryIds() {
     this.prismaService.supplyCategory
       .findMany({
         where: {

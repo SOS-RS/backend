@@ -148,8 +148,17 @@ class ShelterSearch {
     };
   }
 
+  get showDeactivated(): Prisma.ShelterWhereInput {
+    if (this.formProps.showDeactivated) return {};
+
+    return {
+      actived: true,
+    };
+  }
+
   async getQuery(): Promise<Prisma.ShelterWhereInput> {
-    if (Object.keys(this.formProps).length === 0) return {};
+    if (Object.keys(this.formProps).length === 0)
+      return { ...this.showDeactivated };
 
     const search = await this.getSearch();
     const queryData = {
@@ -160,6 +169,7 @@ class ShelterSearch {
         { OR: this.shelterStatus },
         this.priority(this.formProps.supplyIds),
         this.supplyCategoryIds(this.formProps.priority),
+        this.showDeactivated,
       ],
     };
 

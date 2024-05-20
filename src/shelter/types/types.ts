@@ -25,6 +25,7 @@ const ShelterSchema = z.object({
   capacity: z.number().min(0).nullable().optional(),
   contact: z.string().nullable().optional(),
   verified: z.boolean(),
+  actived: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
 });
@@ -34,6 +35,7 @@ const CreateShelterSchema = ShelterSchema.omit({
   createdAt: true,
   updatedAt: true,
   verified: true,
+  actived: true,
 });
 
 const UpdateShelterSchema = ShelterSchema.pick({

@@ -3,7 +3,7 @@ CREATE TABLE "supply_auto_remove_logs" (
     "id" TEXT NOT NULL,
     "supply_id" TEXT NOT NULL,
     "shelter_id" TEXT NOT NULL,
-    "created_at" VARCHAR(32) NOT NULL,
+    "removed_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "supply_auto_remove_logs_pkey" PRIMARY KEY ("id")
 );

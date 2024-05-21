@@ -159,7 +159,7 @@ model SupplyAutoRemoveLog {
   id        String  @id @default(uuid())
   supplyId  String  @map("supply_id")
   shelterId String  @map("shelter_id")
-  removedAt String  @map("removed_at") @db.VarChar(32)
+  removedAt  DateTime @default(value: now()) @map("removed_at") @db.Timestamp(6)
   
 
 

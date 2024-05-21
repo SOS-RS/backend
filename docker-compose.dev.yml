@@ -24,7 +24,7 @@ services:
     command: >
       sh -c "npm install &&
       npx prisma generate &&
-      npx prisma migrate dev &&
+      npm run migrations:dev &&
       npm run start:dev -- --preserveWatchOutput"
   db:
     container_name: sos-rs-db

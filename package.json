@@ -20,8 +20,11 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest.e2e.config.ts",
     "migrations:run": "npx prisma migrate deploy",
-    "migrations:dev": "npx prisma migrate dev",
+    "migrations:dev": "npx prisma migrate dev && npx prisma db seed",
     "docker:compose": "docker-compose -f docker-compose.dev.yml up"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@fastify/static": "^7.0.3",

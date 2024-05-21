@@ -1,13 +1,13 @@
-import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
+import { z } from 'zod';
 
 import { PrismaService } from '../prisma/prisma.service';
+import { SupplyPriority } from '../supply/types';
 import {
   CreateShelterSupplySchema,
   UpdateManyShelterSupplySchema,
   UpdateShelterSupplySchema,
 } from './types';
-import { SupplyPriority } from '../supply/types';
 
 @Injectable()
 export class ShelterSupplyService {
@@ -66,6 +66,15 @@ export class ShelterSupplyService {
           priority,
         );
     }
+    await this.prismaService.shelterSupplyLog.create({
+      data: {
+        shelterSupplyShelterId: where.shelterId,
+        shelterSupplySupplyId: where.supplyId,
+        priority,
+        quantity,
+        createdAt: new Date().toISOString(),
+      },
+    });
 
     await this.prismaService.shelterSupply.update({
       where: {

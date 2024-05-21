@@ -40,7 +40,9 @@ export class ShelterCsvImporterService {
     csvUrl,
     fileStream,
     dryRun = false,
-    useIAToPredictSupplyCategories = false,
+    useIAToPredictSupplyCategories = Boolean(
+      process.env.CSV_IMPORTER_USE_IA_TO_PREDICT_SUPPLY_CATEGORIES,
+    ),
     useBatchTransaction = false,
     onEntity,
   }: ShelterCsvImporterExecutionArgs) {

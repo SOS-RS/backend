@@ -135,10 +135,7 @@ export class ShelterController {
     const res = await this.shelterCsvImporter.execute({
       fileStream,
       csvUrl: body?.csvUrl,
-      // dryRun: true,
-      onEntity: console.log,
       useBatchTransaction: true,
-      useIAToPredictSupplyCategories: false,
     });
     if (file?.path) {
       rmSync(file.path);

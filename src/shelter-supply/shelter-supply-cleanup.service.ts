@@ -26,7 +26,7 @@ export class ShelterSupplyCleanupService {
   private async getShelterSuppliesToDelete(): Promise<ShelterSupply[]> {
     const thresholdDate = subDays(new Date(), 2).toISOString();
 
-    return this.prismaService.shelterSupply.findMany({
+    return await this.prismaService.shelterSupply.findMany({
       where: {
         OR: [
           {

@@ -6,6 +6,7 @@ jest.mock('../prisma/prisma.service');
 
 describe('PartnersService', () => {
   let service: PartnersService;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -24,12 +25,8 @@ describe('PartnersService', () => {
       .compile();
 
     service = module.get<PartnersService>(PartnersService);
+    prismaService = module.get<PrismaService>(PrismaService);
   });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
   it('should return all partners', async () => {
     const partners = await service.index();
     expect(partners).toEqual([]);
@@ -40,6 +37,13 @@ describe('PartnersService', () => {
       name: 'Partner 1',
       link: 'https://partner1.com',
     });
-    expect(service).toBeDefined();
+
+    expect(prismaService.partners.create).toHaveBeenCalledWith({
+      data: {
+        name: 'Partner 1',
+        link: 'https://partner1.com',
+        createdAt: expect.any(String),
+      },
+    });
   });
 });

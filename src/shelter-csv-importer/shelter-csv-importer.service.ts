@@ -40,7 +40,7 @@ export class ShelterCsvImporterService {
     csvUrl,
     fileStream,
     dryRun = false,
-    useIAToPredictSupplyCategories = true,
+    useIAToPredictSupplyCategories = false,
     useBatchTransaction = false,
     onEntity,
   }: ShelterCsvImporterExecutionArgs) {

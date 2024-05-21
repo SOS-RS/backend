@@ -51,7 +51,6 @@ export class ShelterSupplyCleanupService {
   private async removeShelterSupply(
     shelterSupply: ShelterSupply,
   ): Promise<void> {
-
     this.logger.log(
       `Suprimento ${shelterSupply.supplyId} já está há 48 horas com baixa movimentação e não é urgente. Removendo relação com o abrigo ${shelterSupply.shelterId}`,
     );
@@ -76,7 +75,6 @@ export class ShelterSupplyCleanupService {
                 id: shelterSupply.shelterId,
               },
             },
-            removedAt: new Date().toISOString(),
           },
         }),
       ]);

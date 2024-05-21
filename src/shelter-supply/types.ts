@@ -12,7 +12,7 @@ const ShelterSupplySchema = z.object({
     z.literal(SupplyPriority.Needing),
     z.literal(SupplyPriority.Urgent),
   ]),
-  quantity: z.number().gt(0).nullable().optional(),
+  quantity: z.number().min(0).nullable().optional(),
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
 });

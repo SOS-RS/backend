@@ -42,7 +42,7 @@ describe('PartnersService', () => {
       data: {
         name: 'Partner 1',
         link: 'https://partner1.com',
-        createdAt: expect.any(String),
+        createdAt: new Date().toISOString(),
       },
     });
   });

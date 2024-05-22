@@ -9,7 +9,6 @@ import {
   UpdateManyShelterSupplySchema,
   UpdateShelterSupplySchema,
 } from './types';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ShelterSupplyService {
@@ -108,19 +107,19 @@ export class ShelterSupplyService {
       0,
     );
 
-    await this.prismaService.$transaction(async tx => {
+    await this.prismaService.$transaction(async (tx) => {
       await tx.shelter.update({
-          where: {
-            id: shelterId,
+        where: {
+          id: shelterId,
+        },
+        data: {
+          prioritySum: {
+            decrement: prioritySum,
           },
-          data: {
-            prioritySum: {
-              decrement: prioritySum,
-            },
-            updatedAt: new Date().toISOString(),
-          },
-        }),
-      await tx.shelterSupply.updateAndAuditMany({
+          updatedAt: new Date().toISOString(),
+        },
+      }),
+        await tx.shelterSupply.updateAndAuditMany({
           ...audit,
           where: {
             shelterId,
@@ -132,7 +131,7 @@ export class ShelterSupplyService {
             priority: SupplyPriority.UnderControl,
             updatedAt: new Date().toISOString(),
           },
-        })
+        });
     });
   }
 

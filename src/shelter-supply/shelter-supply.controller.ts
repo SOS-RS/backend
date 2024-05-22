@@ -99,7 +99,10 @@ export class ShelterSupplyController {
         data,
       );
     } catch (err: any) {
-      this.logger.error(`Failed to update many shelter supplies: ${err}`,err.stack);
+      this.logger.error(
+        `Failed to update many shelter supplies: ${err}`,
+        err.stack,
+      );
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }

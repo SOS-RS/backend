@@ -36,6 +36,7 @@ export class DashboardService {
       where,
     };
 
+    //Shelters
     const allShelters = await this.prismaService.shelter.findMany({
       ...whereData,
       select: {
@@ -75,6 +76,18 @@ export class DashboardService {
       },
     });
 
+    const allPeopleSheltered = allShelters.reduce((accumulator, current) => {
+      if (current.actived && current.capacity !== null && current.capacity > 0) {
+
+        return accumulator + (current.shelteredPeople ?? 0);
+      } else {
+
+        return accumulator;
+      }
+    }, 0);
+    
+
+    //Categories
     const allCategories = await this.prismaService.supplyCategory.findMany({
       select: {
         id: true,
@@ -118,7 +131,6 @@ export class DashboardService {
           name: true
         }
       });
-    
       return {
         id: category.id,
         name: category.name,
@@ -126,13 +138,12 @@ export class DashboardService {
         sheltersRequesting: sheltersRequesting
       };
     });
-
     const categoriesWithDetails = await Promise.all(categoriesWithDetailsPromises);
-
 
     return {
       allShelters: allShelters.length,
-      categories: categoriesWithDetails
+      categories: categoriesWithDetails,
+      allPeopleSheltered: allPeopleSheltered,
     };
   }
 }

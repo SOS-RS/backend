@@ -108,8 +108,8 @@ export class ShelterSupplyService {
       0,
     );
 
-    await this.prismaService.$transaction([
-      this.prismaService.shelter.update({
+    await this.prismaService.$transaction(async tx => {
+     await tx.shelter.update({
         where: {
           id: shelterId,
         },
@@ -120,7 +120,7 @@ export class ShelterSupplyService {
           updatedAt: new Date().toISOString(),
         },
       }),
-      this.prismaService.shelterSupply.updateAndAuditMany({
+    await  tx.shelterSupply.updateAndAuditMany({
         ...audit,
         where: {
           shelterId,
@@ -132,8 +132,8 @@ export class ShelterSupplyService {
           priority: SupplyPriority.UnderControl,
           updatedAt: new Date().toISOString(),
         },
-      }) as Prisma.PrismaPromise<Prisma.BatchPayload>,
-    ]);
+      })
+    });
   }
 
   async index(shelterId: string) {

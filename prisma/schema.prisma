@@ -173,10 +173,10 @@ model SuppliesHistory {
   supplyName       String?  @map("supply_name")
   shelterName      String?  @map("shelter_name")
   ipAddress        String?  @map("ip_address")
-  previousPriority Int?
-  currentPriority  Int?
-  previousQuantity Int?
-  currentQuantity  Int?
+  previousPriority Int?     @map("previous_priority")
+  currentPriority  Int?     @map("current_priority")
+  previousQuantity Int?     @map("previous_quantity")
+  currentQuantity  Int?     @map("current_quantity")
   userId           String?  @map("user_id")
   updatedAt        DateTime @default(now()) @map("updated_at") @db.Timestamptz()
 

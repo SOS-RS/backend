@@ -36,103 +36,105 @@ export class DashboardService {
       where,
     };
 
+    //Shelters
     const allShelters = await this.prismaService.shelter.findMany({
       ...whereData,
       select: {
         id: true,
         name: true,
-        pix: true,
-        address: true,
-        street: true,
-        neighbourhood: true,
-        city: true,
-        streetNumber: true,
-        zipCode: true,
-        capacity: true,
-        petFriendly: true,
         shelteredPeople: true,
-        prioritySum: true,
-        verified: true,
-        latitude: true,
-        longitude: true,
         actived: true,
-        category: true,
-        createdAt: true,
-        updatedAt: true,
+        capacity: true,
         shelterSupplies: {
-          where: {
-            priority: {
-              notIn: [SupplyPriority.UnderControl],
-            },
-          },
-          orderBy: {
-            updatedAt: 'desc',
-          },
-          include: {
-            supply: true,
-          },
-        },
-      },
-    });
-
-    const allCategories = await this.prismaService.supplyCategory.findMany({
-      select: {
-        id: true,
-        name: true,
-        supplies: {
           select: {
-            id: true,
-            shelterSupplies: {
+            priority: true, 
+            supply: {
               select: {
-                shelter: {
+                supplyCategory: {
                   select: {
-                    id: true,
-                    name: true
+                    name: true 
                   }
                 }
               }
             }
           }
         }
-      },
+      }
     });
 
-    const categoriesWithDetailsPromises = allCategories.map(async (category) => {
-      const supplies = category.supplies.flatMap(supply => supply.shelterSupplies);
-      const sheltersWithSupplies = supplies.map(supply => supply.shelter);
-    
-      const sheltersRequesting = await this.prismaService.shelter.findMany({
-        where: {
-          shelterSupplies: {
-            some: {
-              supply: {
-                supplyCategory: {
-                  id: category.id
-                }
+    const categoriesWithPriorities = await this.prismaService.supplyCategory.findMany({
+      select: {
+        id: true,
+        name: true,
+        supplies: {
+          select: {
+            shelterSupplies: {
+              select: {
+                priority: true,
+                shelterId: true
               }
             }
           }
-        },
-        select: {
-          id: true,
-          name: true
         }
+      }
+    });
+    
+    // Mapeia as categorias e conta as prioridades para cada abrigo
+    const result = categoriesWithPriorities.map(category => {
+      const priorityCounts = {
+        priority100: 0,
+        priority10: 0,
+        priority1: 0
+      };
+    
+      // Cria um conjunto para evitar a contagem duplicada de abrigos
+      const countedShelters = new Set();
+    
+      // Para cada abrigo associado à categoria
+      category.supplies.forEach(supply => {
+        supply.shelterSupplies.forEach(shelterSupply => {
+          if (!countedShelters.has(shelterSupply.shelterId)) {
+            switch (shelterSupply.priority) {
+              case 100:
+                priorityCounts.priority100++;
+                break;
+              case 10:
+                priorityCounts.priority10++;
+                break;
+              case 1:
+                priorityCounts.priority1++;
+                break;
+              default:
+                break;
+            }
+            // Adiciona o abrigo ao conjunto para evitar a contagem duplicada
+            countedShelters.add(shelterSupply.shelterId);
+          }
+        });
       });
     
       return {
-        id: category.id,
-        name: category.name,
-        sheltersWithSupplies: sheltersWithSupplies,
-        sheltersRequesting: sheltersRequesting
+        categoryId: category.id,
+        categoryName: category.name,
+        ...priorityCounts
       };
     });
 
-    const categoriesWithDetails = await Promise.all(categoriesWithDetailsPromises);
+    const allPeopleSheltered = allShelters.reduce((accumulator, current) => {
+      if (current.actived && current.capacity !== null && current.capacity > 0) {
 
+        return accumulator + (current.shelteredPeople ?? 0);
+      } else {
+
+        return accumulator;
+      }
+    }, 0);
+    
 
     return {
       allShelters: allShelters.length,
-      categories: categoriesWithDetails
+      categoriesWithPriorities: result,
+      allPeopleSheltered: allPeopleSheltered,
     };
   }
 }

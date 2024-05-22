@@ -161,6 +161,8 @@ model SupplyHistory {
   supplyId      String  @map("supply_id")
   priority      Int?
   quantity      Int?
+  ip            String?
+  userAgent     String? @map("user_agent")
   createdAt     String  @map("created_at") @db.VarChar(32)
 
   predecessor SupplyHistory? @relation("supplyHistory", fields: [predecessorId], references: [id])

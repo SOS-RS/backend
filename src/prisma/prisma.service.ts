@@ -7,7 +7,6 @@ import {
 import { Prisma, PrismaClient } from '@prisma/client';
 
 import { hooks as userHooks } from './hooks/user';
-import { hooks as shelterSuppliesHooks } from './hooks/shelterSupplies';
 
 @Injectable()
 export class PrismaService
@@ -17,17 +16,24 @@ export class PrismaService
   >
   implements OnModuleInit
 {
-  private logger = new Logger();
+  private static instance: PrismaService;
 
   constructor() {
     super();
   }
 
+  static getInstance(): PrismaService {
+    if (!PrismaService.instance) {
+      PrismaService.instance = new PrismaService();
+      PrismaService.instance.$connect();
+    }
+    return PrismaService.instance;
+  }
+
   async onModuleInit() {
     await this.$connect();
-    this.$use(async (params, next) => {
+    this.$use((params, next) => {
       userHooks.forEach((fn) => fn(params));
-      shelterSuppliesHooks.forEach((fn) => fn(this, params));
       return next(params);
     });
   }
@@ -38,3 +44,5 @@ export class PrismaService
     });
   }
 }
+
+export const prisma = PrismaService.getInstance();

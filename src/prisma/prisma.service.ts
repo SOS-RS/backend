@@ -182,7 +182,7 @@ function ExtendPrismaClient(client: PrismaClient) {
             const afterUpdate = await client.shelterSupply.update(
               args as Prisma.ShelterSupplyUpdateArgs,
             );
-            await client.shelterSupplyLogs.create({
+            await client.suppliesHistory.create({
               data: {
                 ...auditArgs,
                 currentPriority: afterUpdate.priority,
@@ -239,7 +239,7 @@ function ExtendPrismaClient(client: PrismaClient) {
               supply: { name: string };
             })[];
 
-            const diffs: Prisma.ShelterSupplyLogsCreateInput[] = [];
+            const diffs: Prisma.SuppliesHistoryCreateInput[] = [];
 
             shelterSuppliesBefore.forEach((previous, index) => {
               const current = shelterSuppliesAfter[index];
@@ -258,7 +258,7 @@ function ExtendPrismaClient(client: PrismaClient) {
             });
 
             if (diffs.length > 0) {
-              await client.shelterSupplyLogs.createMany({ data: diffs });
+              await client.suppliesHistory.createMany({ data: diffs });
             }
 
             return shelterSuppliesAfter;

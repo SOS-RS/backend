@@ -168,7 +168,7 @@ model Audit {
   @@map("audit_logs")
 }
 
-model ShelterSupplyLogs {
+model SuppliesHistory {
   id               String   @id @default(uuid())
   supplyName       String?  @map("supply_name")
   shelterName      String?  @map("shelter_name")
@@ -180,5 +180,5 @@ model ShelterSupplyLogs {
   userId           String?  @map("user_id")
   updatedAt        DateTime @default(now()) @map("updated_at") @db.Timestamptz()
 
-  @@map("item_updates_log")
+  @@map("supplies_history")
 }

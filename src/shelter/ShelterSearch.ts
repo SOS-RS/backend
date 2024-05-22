@@ -11,6 +11,12 @@ import {
   ShelterTagType,
 } from './types/search.types';
 
+const defaultTagsData: ShelterTagInfo = {
+  NeedDonations: true,
+  NeedVolunteers: true,
+  RemainingSupplies: true,
+};
+
 class ShelterSearch {
   private formProps: Partial<ShelterSearchProps>;
   private prismaService: PrismaService;
@@ -174,6 +180,7 @@ function parseTagResponse(
   voluntaryIds: string[],
 ): SearchShelterTagResponse[] {
   const tags: ShelterTagInfo = {
+    ...defaultTagsData,
     ...(tagProps?.tags ?? {}),
   };
 

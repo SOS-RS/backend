@@ -1,6 +1,13 @@
-import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  INestApplication,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+
+import { hooks as userHooks } from './hooks/user';
+import { hooks as shelterSuppliesHooks } from './hooks/shelterSupplies';
 
 @Injectable()
 export class PrismaService
@@ -10,42 +17,17 @@ export class PrismaService
   >
   implements OnModuleInit
 {
+  private logger = new Logger();
+
   constructor() {
-    super({
-      log: [
-        {
-          emit: 'event',
-          level: 'query',
-        },
-        {
-          emit: 'event',
-          level: 'error',
-        },
-        {
-          emit: 'stdout',
-          level: 'info',
-        },
-        {
-          emit: 'stdout',
-          level: 'warn',
-        },
-      ],
-    });
+    super();
   }
+
   async onModuleInit() {
     await this.$connect();
     this.$use(async (params, next) => {
-      if (
-        (params.action === 'create' || params.action === 'update') &&
-        params.model === 'User' &&
-        !!params.args.data.password
-      ) {
-        const user = params.args.data;
-        const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(user.password, salt);
-        user.password = hash;
-        params.args.data = user;
-      }
+      userHooks.forEach((fn) => fn(params));
+      shelterSuppliesHooks.forEach((fn) => fn(this, params));
       return next(params);
     });
   }

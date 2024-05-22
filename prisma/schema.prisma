@@ -32,6 +32,7 @@ model User {
 
   sessions        Session[]
   shelterManagers ShelterManagers[]
+  audits          Audit[]
 
   @@map("users")
 }
@@ -150,4 +151,34 @@ model Supporters {
   updatedAt String? @map("updated_at") @db.VarChar(32)
 
   @@map("supporters")
+}
+
+model Audit {
+  id            String   @id @default(uuid())
+  modelName     String   @map("model_name")
+  modelId       String   @map("model_id")
+  userId        String?  @map("user_id")
+  ip            String?
+  previousValue Json?    @map("previous_value")
+  currentValue  Json?    @map("current_value")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model ShelterSupplyLogs {
+  id               String   @id @default(uuid())
+  supplyName       String?  @map("supply_name")
+  shelterName      String?  @map("shelter_name")
+  ipAddress        String?  @map("ip_address")
+  previousPriority Int?
+  currentPriority  Int?
+  previousQuantity Int?
+  currentQuantity  Int?
+  userId           String?  @map("user_id")
+  updatedAt        DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+
+  @@map("item_updates_log")
 }

@@ -1,17 +1,22 @@
-import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
+import { z } from 'zod';
 
-import { PrismaService } from '../prisma/prisma.service';
+import { SessionData } from '@/decorators/audit.decorator';
+import { ExtendedPrismaService, PrismaService } from '../prisma/prisma.service';
+import { SupplyPriority } from '../supply/types';
 import {
   CreateShelterSupplySchema,
   UpdateManyShelterSupplySchema,
   UpdateShelterSupplySchema,
 } from './types';
-import { SupplyPriority } from '../supply/types';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ShelterSupplyService {
-  constructor(private readonly prismaService: PrismaService) {}
+  private readonly prismaService: ExtendedPrismaService;
+  constructor(prismaService: PrismaService) {
+    this.prismaService = prismaService as unknown as ExtendedPrismaService;
+  }
 
   private async handleUpdateShelterSum(
     shelterId: string,
@@ -46,7 +51,10 @@ export class ShelterSupplyService {
     });
   }
 
-  async update(body: z.infer<typeof UpdateShelterSupplySchema>) {
+  async update(
+    body: z.infer<typeof UpdateShelterSupplySchema>,
+    audit?: SessionData,
+  ) {
     const { data, where } = UpdateShelterSupplySchema.parse(body);
     const { priority, quantity } = data;
     if (priority !== null && priority !== undefined) {
@@ -67,7 +75,8 @@ export class ShelterSupplyService {
         );
     }
 
-    await this.prismaService.shelterSupply.update({
+    await this.prismaService.shelterSupply.updateAndAudit({
+      ...audit,
       where: {
         shelterId_supplyId: where,
       },
@@ -79,7 +88,10 @@ export class ShelterSupplyService {
     });
   }
 
-  async updateMany(body: z.infer<typeof UpdateManyShelterSupplySchema>) {
+  async updateMany(
+    body: z.infer<typeof UpdateManyShelterSupplySchema>,
+    audit?: SessionData,
+  ) {
     const { ids, shelterId } = UpdateManyShelterSupplySchema.parse(body);
 
     const supplies = await this.prismaService.shelterSupply.findMany({
@@ -108,7 +120,8 @@ export class ShelterSupplyService {
           updatedAt: new Date().toISOString(),
         },
       }),
-      this.prismaService.shelterSupply.updateMany({
+      this.prismaService.shelterSupply.updateAndAuditMany({
+        ...audit,
         where: {
           shelterId,
           supplyId: {
@@ -119,7 +132,7 @@ export class ShelterSupplyService {
           priority: SupplyPriority.UnderControl,
           updatedAt: new Date().toISOString(),
         },
-      }),
+      }) as Prisma.PrismaPromise<Prisma.BatchPayload>,
     ]);
   }
 

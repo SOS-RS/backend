@@ -9,14 +9,17 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-import { ShelterSupplyService } from './shelter-supply.service';
-import { ServerResponse } from '../utils';
+import { SessionData } from '@/decorators/audit.decorator';
 import { DistributionCenterGuard } from '@/guards/distribution-center.guard';
+import { UserGuard } from '@/guards/user.guard';
+import { ServerResponse } from '../utils';
+import { ShelterSupplyService } from './shelter-supply.service';
 
 @ApiTags('Suprimento de abrigos')
 @Controller('shelter/supplies')
+@ApiBearerAuth()
 export class ShelterSupplyController {
   private logger = new Logger(ShelterSupplyController.name);
 
@@ -48,17 +51,22 @@ export class ShelterSupplyController {
     }
   }
 
+  @UseGuards(UserGuard)
   @Put(':shelterId/:supplyId')
   async update(
     @Body() body,
     @Param('shelterId') shelterId: string,
     @Param('supplyId') supplyId: string,
+    @SessionData() sessionData: SessionData,
   ) {
     try {
-      const data = await this.shelterSupplyService.update({
-        where: { shelterId, supplyId },
-        data: body,
-      });
+      const data = await this.shelterSupplyService.update(
+        {
+          where: { shelterId, supplyId },
+          data: body,
+        },
+        sessionData,
+      );
       return new ServerResponse(
         200,
         'Successfully updated shelter supply',

@@ -42,24 +42,12 @@ export class DashboardService {
       select: {
         id: true,
         name: true,
-        pix: true,
-        address: true,
-        street: true,
-        neighbourhood: true,
-        city: true,
-        streetNumber: true,
-        zipCode: true,
         capacity: true,
         petFriendly: true,
         shelteredPeople: true,
         prioritySum: true,
-        verified: true,
-        latitude: true,
-        longitude: true,
         actived: true,
         category: true,
-        createdAt: true,
-        updatedAt: true,
         shelterSupplies: {
           where: {
             priority: {

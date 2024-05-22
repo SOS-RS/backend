@@ -15,7 +15,7 @@ import { Prisma } from '@prisma/client';
 export class ShelterSupplyService {
   private readonly prismaService: ExtendedPrismaService;
   constructor(prismaService: PrismaService) {
-    this.prismaService = prismaService as unknown as ExtendedPrismaService;
+    this.prismaService = prismaService as ExtendedPrismaService;
   }
 
   private async handleUpdateShelterSum(
@@ -90,7 +90,7 @@ export class ShelterSupplyService {
 
   async updateMany(
     body: z.infer<typeof UpdateManyShelterSupplySchema>,
-    audit?: SessionData,
+    audit: SessionData,
   ) {
     const { ids, shelterId } = UpdateManyShelterSupplySchema.parse(body);
 
@@ -109,30 +109,30 @@ export class ShelterSupplyService {
     );
 
     await this.prismaService.$transaction(async tx => {
-     await tx.shelter.update({
-        where: {
-          id: shelterId,
-        },
-        data: {
-          prioritySum: {
-            decrement: prioritySum,
+      await tx.shelter.update({
+          where: {
+            id: shelterId,
           },
-          updatedAt: new Date().toISOString(),
-        },
-      }),
-    await  tx.shelterSupply.updateAndAuditMany({
-        ...audit,
-        where: {
-          shelterId,
-          supplyId: {
-            in: ids,
+          data: {
+            prioritySum: {
+              decrement: prioritySum,
+            },
+            updatedAt: new Date().toISOString(),
           },
-        },
-        data: {
-          priority: SupplyPriority.UnderControl,
-          updatedAt: new Date().toISOString(),
-        },
-      })
+        }),
+      await tx.shelterSupply.updateAndAuditMany({
+          ...audit,
+          where: {
+            shelterId,
+            supplyId: {
+              in: ids,
+            },
+          },
+          data: {
+            priority: SupplyPriority.UnderControl,
+            updatedAt: new Date().toISOString(),
+          },
+        })
     });
   }
 

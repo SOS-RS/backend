@@ -80,19 +80,26 @@ export class ShelterSupplyController {
 
   @Put(':shelterId/supplies/many')
   @UseGuards(DistributionCenterGuard)
-  async updateMany(@Body() body, @Param('shelterId') shelterId: string) {
+  async updateMany(
+    @Body() body,
+    @Param('shelterId') shelterId: string,
+    @SessionData() sessionData: SessionData,
+  ) {
     try {
-      const data = await this.shelterSupplyService.updateMany({
-        shelterId,
-        ...body,
-      });
+      const data = await this.shelterSupplyService.updateMany(
+        {
+          shelterId,
+          ...body,
+        },
+        sessionData,
+      );
       return new ServerResponse(
         200,
         'Successfully updated many shelter supplies',
         data,
       );
     } catch (err: any) {
-      this.logger.error(`Failed to update many shelter supplies: ${err}`);
+      this.logger.error(`Failed to update many shelter supplies: ${err}`,err.stack);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }

@@ -1,7 +1,6 @@
 import { SessionData } from '@/decorators/audit.decorator';
 import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { Prisma, PrismaClient, ShelterSupply } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -59,40 +58,6 @@ export class PrismaService
       await app.close();
     });
   }
-
-  // auditLog: Prisma.Middleware<any> = async (params, next) => {
-  //   const { action, args, dataPath, model, runInTransaction } = params;
-  //   console.log(
-  //     '🚀 ~ auditLog:Prisma.Middleware<any>= ~ {action,args,dataPath,model}:',
-  //     { action, args, dataPath, model },
-  //   );
-  //   switch (action) {
-  //     case 'delete':
-  //     case 'update': {
-  //       if (model && typeof args === 'object' && args.data) {
-  //         // //@ts-expect-error
-  //         // const modelBefore = await this[model.toLowerCase() as PrismaModel].findUnique({
-  //         //   where: {
-  //         //     id: args.data.id,
-  //         //   },
-  //         // });
-
-  //         const modelBefore = await this.$queryRawUnsafe(
-  //           `Select * from ${model} where id = ${args.data.id}`,
-  //         );
-  //         console.log('🚀 ~ modelBefore ~ modelBefore:', modelBefore);
-  //         const modelAfter = await next(params);
-  //         console.log(
-  //           '🚀 ~ auditLog:Prisma.Middleware<any>= ~ modelAfter:',
-  //           modelAfter,
-  //         );
-  //       }
-  //       break;
-  //     }
-  //     default:
-  //       return next(params);
-  //   }
-  // };
 }
 
 export type AuditableProps<T = any> = {
@@ -106,9 +71,28 @@ export type AuditableProps<T = any> = {
   };
 };
 
+/**
+ * Customização do cliente para permitir customizar alguns métodos
+ * @see https://www.prisma.io/docs/orm/prisma-client/client-extensions/
+ */
 function ExtendPrismaClient(client: PrismaClient) {
   return client
     .$extends({
+      result: {
+        shelterSupply: {
+          equals: {
+            needs: { shelterId: true, supplyId: true },
+            compute({ shelterId, supplyId }) {
+              return (other: ShelterSupply) => {
+                return (
+                  shelterId.toLowerCase() === other.shelterId.toLowerCase() &&
+                  supplyId.toLowerCase() === other.supplyId.toLowerCase()
+                );
+              };
+            },
+          },
+        },
+      },
       model: {
         $allModels: {
           async updateAndAudit<T>(
@@ -167,12 +151,14 @@ function ExtendPrismaClient(client: PrismaClient) {
             return modelAfter;
           },
         },
-      }, 
+      },
     })
     .$extends({
       model: {
         shelterSupply: {
-          async updateAndAudit(args: Prisma.ShelterSupplyUpdateArgs & SessionData) {
+          async updateAndAudit(
+            args: Prisma.ShelterSupplyUpdateArgs & SessionData,
+          ) {
             const { data, where, ipAddress, userId } = args;
             const auditArgs = Object.assign({ ipAddress, userId }, {});
             delete args.ipAddress;
@@ -210,51 +196,80 @@ function ExtendPrismaClient(client: PrismaClient) {
 
             return afterUpdate;
           },
-          async updateAndAuditMany(args: Prisma.ShelterSupplyUpdateManyArgs & SessionData) {
-            const {  where, ipAddress, userId } = args;
-            const auditArgs = Object.assign({ ipAddress, userId }, {});
-            console.log("🚀 ~ updateAndAuditMany ~ auditArgs:", auditArgs)
+          async updateAndAuditMany(
+            args: Prisma.ShelterSupplyUpdateManyArgs & SessionData,
+          ) {
+            const { where } = args;
+            const { ipAddress, userId } = Object.assign(
+              { ipAddress: args.ipAddress, userId: args.userId },
+              {},
+            );
+
             delete args.ipAddress;
             delete args.userId;
 
-            // TODO: finish implementation
-            // const beforeUpdate = await client.shelterSupply.findMany({
-            //   where,
-            //   include: {
-            //     shelter: { select: { name: true } },
-            //     supply: { select: { name: true } },
-            //   },
-            // });
+            const shelterSupplyFindManyArgs: Prisma.ShelterSupplyFindManyArgs =
+              {
+                where,
+                orderBy: { createdAt: 'asc' },
+                include: {
+                  shelter: { select: { name: true } },
+                  supply: { select: { name: true } },
+                },
+              };
 
-       
-            const afterUpdate = await client.shelterSupply.updateMany(
-              args as Prisma.ShelterSupplyUpdateManyArgs 
-            )
-            console.log("🚀 ~ updateAndAuditMany ~ afterUpdate:", afterUpdate)
+            const shelterSuppliesBefore = await (<ExtendedPrismaService>(
+              client
+            )).shelterSupply.findMany(shelterSupplyFindManyArgs);
 
+            if (shelterSuppliesBefore.length === 0) {
+              return { count: 0 } as Prisma.BatchPayload;
+            }
 
-            // const diff = beforeUpdate.filter((ss,index) => {
-              // return ss.priority !== afterUpdate[index],
-            // })
-            // console.log("🚀 ~ diff ~ beforeUpdate:", beforeUpdate)
+            await (<ExtendedPrismaService>client).shelterSupply.updateMany(
+              args as Prisma.ShelterSupplyUpdateManyArgs,
+            );
 
-            // await client.shelterSupplyLogs.create({
-            //   data: {
-            //     ...auditArgs,
-            //     currentPriority: afterUpdate.priority,
-            //     previousPriority: beforeUpdate?.priority,
-            //     currentQuantity: afterUpdate.quantity,
-            //     previousQuantity: beforeUpdate?.quantity,
-            //     shelterName: beforeUpdate?.shelter.name,
-            //     supplyName: beforeUpdate?.supply.name,
-            //   },
-            // });
+            const shelterSuppliesAfter = (await (<ExtendedPrismaService>(
+              client
+            )).shelterSupply.findMany(
+              shelterSupplyFindManyArgs,
+            )) as ((typeof shelterSuppliesBefore)[number] & {
+              shelter: { name: string };
+              supply: { name: string };
+            })[];
 
-            return afterUpdate;
+            const diffs: Prisma.ShelterSupplyLogsCreateInput[] = [];
+
+            shelterSuppliesBefore.forEach((previous, index) => {
+              const current = shelterSuppliesAfter[index];
+              if (previous.equals(current)) {
+                diffs.push({
+                  userId,
+                  ipAddress,
+                  currentPriority: current.priority,
+                  previousPriority: previous?.priority,
+                  currentQuantity: current.quantity,
+                  previousQuantity: previous?.quantity,
+                  shelterName: current.shelter.name,
+                  supplyName: current.supply.name,
+                });
+              }
+            });
+
+            if (diffs.length > 0) {
+              await client.shelterSupplyLogs.createMany({ data: diffs });
+            }
+
+            return shelterSuppliesAfter;
           },
         },
       },
     });
 }
 
-export type ExtendedPrismaService = ReturnType<typeof ExtendPrismaClient>;
+type CustomPrismaClient = ReturnType<typeof ExtendPrismaClient>;
+
+export type ExtendedPrismaService = ReturnType<
+  typeof Object.assign<CustomPrismaClient, PrismaService>
+>;

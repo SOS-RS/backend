@@ -7,4 +7,5 @@ export enum ShelterSupplyHistoryAction {
 export interface UserIdentity {
   ip?: string;
   userAgent?: string;
+  userId?: string;
 }

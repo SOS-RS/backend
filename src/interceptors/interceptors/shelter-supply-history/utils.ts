@@ -1,6 +1,6 @@
-import { Prisma } from '@prisma/client';
-import { Logger } from '@nestjs/common';
 import { z } from 'zod';
+import { FastifyRequest } from 'fastify';
+import { Logger } from '@nestjs/common';
 
 import {
   CreateShelterSupplySchema,
@@ -11,7 +11,7 @@ import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateSupplyHistorySchema } from '../../../supplies-history/types';
 import { SupplyPriority } from '../../../supply/types';
 import { ShelterSupplyHistoryAction, UserIdentity } from './types';
-import { FastifyRequest } from 'fastify';
+import { getSessionData } from '@/utils/utils';
 
 function registerSupplyLog(
   prismaService: PrismaService,
@@ -111,10 +111,16 @@ function handler(
   request: FastifyRequest,
 ) {
   const headers = request.headers;
+  const token = headers['authorization'];
   const user: UserIdentity = {
     ip: headers['x-real-ip']?.toString(),
     userAgent: headers['user-agent'],
   };
+
+  if (token) {
+    const { userId } = getSessionData(token);
+    user.userId = userId;
+  }
 
   switch (action) {
     case ShelterSupplyHistoryAction.Create:

@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 
 import { ShelterSupplyHistoryAction } from './types';
 import { handler } from './utils';
-import { PrismaService, prisma } from '../../../prisma/prisma.service';
+import { prisma } from '../../../prisma/prisma.service';
 
 @Injectable()
 export class ShelterSupplyHistoryInterceptor implements NestInterceptor {

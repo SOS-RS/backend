@@ -32,6 +32,7 @@ model User {
 
   sessions        Session[]
   shelterManagers ShelterManagers[]
+  suppliesHistory SupplyHistory[]
 
   @@map("users")
 }
@@ -159,6 +160,7 @@ model SupplyHistory {
   predecessorId String? @unique @map("predecessor_id")
   shelterId     String  @map("shelter_id")
   supplyId      String  @map("supply_id")
+  userId        String? @map("user_id")
   priority      Int?
   quantity      Int?
   ip            String?
@@ -169,6 +171,7 @@ model SupplyHistory {
   successor   SupplyHistory? @relation("supplyHistory")
   shelter     Shelter        @relation(fields: [shelterId], references: [id])
   supply      Supply         @relation(fields: [supplyId], references: [id])
+  user        User?          @relation(fields: [userId], references: [id])
 
   @@map("supplies_history")
 }

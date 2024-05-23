@@ -1,4 +1,4 @@
-import { Module, Scope } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { ShelterSupplyService } from './shelter-supply.service';
 import { ShelterSupplyController } from './shelter-supply.controller';

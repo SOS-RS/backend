@@ -1,8 +1,8 @@
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { SessionsController } from './sessions.controller';
 import { SessionsService } from './sessions.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 
 describe('SessionsController', () => {
   let controller: SessionsController;
@@ -26,12 +26,14 @@ describe('SessionsController', () => {
       })
       .compile();
 
+    module.useLogger({
+      log: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      verbose: jest.fn(),
+    });
     controller = module.get<SessionsController>(SessionsController);
     service = module.get<SessionsService>(SessionsService);
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
   });
 
   it('should return a token', async () => {

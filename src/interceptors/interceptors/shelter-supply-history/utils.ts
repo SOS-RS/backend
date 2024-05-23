@@ -134,7 +134,7 @@ function handler(
       registerUpdateManySupplyLog(
         prismaService,
         {
-          shelterId: (request.params as any).get('shelterId'),
+          shelterId: (request.params as any).shelterId,
           ids: (request.body as any).ids,
         },
         user,

@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    if: github.repository == 'SOS-RS/backend'
     runs-on: stg
 
     steps:

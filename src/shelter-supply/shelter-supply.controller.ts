@@ -8,8 +8,6 @@ import {
   Post,
   Put,
   UseGuards,
-  Headers,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 

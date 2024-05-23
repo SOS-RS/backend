@@ -12,6 +12,7 @@ import { SupplyCategoriesModule } from './supply-categories/supply-categories.mo
 import { ShelterManagersModule } from './shelter-managers/shelter-managers.module';
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { PartnersModule } from './partners/partners.module';
+import { ShelterCsvImporterModule } from './shelter-csv-importer/shelter-csv-importer.module';
 import { SupportersModule } from './supporters/supporters.module';
 
 @Module({
@@ -26,6 +27,7 @@ import { SupportersModule } from './supporters/supporters.module';
     ShelterSupplyModule,
     PartnersModule,
     SupportersModule,
+    ShelterCsvImporterModule,
   ],
   controllers: [],
   providers: [

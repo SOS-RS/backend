@@ -13,6 +13,7 @@ const config: Config = {
     '^src/(.*)$': '<rootDir>/$1',
     '^@/(.*)$': '<rootDir>/$1',
     '^test/(.*)$': '<rootDir>/../$1',
+    '^examples/(.*)$': '<rootDir>/../test/examples/$1',
   },
   testEnvironment: 'node',
 };

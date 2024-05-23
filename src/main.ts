@@ -3,16 +3,19 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import multer from 'fastify-multer';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const fastifyAdapter = new FastifyAdapter();
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     fastifyAdapter,
   );
+
+  app.register(multer().contentParser);
 
   const config = new DocumentBuilder()
     .setTitle('SOS - Rio Grande do Sul')

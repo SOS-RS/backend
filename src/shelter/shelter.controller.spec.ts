@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ShelterController } from './shelter.controller';
 import { ShelterService } from './shelter.service';
+import { ShelterCsvImporterService } from 'src/shelter-csv-importer/shelter-csv-importer.service';
 
 describe('ShelterController', () => {
   let controller: ShelterController;
@@ -9,7 +10,7 @@ describe('ShelterController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ShelterController],
-      providers: [ShelterService],
+      providers: [ShelterService, ShelterCsvImporterService],
     })
       .useMocker((token) => {
         if (token === PrismaService) {

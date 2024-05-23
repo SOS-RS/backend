@@ -1,12 +1,12 @@
 import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { getSessionData } from '@/utils';
 
 @Injectable()
 export class LoggingMiddleware implements NestMiddleware {
   private logger = new Logger(LoggingMiddleware.name);
-  use(req: Request, _: Response, next: () => void) {
+  use(req: FastifyRequest, _: FastifyReply, next: () => void) {
     const { method, originalUrl, headers } = req;
     const ip = headers['x-real-ip'] || req.ip;
     const token = headers.authorization?.split('Bearer ').at(-1);

@@ -13,6 +13,7 @@ import { ShelterManagersModule } from './shelter-managers/shelter-managers.modul
 import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { PartnersModule } from './partners/partners.module';
 import { SupportersModule } from './supporters/supporters.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SupportersModule } from './supporters/supporters.module';
     ShelterSupplyModule,
     PartnersModule,
     SupportersModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [

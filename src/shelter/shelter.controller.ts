@@ -17,7 +17,6 @@ import { ServerResponse } from '../utils';
 import { StaffGuard } from '@/guards/staff.guard';
 import { ApplyUser } from '@/guards/apply-user.guard';
 import { UserDecorator } from '@/decorators/UserDecorator/user.decorator';
-import { Hmac } from '@/decorators/Hmac';
 
 @ApiTags('Abrigos')
 @Controller('shelters')
@@ -26,7 +25,6 @@ export class ShelterController {
 
   constructor(private readonly shelterService: ShelterService) {}
 
-  @Hmac()
   @Get('')
   async index(@Query() query) {
     try {

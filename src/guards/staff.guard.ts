@@ -1,23 +1,14 @@
-import { ExecutionContext, HttpException, Injectable } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Injectable } from '@nestjs/common';
 import { AccessLevel } from '@prisma/client';
 
-import { canActivate } from './utils';
+import { AbstractGuard } from './abstract.guard';
 
 @Injectable()
-export class StaffGuard extends AuthGuard('jwt') {
+export class StaffGuard extends AbstractGuard {
   constructor() {
     super();
   }
-
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    await super.canActivate(context);
-    const ok = await canActivate(context, [
-      AccessLevel.Admin,
-      AccessLevel.Staff,
-    ]);
-    if (ok) return true;
-
-    throw new HttpException('Acesso não autorizado', 401);
+  getAccessLevel(): AccessLevel[] {
+    return [AccessLevel.Staff, AccessLevel.Admin];
   }
 }

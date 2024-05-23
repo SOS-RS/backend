@@ -10,7 +10,9 @@ import {
 import { PartnersService } from './partners.service';
 import { ServerResponse } from '../utils';
 import { AdminGuard } from '@/guards/admin.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Parceiros')
 @Controller('partners')
 export class PartnersController {
   private logger = new Logger(PartnersController.name);

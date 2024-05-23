@@ -11,7 +11,9 @@ import {
 import { SupportersService } from './supporters.service';
 import { ServerResponse } from '../utils';
 import { AdminGuard } from '@/guards/admin.guard';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Apoiadores')
 @Controller('supporters')
 export class SupportersController {
   private logger = new Logger(SupportersController.name);

@@ -21,7 +21,8 @@
     "test:e2e": "jest --config ./test/jest.e2e.config.ts",
     "migrations:run": "npx prisma migrate deploy",
     "migrations:dev": "npx prisma migrate dev",
-    "docker:compose": "docker-compose -f docker-compose.dev.yml up"
+    "compose:up": "docker compose -f docker-compose.dev.yml --env-file .env.docker up -d",
+    "compose:down": "docker compose -f docker-compose.dev.yml --env-file .env.docker down -v"
   },
   "dependencies": {
     "@fastify/static": "^7.0.3",

@@ -9,7 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SupplyPriority } from '../supply/types';
 import { SearchSchema } from '../types';
 import { ShelterSearch, parseTagResponse } from './ShelterSearch';
-import { ShelterSearchPropsSchema } from './types/search.types';
+import { GeolocationFilterSchema, ShelterSearchPropsSchema } from './types/search.types';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
@@ -215,6 +215,33 @@ export class ShelterService implements OnModuleInit {
     }));
   }
 
+  async getSheltersBylocation(body: z.infer<typeof GeolocationFilterSchema>) {
+    const {
+      latitude: lat,
+      longitude: lng,
+      radiusInMeters: radius,
+    } = GeolocationFilterSchema.parse(body);
+
+    const shelters = await this.prismaService.shelter.findMany();
+    const sheltersWithinRadius: any = [];
+
+    shelters.forEach(async shelter => {
+      if (!shelter.latitude || !shelter.longitude) {
+        return;
+      }
+      const distance = await this.calculateDistance(lat, lng, shelter.latitude, shelter.longitude);
+      const radiusInKm = radius / 1000;
+      if (distance <= radiusInKm) {
+        sheltersWithinRadius.push(shelter);
+      }
+    });
+
+    return {
+      shelters: sheltersWithinRadius,
+    };
+  }
+
+
   private loadVoluntaryIds() {
     this.prismaService.supplyCategory
       .findMany({
@@ -228,4 +255,17 @@ export class ShelterService implements OnModuleInit {
         this.voluntaryIds.push(...resp.map((s) => s.id));
       });
   }
+
+  private calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance;
+  }
+
 }

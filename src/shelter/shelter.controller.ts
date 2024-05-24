@@ -95,4 +95,15 @@ export class ShelterController {
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }
+
+  @Post('geolocation')
+  async geolocation(@Body() body) {
+    try {
+      const data = await this.shelterService.getSheltersBylocation(body);
+      return new ServerResponse(200, 'Successfully get shelters by location', data);
+    } catch (err: any) {
+      this.logger.error(`Failed to get shelters by location: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
 }

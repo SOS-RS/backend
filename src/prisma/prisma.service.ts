@@ -39,5 +39,3 @@ export class PrismaService
     });
   }
 }
-
-export const prisma = PrismaService.getInstance();

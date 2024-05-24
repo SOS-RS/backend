@@ -102,6 +102,8 @@ model Shelter {
   petFriendly     Boolean?        @map("pet_friendly")
   shelteredPeople Int?            @map("sheltered_people")
   capacity        Int?
+  shelteredPets   Int?            @map("sheltered_pets")
+  petCapacity     Int?            @map("pet_capacity")
   contact         String?
   prioritySum     Int             @default(value: 0) @map("priority_sum")
   latitude        Float?

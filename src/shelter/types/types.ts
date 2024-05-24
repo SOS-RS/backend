@@ -8,6 +8,22 @@ export interface DefaultSupplyProps {
   supply: string;
 }
 
+const petFriendlyRefinement = function(obj, ctx) {
+  if(!obj.petFriendly) {
+    if(obj.petCapacity) ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Shelter is not pet friendly',
+      path: ['petCapacity']
+    });
+
+    if(obj.shelteredPets) ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Shelter is not pet friendly',
+      path: ['shelteredPets']
+    });
+  }
+};
+
 const ShelterSchema = z.object({
   id: z.string(),
   name: z.string().transform(capitalize),
@@ -20,9 +36,11 @@ const ShelterSchema = z.object({
   zipCode: z.string().nullable().optional(),
   petFriendly: z.boolean().nullable().optional(),
   shelteredPeople: z.number().min(0).nullable().optional(),
+  shelteredPets: z.number().min(0).nullable().optional(),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   capacity: z.number().min(0).nullable().optional(),
+  petCapacity: z.number().min(0).nullable().optional(),
   contact: z.string().nullable().optional(),
   verified: z.boolean(),
   createdAt: z.string(),
@@ -34,12 +52,15 @@ const CreateShelterSchema = ShelterSchema.omit({
   createdAt: true,
   updatedAt: true,
   verified: true,
-});
+}).superRefine(petFriendlyRefinement);
 
 const UpdateShelterSchema = ShelterSchema.pick({
   petFriendly: true,
   shelteredPeople: true,
-}).partial();
+  petCapacity: true,
+  shelteredPets: true
+}).partial()
+  .superRefine(petFriendlyRefinement);
 
 const FullUpdateShelterSchema = ShelterSchema.omit({
   id: true,
@@ -47,7 +68,9 @@ const FullUpdateShelterSchema = ShelterSchema.omit({
   updatedAt: true,
 })
   .partial()
-  .transform(removeEmptyStrings);
+  .transform(removeEmptyStrings)
+  .superRefine(petFriendlyRefinement);
+  
 
 export {
   ShelterSchema,

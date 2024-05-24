@@ -32,6 +32,7 @@ model User {
 
   sessions        Session[]
   shelterManagers ShelterManagers[]
+  suppliesHistory SupplyHistory[]
 
   @@map("users")
 }
@@ -85,6 +86,7 @@ model Supply {
 
   supplyCategory  SupplyCategory  @relation(fields: [supplyCategoryId], references: [id])
   shelterSupplies ShelterSupply[]
+  supplyHistories SupplyHistory[]
 
   @@map("supplies")
 }
@@ -114,6 +116,7 @@ model Shelter {
 
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
+  supplyHistories SupplyHistory[]
 
   @@map("shelters")
 }
@@ -150,4 +153,25 @@ model Supporters {
   updatedAt String? @map("updated_at") @db.VarChar(32)
 
   @@map("supporters")
+}
+
+model SupplyHistory {
+  id            String  @id @default(uuid())
+  predecessorId String? @unique @map("predecessor_id")
+  shelterId     String  @map("shelter_id")
+  supplyId      String  @map("supply_id")
+  userId        String? @map("user_id")
+  priority      Int?
+  quantity      Int?
+  ip            String?
+  userAgent     String? @map("user_agent")
+  createdAt     String  @map("created_at") @db.VarChar(32)
+
+  predecessor SupplyHistory? @relation("supplyHistory", fields: [predecessorId], references: [id])
+  successor   SupplyHistory? @relation("supplyHistory")
+  shelter     Shelter        @relation(fields: [shelterId], references: [id])
+  supply      Supply         @relation(fields: [supplyId], references: [id])
+  user        User?          @relation(fields: [userId], references: [id])
+
+  @@map("supplies_history")
 }

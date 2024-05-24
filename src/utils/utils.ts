@@ -110,11 +110,11 @@ function calculateGeolocationBounds({
   };
 }
 
-function removeEmptyStrings(obj: Record<string, any>): Record<string, any> {
+function removeEmptyStrings<T>(obj): T {
   return Object.entries(obj).reduce(
     (prev, [key, value]) => (value === '' ? prev : { ...prev, [key]: value }),
     {},
-  );
+  ) as T;
 }
 
 export {

@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    if: github.repository == 'SOS-RS/backend'
     runs-on: self-hosted
 
     steps:
@@ -24,6 +25,7 @@ jobs:
           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
           echo HOST=${{ secrets.HOST }} >> .env
           echo PORT=${{ secrets.PORT }} >> .env
+          echo HMAC_SECRET_KEY=${{ secrets.HMAC_SECRET_KEY }} >> .env
           echo SERVER_USER_PASSWORD=${{ secrets.SERVER_USER_PASSWORD }} >> .env
           cat .env
 

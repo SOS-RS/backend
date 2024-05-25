@@ -47,7 +47,7 @@ const FullUpdateShelterSchema = ShelterSchema.omit({
   updatedAt: true,
 })
   .partial()
-  .transform(removeEmptyStrings);
+  .transform((args) => removeEmptyStrings<typeof args>(args));
 
 export {
   ShelterSchema,

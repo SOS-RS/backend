@@ -26,7 +26,7 @@ export class ShelterSupplyService {
         prioritySum: {
           increment: newPriority - oldPriority,
         },
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
   }
@@ -41,7 +41,7 @@ export class ShelterSupplyService {
         priority,
         supplyId,
         quantity: priority !== SupplyPriority.UnderControl ? quantity : null,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       },
     });
   }
@@ -74,7 +74,7 @@ export class ShelterSupplyService {
       data: {
         ...data,
         quantity: priority !== SupplyPriority.UnderControl ? quantity : null,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
   }
@@ -88,6 +88,10 @@ export class ShelterSupplyService {
         supplyId: {
           in: ids,
         },
+      },
+      data: {
+        priority: SupplyPriority.UnderControl,
+        updatedAt: new Date(),
       },
     });
 

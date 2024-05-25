@@ -13,7 +13,7 @@ export class SupplyService {
     return await this.prismaService.supply.create({
       data: {
         ...payload,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       },
     });
   }
@@ -26,7 +26,7 @@ export class SupplyService {
       },
       data: {
         ...payload,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
   }

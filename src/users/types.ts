@@ -11,8 +11,8 @@ const UserSchema = z.object({
   password: z.string(),
   phone: z.string().transform(removeNotNumbers),
   accessLevel: z.nativeEnum(AccessLevel),
-  createdAt: z.string(),
-  updatedAt: z.string().nullable().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable().optional(),
 });
 
 const CreateUserSchema = UserSchema.pick({

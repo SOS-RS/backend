@@ -46,7 +46,7 @@ export class ShelterService implements OnModuleInit {
       },
       data: {
         ...payload,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
   }
@@ -59,7 +59,7 @@ export class ShelterService implements OnModuleInit {
       },
       data: {
         ...payload,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
   }

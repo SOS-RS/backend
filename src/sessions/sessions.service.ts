@@ -30,7 +30,7 @@ export class SessionsService {
       },
       data: {
         active: false,
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
       },
     });
 
@@ -39,7 +39,7 @@ export class SessionsService {
         userId: user.id,
         ip,
         userAgent,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       },
     });
 
@@ -76,7 +76,7 @@ export class SessionsService {
         userId,
       },
       data: {
-        updatedAt: new Date().toISOString(),
+        updatedAt: new Date(),
         active: false,
       },
     });

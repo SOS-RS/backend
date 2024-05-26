@@ -130,7 +130,11 @@ export class ShelterService implements OnModuleInit {
     const { getQuery } = new ShelterSearch(this.prismaService, queryData);
     const where = await getQuery();
 
-    const count = await this.prismaService.shelter.count({ where });
+    // fetches the total ammount of shelters
+    //const countTotal = await this.prismaService.shelter.count({ where });
+    const count = await this.prismaService.shelter.count({where:{ actived: true}})
+    // fetches the total count of enabled shelters.
+
 
     const take = perPage;
     const skip = perPage * (page - 1);
@@ -179,6 +183,9 @@ export class ShelterService implements OnModuleInit {
           },
         },
       },
+      where:{
+        actived:true // prevents sending deactivated shelters to the client.
+      }
     });
 
     const parsed = parseTagResponse(queryData, results, this.voluntaryIds);

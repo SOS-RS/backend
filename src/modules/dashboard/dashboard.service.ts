@@ -3,10 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ShelterSearchPropsSchema } from 'src/shelter/types/search.types';
 import { SearchSchema } from 'src/types';
-import { parseTagResponse, ShelterSearch } from 'src/shelter/ShelterSearch';
+import { ShelterSearch } from 'src/shelter/ShelterSearch';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { Prisma } from '@prisma/client';
-import { SupplyPriority } from 'src/supply/types';
 
 @Injectable()
 export class DashboardService {
@@ -24,8 +23,6 @@ export class DashboardService {
     const { getQuery } = new ShelterSearch(this.prismaService, queryData);
     const where = await getQuery();
 
-    const count = await this.prismaService.shelter.count({ where });
-
     const take = perPage;
     const skip = perPage * (page - 1);
 
@@ -36,7 +33,6 @@ export class DashboardService {
       where,
     };
 
-    //Shelters
     const allShelters = await this.prismaService.shelter.findMany({
       ...whereData,
       select: {
@@ -47,52 +43,50 @@ export class DashboardService {
         capacity: true,
         shelterSupplies: {
           select: {
-            priority: true, 
+            priority: true,
             supply: {
               select: {
                 supplyCategory: {
                   select: {
-                    name: true 
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
 
-    const categoriesWithPriorities = await this.prismaService.supplyCategory.findMany({
-      select: {
-        id: true,
-        name: true,
-        supplies: {
-          select: {
-            shelterSupplies: {
-              select: {
-                priority: true,
-                shelterId: true
-              }
-            }
-          }
-        }
-      }
-    });
-    
-    // Mapeia as categorias e conta as prioridades para cada abrigo
-    const result = categoriesWithPriorities.map(category => {
+    const categoriesWithPriorities =
+      await this.prismaService.supplyCategory.findMany({
+        select: {
+          id: true,
+          name: true,
+          supplies: {
+            select: {
+              shelterSupplies: {
+                select: {
+                  priority: true,
+                  shelterId: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+    const result = categoriesWithPriorities.map((category) => {
       const priorityCounts = {
         priority100: 0,
         priority10: 0,
-        priority1: 0
+        priority1: 0,
       };
-    
-      // Cria um conjunto para evitar a contagem duplicada de abrigos
+
       const countedShelters = new Set();
-    
-      // Para cada abrigo associado à categoria
-      category.supplies.forEach(supply => {
-        supply.shelterSupplies.forEach(shelterSupply => {
+
+      category.supplies.forEach((supply) => {
+        supply.shelterSupplies.forEach((shelterSupply) => {
           if (!countedShelters.has(shelterSupply.shelterId)) {
             switch (shelterSupply.priority) {
               case 100:
@@ -107,29 +101,30 @@ export class DashboardService {
               default:
                 break;
             }
-            // Adiciona o abrigo ao conjunto para evitar a contagem duplicada
+
             countedShelters.add(shelterSupply.shelterId);
           }
         });
       });
-    
+
       return {
         categoryId: category.id,
         categoryName: category.name,
-        ...priorityCounts
+        ...priorityCounts,
       };
     });
 
     const allPeopleSheltered = allShelters.reduce((accumulator, current) => {
-      if (current.actived && current.capacity !== null && current.capacity > 0) {
-
+      if (
+        current.actived &&
+        current.capacity !== null &&
+        current.capacity > 0
+      ) {
         return accumulator + (current.shelteredPeople ?? 0);
       } else {
-
         return accumulator;
       }
     }, 0);
-    
 
     return {
       allShelters: allShelters.length,

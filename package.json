@@ -30,6 +30,7 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-fastify": "^10.3.8",
+    "@nestjs/schedule": "^4.0.2",
     "@nestjs/swagger": "^7.3.1",
     "@prisma/client": "^5.13.0",
     "bcrypt": "^5.1.1",

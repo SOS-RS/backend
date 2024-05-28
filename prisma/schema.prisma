@@ -19,6 +19,20 @@ enum ShelterCategory {
   DistributionCenter
 }
 
+enum SupplyMeasure {
+  Unit
+  Kg
+  Litters
+  Box
+  Piece
+}
+
+enum DonationOrderStatus {
+  Pending
+  Canceled
+  Complete
+}
+
 model User {
   id          String      @id @default(uuid())
   name        String
@@ -33,6 +47,7 @@ model User {
   sessions        Session[]
   shelterManagers ShelterManagers[]
   suppliesHistory SupplyHistory[]
+  donationOrders  DonationOrder[]
 
   @@map("users")
 }
@@ -78,15 +93,17 @@ model ShelterSupply {
 }
 
 model Supply {
-  id               String  @id @default(uuid())
-  supplyCategoryId String  @map("supply_category_id")
+  id               String        @id @default(uuid())
+  supplyCategoryId String        @map("supply_category_id")
   name             String
-  createdAt        String  @map("created_at") @db.VarChar(32)
-  updatedAt        String? @map("updated_at") @db.VarChar(32)
+  measure          SupplyMeasure @default(value: Unit)
+  createdAt        String        @map("created_at") @db.VarChar(32)
+  updatedAt        String?       @map("updated_at") @db.VarChar(32)
 
-  supplyCategory  SupplyCategory  @relation(fields: [supplyCategoryId], references: [id])
-  shelterSupplies ShelterSupply[]
-  supplyHistories SupplyHistory[]
+  supplyCategory      SupplyCategory        @relation(fields: [supplyCategoryId], references: [id])
+  shelterSupplies     ShelterSupply[]
+  supplyHistories     SupplyHistory[]
+  DonationOrderSupply DonationOrderSupply[]
 
   @@map("supplies")
 }
@@ -117,6 +134,7 @@ model Shelter {
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
   supplyHistories SupplyHistory[]
+  DonationOrder   DonationOrder[]
 
   @@map("shelters")
 }
@@ -174,4 +192,33 @@ model SupplyHistory {
   user        User?          @relation(fields: [userId], references: [id])
 
   @@map("supplies_history")
+}
+
+model DonationOrderSupply {
+  id              String  @id @default(uuid())
+  donationOrderId String  @map("donation_order_id")
+  supplyId        String  @map("supply_id")
+  quantity        Int
+  createdAt       String  @map("created_at") @db.VarChar(32)
+  updatedAt       String? @map("updated_at") @db.VarChar(32)
+
+  supply        Supply        @relation(fields: [supplyId], references: [id])
+  donationOrder DonationOrder @relation(fields: [donationOrderId], references: [id])
+
+  @@map("donation_order_supplies")
+}
+
+model DonationOrder {
+  id        String              @id @default(uuid())
+  userId    String              @map("user_id")
+  shelterId String              @map("shelter_id")
+  status    DonationOrderStatus @default(value: Pending)
+  createdAt String              @map("created_at") @db.VarChar(32)
+  updatedAt String?             @map("updated_at") @db.VarChar(32)
+
+  user                  User                  @relation(fields: [userId], references: [id])
+  shelter               Shelter               @relation(fields: [shelterId], references: [id])
+  donationOrderSupplies DonationOrderSupply[]
+
+  @@map("donation_orders")
 }

@@ -125,11 +125,11 @@ export class UsersController {
     examples: {
       'Exemplo 1': {
         value: {
-          name: 'Dinho',
-          lastName: 'Duarte',
-          phone: '(31) 996675945',
-          login: 'dinho duarte',
-          password: '123456',
+          name: 'João',
+          lastName: 'Neves',
+          phone: '(11) 99999-9999',
+          login: 'joaodasneves',
+          password: '12345678',
         },
       },
     },

@@ -1,16 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { DashboardService } from './dashboard.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { PrismaModule } from '../../prisma/prisma.module';
+import { DonationOrderService } from './donation-order.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
-describe('DashboardService', () => {
-  let service: DashboardService;
+describe('DonationOrderService', () => {
+  let service: DonationOrderService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
-      providers: [DashboardService],
+      providers: [DonationOrderService],
     })
       .useMocker((token) => {
         if (token === PrismaService) {
@@ -19,7 +19,7 @@ describe('DashboardService', () => {
       })
       .compile();
 
-    service = module.get<DashboardService>(DashboardService);
+    service = module.get<DonationOrderService>(DonationOrderService);
   });
 
   it('should be defined', () => {

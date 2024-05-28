@@ -15,6 +15,7 @@ import { PartnersModule } from './partners/partners.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { SupportersModule } from './supporters/supporters.module';
 import { SuppliesHistoryModule } from './supplies-history/supplies-history.module';
+import { DonationOrderModule } from './donation-order/donation-order.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { SuppliesHistoryModule } from './supplies-history/supplies-history.modul
     DashboardModule,
     SupportersModule,
     SuppliesHistoryModule,
+    DonationOrderModule,
   ],
   controllers: [],
   providers: [

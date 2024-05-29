@@ -46,6 +46,7 @@ export class DashboardService {
             priority: true,
             supply: {
               select: {
+                measure: true,
                 supplyCategory: {
                   select: {
                     name: true,

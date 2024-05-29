@@ -104,7 +104,7 @@ export class ShelterService implements OnModuleInit {
               select: {
                 id: true,
                 name: true,
-
+                measure: true,
                 supplyCategory: {
                   select: {
                     id: true,

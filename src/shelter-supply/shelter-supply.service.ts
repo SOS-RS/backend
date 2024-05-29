@@ -135,6 +135,7 @@ export class ShelterSupplyService {
           select: {
             id: true,
             name: true,
+            measure: true,
             supplyCategory: {
               select: {
                 id: true,

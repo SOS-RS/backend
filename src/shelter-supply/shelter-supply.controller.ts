@@ -14,6 +14,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { ShelterSupplyService } from './shelter-supply.service';
 import { ServerResponse } from '../utils';
 import { DistributionCenterGuard } from '@/guards/distribution-center.guard';
+import { RegisterShelterSupplyHistory } from '@/decorators/RegisterShelterSupplyHistory';
+import { ShelterSupplyHistoryAction } from '@/interceptors/interceptors/shelter-supply-history/types';
 
 @ApiTags('Suprimento de abrigos')
 @Controller('shelter/supplies')
@@ -34,6 +36,7 @@ export class ShelterSupplyController {
   }
 
   @Post('')
+  @RegisterShelterSupplyHistory(ShelterSupplyHistoryAction.Create)
   async store(@Body() body) {
     try {
       const data = await this.shelterSupplyService.store(body);
@@ -49,6 +52,7 @@ export class ShelterSupplyController {
   }
 
   @Put(':shelterId/:supplyId')
+  @RegisterShelterSupplyHistory(ShelterSupplyHistoryAction.Update)
   async update(
     @Body() body,
     @Param('shelterId') shelterId: string,
@@ -72,6 +76,7 @@ export class ShelterSupplyController {
 
   @Put(':shelterId/supplies/many')
   @UseGuards(DistributionCenterGuard)
+  @RegisterShelterSupplyHistory(ShelterSupplyHistoryAction.UpdateMany)
   async updateMany(@Body() body, @Param('shelterId') shelterId: string) {
     try {
       const data = await this.shelterSupplyService.updateMany({

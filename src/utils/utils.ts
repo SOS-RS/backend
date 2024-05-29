@@ -115,6 +115,13 @@ function calculateGeolocationBounds({
   };
 }
 
+function removeEmptyStrings<T>(obj): T {
+  return Object.entries(obj).reduce(
+    (prev, [key, value]) => (value === '' ? prev : { ...prev, [key]: value }),
+    {},
+  ) as T;
+}
+
 export {
   ServerResponse,
   calculateGeolocationBounds,
@@ -123,4 +130,5 @@ export {
   deepMerge,
   getSessionData,
   removeNotNumbers,
+  removeEmptyStrings,
 };

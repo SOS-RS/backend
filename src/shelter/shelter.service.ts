@@ -1,7 +1,7 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Prisma, ShelterSupply } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
-import { subDays } from 'date-fns';
+import { millisecondsToHours, subDays } from 'date-fns';
 import * as qs from 'qs';
 import { z } from 'zod';
 
@@ -13,11 +13,14 @@ import { ShelterSearchPropsSchema } from './types/search.types';
 import {
   CreateShelterSchema,
   FullUpdateShelterSchema,
+  IShelterSupplyDecay,
   UpdateShelterSchema,
 } from './types/types';
+import { registerSupplyLog } from '@/interceptors/interceptors/shelter-supply-history/utils';
 
 @Injectable()
 export class ShelterService implements OnModuleInit {
+  private logger = new Logger(ShelterService.name);
   private voluntaryIds: string[] = [];
 
   constructor(private readonly prismaService: PrismaService) {}
@@ -93,6 +96,10 @@ export class ShelterService implements OnModuleInit {
           select: {
             priority: true,
             quantity: true,
+            supplyId: true,
+            shelterId: true,
+            createdAt: true,
+            updatedAt: true,
             supply: {
               select: {
                 id: true,
@@ -114,6 +121,8 @@ export class ShelterService implements OnModuleInit {
         updatedAt: true,
       },
     });
+
+    if (data) this.decayShelterSupply(data.shelterSupplies);
 
     return data;
   }
@@ -181,6 +190,8 @@ export class ShelterService implements OnModuleInit {
       },
     });
 
+    this.decayShelterSupply(results.flatMap((r) => r.shelterSupplies));
+
     const parsed = parseTagResponse(queryData, results, this.voluntaryIds);
 
     return {
@@ -227,5 +238,101 @@ export class ShelterService implements OnModuleInit {
       .then((resp) => {
         this.voluntaryIds.push(...resp.map((s) => s.id));
       });
+  }
+
+  private parseShelterSupply(
+    shelterSupply: ShelterSupply,
+  ): IShelterSupplyDecay {
+    return {
+      shelterId: shelterSupply.shelterId,
+      supplyId: shelterSupply.supplyId,
+      priority: shelterSupply.priority,
+      createdAt: new Date(shelterSupply.createdAt).getTime(),
+      updatedAt: shelterSupply.updatedAt
+        ? new Date(shelterSupply.updatedAt).getTime()
+        : 0,
+    };
+  }
+
+  private canDecayShelterSupply(
+    shelterSupply: IShelterSupplyDecay,
+    priorities: SupplyPriority[],
+    timeInHoursToDecay: number,
+  ): boolean {
+    return (
+      priorities.includes(shelterSupply.priority) &&
+      millisecondsToHours(
+        new Date().getTime() -
+          Math.max(shelterSupply.createdAt, shelterSupply.updatedAt),
+      ) > timeInHoursToDecay
+    );
+  }
+
+  private async handleDecayShelterSupply(
+    shelterSupplies: IShelterSupplyDecay[],
+    newPriority: SupplyPriority,
+  ) {
+    const shelterIds: Set<string> = new Set();
+    shelterSupplies.forEach((s) => shelterIds.add(s.shelterId));
+
+    await this.prismaService.$transaction([
+      this.prismaService.shelter.updateMany({
+        where: {
+          id: {
+            in: Array.from(shelterIds),
+          },
+        },
+        data: {
+          updatedAt: new Date().toISOString(),
+        },
+      }),
+      ...shelterSupplies.map((s) =>
+        this.prismaService.shelterSupply.update({
+          where: {
+            shelterId_supplyId: {
+              shelterId: s.shelterId,
+              supplyId: s.supplyId,
+            },
+          },
+          data: {
+            priority: newPriority,
+            updatedAt: new Date().toISOString(),
+          },
+        }),
+      ),
+    ]);
+
+    shelterSupplies.forEach((s) => {
+      registerSupplyLog({
+        shelterId: s.shelterId,
+        supplyId: s.supplyId,
+        priority: newPriority,
+      });
+    });
+  }
+
+  private async decayShelterSupply(shelterSupplies: ShelterSupply[]) {
+    this.handleDecayShelterSupply(
+      shelterSupplies
+        .map(this.parseShelterSupply)
+        .filter((f) =>
+          this.canDecayShelterSupply(f, [SupplyPriority.Urgent], 12),
+        ),
+
+      SupplyPriority.Needing,
+    );
+
+    this.handleDecayShelterSupply(
+      shelterSupplies
+        .map(this.parseShelterSupply)
+        .filter((f) =>
+          this.canDecayShelterSupply(
+            f,
+            [SupplyPriority.Needing, SupplyPriority.Remaining],
+            48,
+          ),
+        ),
+      SupplyPriority.UnderControl,
+    );
   }
 }

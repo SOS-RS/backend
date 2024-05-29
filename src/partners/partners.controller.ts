@@ -9,8 +9,10 @@ import {
 } from '@nestjs/common';
 import { PartnersService } from './partners.service';
 import { ServerResponse } from '../utils';
+import { ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from '@/guards/admin.guard';
 
+@ApiTags('Parceiros')
 @Controller('partners')
 export class PartnersController {
   private logger = new Logger(PartnersController.name);
@@ -33,7 +35,7 @@ export class PartnersController {
   async store(@Body() body) {
     try {
       await this.partnersService.store(body);
-      return new ServerResponse(200, 'Successfully created partner');
+      return new ServerResponse(201, 'Successfully created partner');
     } catch (err: any) {
       this.logger.error(`Failed to create partner: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);

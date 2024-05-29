@@ -31,16 +31,13 @@ export type GeolocationFilter = z.infer<typeof GeolocationFilterSchema>;
 
 export const ShelterSearchPropsSchema = z.object({
   search: z.string().optional(),
-  priority: z.preprocess(
-    (value) =>
-      typeof value === 'string'
-        ? value
-            .split(',')
-            .map((v) => Number(v))
-            .filter((v) => !isNaN(v))
-        : [],
-    z.array(z.nativeEnum(SupplyPriority)).optional(),
-  ),
+  priorities: z
+    .array(z.string())
+    .optional()
+    .transform((values) =>
+      values ? values.map(parseInt).filter((v) => !isNaN(v)) : [],
+    )
+    .pipe(z.array(z.nativeEnum(SupplyPriority))),
   supplyCategoryIds: z.array(z.string()).optional(),
   supplyIds: z.array(z.string()).optional(),
   shelterStatus: z.array(ShelterStatusSchema).optional(),

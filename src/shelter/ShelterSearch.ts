@@ -31,13 +31,13 @@ class ShelterSearch {
   }
 
   priority(supplyIds: string[] = []): Prisma.ShelterWhereInput {
-    if (!this.formProps.priority?.length) return {};
+    if (!this.formProps.priorities?.length) return {};
 
     return {
       shelterSupplies: {
         some: {
           priority: {
-            in: this.formProps.priority,
+            in: this.formProps.priorities,
           },
           supplyId:
             supplyIds.length > 0
@@ -81,7 +81,6 @@ class ShelterSearch {
       return {
         shelterSupplies: {
           some: {
-            priority: undefined,
             supply: {
               supplyCategoryId: {
                 in: this.formProps.supplyCategoryIds,
@@ -179,7 +178,7 @@ class ShelterSearch {
         search,
         { OR: this.shelterStatus },
         this.priority(this.formProps.supplyIds),
-        this.supplyCategoryIds(this.formProps.priority),
+        this.supplyCategoryIds(this.formProps.priorities),
       ],
     };
 

@@ -14,6 +14,9 @@ import { ShelterSupplyModule } from './shelter-supply/shelter-supply.module';
 import { PartnersModule } from './partners/partners.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { SupportersModule } from './supporters/supporters.module';
+import { TransportsModule } from './transports/transports.module';
+import { TransportManagersModule } from './transport-managers/transport-managers.module';
+import { TripsModule } from './trips/trips.module';
 import { SuppliesHistoryModule } from './supplies-history/supplies-history.module';
 
 @Module({
@@ -29,6 +32,9 @@ import { SuppliesHistoryModule } from './supplies-history/supplies-history.modul
     PartnersModule,
     DashboardModule,
     SupportersModule,
+    TransportsModule,
+    TransportManagersModule,
+    TripsModule,
     SuppliesHistoryModule,
   ],
   controllers: [],

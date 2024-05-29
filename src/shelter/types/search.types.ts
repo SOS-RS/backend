@@ -32,8 +32,14 @@ export type GeolocationFilter = z.infer<typeof GeolocationFilterSchema>;
 export const ShelterSearchPropsSchema = z.object({
   search: z.string().optional(),
   priority: z.preprocess(
-    (value) => Number(value) || undefined,
-    z.nativeEnum(SupplyPriority).optional(),
+    (value) =>
+      typeof value === 'string'
+        ? value
+            .split(',')
+            .map((v) => Number(v))
+            .filter((v) => !isNaN(v))
+        : [],
+    z.array(z.nativeEnum(SupplyPriority)).optional(),
   ),
   supplyCategoryIds: z.array(z.string()).optional(),
   supplyIds: z.array(z.string()).optional(),

@@ -16,6 +16,7 @@ const DonationOrderScheme = z.object({
 
 const CreateDonationOrderScheme = DonationOrderScheme.omit({
   id: true,
+  status: true,
   createdAt: true,
   updatedAt: true,
 }).extend({

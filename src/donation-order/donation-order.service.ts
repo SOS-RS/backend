@@ -11,7 +11,8 @@ import { SearchSchema } from '../types';
 export class DonationOrderService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async index(shelterId: string, userId: string, query: any) {
+  async index(userId: string, query: any) {
+    const { shelterId } = query;
     const { order, orderBy, page, perPage } = SearchSchema.parse(query);
 
     const where: Prisma.DonationOrderWhereInput = {
@@ -25,7 +26,7 @@ export class DonationOrderService {
         accessLevel: AccessLevel.DistributionCenter,
       },
     });
-    if (isDistributionCenter) delete where.userId;
+    if (isDistributionCenter) delete where.shelterId;
 
     const count = await this.prismaService.donationOrder.count({ where });
 
@@ -45,6 +46,12 @@ export class DonationOrderService {
         id: true,
         status: true,
         userId: true,
+        shelter: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         donationOrderSupplies: {
           select: {
             quantity: true,
@@ -72,23 +79,58 @@ export class DonationOrderService {
     };
   }
 
+  async show(id: string, userId: string) {
+    const data = await this.prismaService.donationOrder.findUnique({
+      where: { id, userId },
+      select: {
+        id: true,
+        status: true,
+        userId: true,
+        shelter: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        donationOrderSupplies: {
+          select: {
+            quantity: true,
+            supply: {
+              select: {
+                name: true,
+                measure: true,
+              },
+            },
+          },
+        },
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    return data;
+  }
+
   async store(body: z.infer<typeof CreateDonationOrderScheme>) {
-    const { supplies, ...rest } = CreateDonationOrderScheme.parse(body);
-    await this.prismaService.donationOrder.create({
+    const { supplies, shelterId, userId } =
+      CreateDonationOrderScheme.parse(body);
+    const donation = await this.prismaService.donationOrder.create({
       data: {
-        ...rest,
-        createdAt: new Date().toString(),
+        shelterId,
+        userId,
+        createdAt: new Date().toISOString(),
         donationOrderSupplies: {
           createMany: {
             data: supplies.map((s) => ({
               supplyId: s.id,
               quantity: s.quantity,
-              createdAt: new Date().toString(),
+              createdAt: new Date().toISOString(),
             })),
           },
         },
       },
     });
+
+    return donation;
   }
 
   async update(

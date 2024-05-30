@@ -2,11 +2,7 @@ import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
-import {
-  CreateShelterSupplySchema,
-  UpdateManyShelterSupplySchema,
-  UpdateShelterSupplySchema,
-} from './types';
+import { CreateShelterSupplySchema, UpdateShelterSupplySchema } from './types';
 import { SupplyPriority } from '../supply/types';
 
 @Injectable()
@@ -79,50 +75,6 @@ export class ShelterSupplyService {
     });
   }
 
-  async updateMany(body: z.infer<typeof UpdateManyShelterSupplySchema>) {
-    const { ids, shelterId } = UpdateManyShelterSupplySchema.parse(body);
-
-    const supplies = await this.prismaService.shelterSupply.findMany({
-      where: {
-        shelterId,
-        supplyId: {
-          in: ids,
-        },
-      },
-    });
-
-    const prioritySum = supplies.reduce(
-      (prev, current) => prev + current.priority,
-      0,
-    );
-
-    await this.prismaService.$transaction([
-      this.prismaService.shelter.update({
-        where: {
-          id: shelterId,
-        },
-        data: {
-          prioritySum: {
-            decrement: prioritySum,
-          },
-          updatedAt: new Date().toISOString(),
-        },
-      }),
-      this.prismaService.shelterSupply.updateMany({
-        where: {
-          shelterId,
-          supplyId: {
-            in: ids,
-          },
-        },
-        data: {
-          priority: SupplyPriority.UnderControl,
-          updatedAt: new Date().toISOString(),
-        },
-      }),
-    ]);
-  }
-
   async index(shelterId: string) {
     return await this.prismaService.shelterSupply.findMany({
       where: {
@@ -135,6 +87,7 @@ export class ShelterSupplyService {
           select: {
             id: true,
             name: true,
+            measure: true,
             supplyCategory: {
               select: {
                 id: true,

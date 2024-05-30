@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserSchema, UpdateUserSchema } from './types';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -32,5 +33,13 @@ export class UsersService {
         updatedAt: new Date().toISOString(),
       },
     });
+  }
+
+  async checkIfUserExists(payload: Partial<User>): Promise<boolean> {
+    const result = await this.prismaService.user.findFirst({
+      where: payload,
+    });
+
+    return !!result;
   }
 }

@@ -14,15 +14,14 @@ import { ShelterSupplyHistoryAction, UserIdentity } from './types';
 import { getSessionData } from '@/utils/utils';
 
 function registerSupplyLog(
-  prismaService: PrismaService,
   body: z.infer<typeof CreateSupplyHistorySchema>,
-  user: UserIdentity,
+  user: UserIdentity = {},
 ) {
   const fn = async () => {
     const { shelterId, supplyId, ...rest } =
       CreateSupplyHistorySchema.parse(body);
 
-    const prev = await prismaService.supplyHistory.findFirst({
+    const prev = await PrismaService.getInstance().supplyHistory.findFirst({
       where: {
         shelterId,
         supplyId,
@@ -32,7 +31,7 @@ function registerSupplyLog(
       },
     });
 
-    await prismaService.supplyHistory.create({
+    await PrismaService.getInstance().supplyHistory.create({
       data: {
         shelterId,
         supplyId,
@@ -57,23 +56,20 @@ function registerSupplyLog(
 }
 
 function registerCreateSupplyLog(
-  prismaService: PrismaService,
   body: z.infer<typeof CreateShelterSupplySchema>,
   user: UserIdentity,
 ) {
   const payload = CreateShelterSupplySchema.parse(body);
-  registerSupplyLog(prismaService, payload, user);
+  registerSupplyLog(payload, user);
 }
 
 function registerUpdateSupplyLog(
-  prismaService: PrismaService,
   body: z.infer<typeof UpdateShelterSupplySchema>,
   user: UserIdentity,
 ) {
   const payload = UpdateShelterSupplySchema.parse(body);
 
   registerSupplyLog(
-    prismaService,
     {
       shelterId: payload.where.shelterId,
       supplyId: payload.where.supplyId,
@@ -85,7 +81,6 @@ function registerUpdateSupplyLog(
 }
 
 function registerUpdateManySupplyLog(
-  prismaService: PrismaService,
   body: z.infer<typeof UpdateManyShelterSupplySchema>,
   user: UserIdentity,
 ) {
@@ -93,7 +88,6 @@ function registerUpdateManySupplyLog(
 
   ids.forEach((id) =>
     registerSupplyLog(
-      prismaService,
       {
         shelterId,
         supplyId: id,
@@ -124,11 +118,10 @@ function handler(
 
   switch (action) {
     case ShelterSupplyHistoryAction.Create:
-      registerCreateSupplyLog(prismaService, request.body as any, user);
+      registerCreateSupplyLog(request.body as any, user);
       break;
     case ShelterSupplyHistoryAction.Update:
       registerUpdateSupplyLog(
-        prismaService,
         {
           data: request.body as any,
           where: request.params as any,
@@ -138,7 +131,6 @@ function handler(
       break;
     case ShelterSupplyHistoryAction.UpdateMany:
       registerUpdateManySupplyLog(
-        prismaService,
         {
           shelterId: (request.params as any).shelterId,
           ids: (request.body as any).ids,
@@ -149,4 +141,4 @@ function handler(
   }
 }
 
-export { handler };
+export { handler, registerSupplyLog };

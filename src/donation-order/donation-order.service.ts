@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Injectable } from '@nestjs/common';
-import { AccessLevel, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -19,14 +19,6 @@ export class DonationOrderService {
       shelterId,
       userId,
     };
-
-    const isDistributionCenter = await this.prismaService.user.findFirst({
-      where: {
-        id: userId,
-        accessLevel: AccessLevel.DistributionCenter,
-      },
-    });
-    if (isDistributionCenter) delete where.shelterId;
 
     const count = await this.prismaService.donationOrder.count({ where });
 

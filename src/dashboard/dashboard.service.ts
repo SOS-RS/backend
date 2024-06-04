@@ -1,9 +1,9 @@
 import * as qs from 'qs';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { ShelterSearchPropsSchema } from 'src/shelter/types/search.types';
-import { SearchSchema } from 'src/types';
-import { ShelterSearch } from 'src/shelter/ShelterSearch';
+import { SearchSchema } from '../types';
+import { ShelterSearch } from '../shelter/ShelterSearch';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 import { Prisma } from '@prisma/client';
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { HttpException, Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { DonationOrderStatus, Prisma } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -162,22 +162,27 @@ export class DonationOrderService {
         );
     }
 
+    const updatePromises =
+      status === DonationOrderStatus.Complete
+        ? order.donationOrderSupplies.map((d) =>
+            this.prismaService.shelterSupply.update({
+              where: {
+                shelterId_supplyId: {
+                  shelterId: order.shelterId,
+                  supplyId: d.supplyId,
+                },
+              },
+              data: {
+                quantity: {
+                  decrement: d.quantity,
+                },
+              },
+            }),
+          )
+        : [];
+
     await this.prismaService.$transaction([
-      ...order.donationOrderSupplies.map((d) =>
-        this.prismaService.shelterSupply.update({
-          where: {
-            shelterId_supplyId: {
-              shelterId: order.shelterId,
-              supplyId: d.supplyId,
-            },
-          },
-          data: {
-            quantity: {
-              decrement: d.quantity,
-            },
-          },
-        }),
-      ),
+      ...updatePromises,
       this.prismaService.donationOrder.update({
         where: {
           id: orderId,

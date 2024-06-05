@@ -27,4 +27,21 @@ const UpdateSupplySchema = SupplySchema.pick({
   supplyCategoryId: true,
 }).partial();
 
-export { SupplySchema, CreateSupplySchema, UpdateSupplySchema, SupplyPriority };
+const SurplusDemandMatch = z.object({
+  supplyId: z.string().nullable().optional(),
+  shelterIdSurplus: z.string().nullable().optional(),
+  shelterIdNeeded: z.string().nullable().optional(),
+  page: z.preprocess((v) => +((v ?? '1') as string), z.number().min(1)),
+  perPage: z.preprocess(
+    (v) => +((v ?? '10') as string),
+    z.number().min(1).max(100),
+  ),
+});
+
+export {
+  SupplySchema,
+  CreateSupplySchema,
+  UpdateSupplySchema,
+  SurplusDemandMatch,
+  SupplyPriority
+};

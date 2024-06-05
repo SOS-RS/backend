@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { DashboardService } from './dashboard.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { PrismaModule } from '../../prisma/prisma.module';
+import { PrismaService } from '../prisma/prisma.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
 describe('DashboardService', () => {
   let service: DashboardService;

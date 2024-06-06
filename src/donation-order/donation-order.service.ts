@@ -12,11 +12,19 @@ export class DonationOrderService {
   private donationOrderVisibleFields: Prisma.DonationOrderSelect = {
     id: true,
     status: true,
-    userId: true,
+    user: {
+      select: {
+        id: true,
+        name: true,
+        lastName: true,
+        phone: true,
+      },
+    },
     shelter: {
       select: {
         id: true,
         name: true,
+        address: true,
       },
     },
     donationOrderSupplies: {

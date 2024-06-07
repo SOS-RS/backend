@@ -58,7 +58,14 @@ export class SupplyService {
   }
 
   async isDuplicate(body: z.infer<typeof CreateSupplySchema>):Promise<boolean> {
+
+    const payload = CreateSupplySchema.parse(body);
+    const payloadName = slugify(payload.name)
+
     const existingData = await this.prismaService.supply.findFirst({
+      where: {
+        name: payload.name
+      },
       select: {
         name: true,
         supplyCategory: {
@@ -69,9 +76,6 @@ export class SupplyService {
       },
     });
     const existingDataName = slugify(existingData?.name)
-
-    const payload = CreateSupplySchema.parse(body);
-    const payloadName = slugify(payload.name)
 
     if (existingDataName === payloadName
       && payload.supplyCategoryId === existingData?.supplyCategory.id) {

@@ -37,4 +37,10 @@ export class SupplyCategoriesService {
   async index() {
     return await this.prismaService.supplyCategory.findMany({});
   }
+
+  async isDuplicate(body: z.infer<typeof CreateSupplyCategorySchema>) : boolean {
+
+    const existingData = return await this.prismaService.supplyCategory.findMany({});
+
+  }
 }

@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSupplySchema, UpdateSupplySchema } from './types';
 
+import { slugify } from '@/utils/utils';
+
 @Injectable()
 export class SupplyService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -56,26 +58,14 @@ export class SupplyService {
   }
 
   async isDuplicate(body: z.infer<typeof CreateSupplySchema>):Promise<boolean> {
-
-    function slugify(name: string | void):string {
-
-      const slugName = String(name).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
-      .replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')
-      return slugName
-    }
-
     const existingData = await this.prismaService.supply.findFirst({
       select: {
-        id: false,
         name: true,
         supplyCategory: {
           select: {
             id: true,
-            name: false,
           },
         },
-        createdAt: false,
-        updatedAt: false,
       },
     });
     const existingDataName = slugify(existingData?.name)
@@ -90,4 +80,5 @@ export class SupplyService {
 
     return false;
   }
+
 }

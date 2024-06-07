@@ -316,7 +316,7 @@ export class ShelterService implements OnModuleInit {
       shelterSupplies
         .map(this.parseShelterSupply)
         .filter((f) =>
-          this.canDecayShelterSupply(f, [SupplyPriority.Urgent], 12),
+          this.canDecayShelterSupply(f, [SupplyPriority.Urgent], 48),
         ),
 
       SupplyPriority.Needing,
@@ -329,7 +329,7 @@ export class ShelterService implements OnModuleInit {
           this.canDecayShelterSupply(
             f,
             [SupplyPriority.Needing, SupplyPriority.Remaining],
-            48,
+            72,
           ),
         ),
       SupplyPriority.UnderControl,

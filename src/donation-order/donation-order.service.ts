@@ -87,30 +87,7 @@ export class DonationOrderService {
   async show(id: string, userId: string) {
     const data = await this.prismaService.donationOrder.findUnique({
       where: { id, userId },
-      select: {
-        id: true,
-        status: true,
-        userId: true,
-        shelter: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        donationOrderSupplies: {
-          select: {
-            quantity: true,
-            supply: {
-              select: {
-                name: true,
-                measure: true,
-              },
-            },
-          },
-        },
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: this.donationOrderVisibleFields,
     });
     return data;
   }

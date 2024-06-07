@@ -7,6 +7,8 @@ import {
   UpdateSupplyCategorySchema,
 } from './types';
 
+import { slugify } from '@/utils/utils';
+
 @Injectable()
 export class SupplyCategoriesService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -38,9 +40,25 @@ export class SupplyCategoriesService {
     return await this.prismaService.supplyCategory.findMany({});
   }
 
-  async isDuplicate(body: z.infer<typeof CreateSupplyCategorySchema>) : boolean {
+  async isDuplicate(body: z.infer<typeof CreateSupplyCategorySchema>) : Promise<boolean> {
 
-    const existingData = return await this.prismaService.supplyCategory.findMany({});
+    const payload = CreateSupplyCategorySchema.parse(body);
+    const existingData = await this.prismaService.supplyCategory.findFirst({
+      where: {
+        name: payload.name
+      },
+      select: {
+        name: true,
+      },
+    });
 
+    const payloadName = slugify(payload.name)
+    const existingDataName = slugify(existingData?.name)
+
+    if (payloadName === existingDataName) {
+      return true
+    }
+
+    return false
   }
 }

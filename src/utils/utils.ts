@@ -119,9 +119,9 @@ function removeEmptyStrings<T>(obj): T {
 
 function slugify(str:string | void):string {
 
-  const slugfied = String(str).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
+  const slugified = String(str).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
   .replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')
-  return slugfied
+  return slugified
 
 }
 export {

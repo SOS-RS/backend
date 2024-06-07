@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   Logger,
   Param,
@@ -24,7 +25,6 @@ export class UsersController {
   constructor(private readonly userServices: UsersService) {}
 
   @Post('')
-  @UseGuards(AdminGuard)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Cria um novo usuário',
@@ -43,9 +43,9 @@ export class UsersController {
     examples: {
       'Exemplo 1': {
         value: {
-          name: 'Dinho',
-          lastName: 'Duarte',
-          phone: '(31) 996675945',
+          name: 'Administrador',
+          lastName: 'Web',
+          phone: '(31) 999999999',
         },
       },
     },
@@ -83,10 +83,10 @@ export class UsersController {
     examples: {
       'Exemplo 1': {
         value: {
-          name: 'Dinho',
-          lastName: 'Duarte',
-          phone: '(31) 996675945',
-          login: 'dinho duarte',
+          name: 'Administrador',
+          lastName: 'Web',
+          phone: '(31) 999999999',
+          login: 'admin',
           password: '123456',
         },
       },
@@ -125,11 +125,11 @@ export class UsersController {
     examples: {
       'Exemplo 1': {
         value: {
-          name: 'Dinho',
-          lastName: 'Duarte',
-          phone: '(31) 996675945',
-          login: 'dinho duarte',
-          password: '123456',
+          name: 'João',
+          lastName: 'Neves',
+          phone: '(11) 99999-9999',
+          login: 'joaodasneves',
+          password: '12345678',
         },
       },
     },
@@ -141,6 +141,21 @@ export class UsersController {
       return new ServerResponse(201, 'Successfully updated');
     } catch (err: any) {
       this.logger.error(`Failed to update user: ${err}`);
+      throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
+    }
+  }
+
+  @Get('find/:field/:value')
+  async find(@Param('field') field: string, @Param('value') value: string) {
+    try {
+      const result = await this.userServices.checkIfUserExists({
+        [field]: value,
+      });
+      return new ServerResponse(201, 'Successfully searched user', {
+        exists: result,
+      });
+    } catch (err: any) {
+      this.logger.error(`Failed to find user: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);
     }
   }

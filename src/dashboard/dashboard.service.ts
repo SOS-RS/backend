@@ -46,6 +46,7 @@ export class DashboardService {
             priority: true,
             supply: {
               select: {
+                measure: true,
                 supplyCategory: {
                   select: {
                     name: true,
@@ -58,34 +59,35 @@ export class DashboardService {
       },
     });
 
-    const categoriesWithPriorities = await this.prismaService.supplyCategory.findMany({
-      select: {
-        id: true,
-        name: true,
-        supplies: {
-          select: {
-            shelterSupplies: {
-              select: {
-                priority: true,
-                shelterId: true
-              }
-            }
-          }
-        }
-      }
-    });
-    
-    const result = categoriesWithPriorities.map(category => {
+    const categoriesWithPriorities =
+      await this.prismaService.supplyCategory.findMany({
+        select: {
+          id: true,
+          name: true,
+          supplies: {
+            select: {
+              shelterSupplies: {
+                select: {
+                  priority: true,
+                  shelterId: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+    const result = categoriesWithPriorities.map((category) => {
       const priorityCounts = {
         priority100: 0,
         priority10: 0,
         priority1: 0,
       };
-    
+
       const countedShelters = new Set();
-    
-      category.supplies.forEach(supply => {
-        supply.shelterSupplies.forEach(shelterSupply => {
+
+      category.supplies.forEach((supply) => {
+        supply.shelterSupplies.forEach((shelterSupply) => {
           if (!countedShelters.has(shelterSupply.shelterId)) {
             switch (shelterSupply.priority) {
               case 100:
@@ -124,30 +126,40 @@ export class DashboardService {
       }
     }, 0);
 
-    const numSheltersAvailable = allShelters.filter(shelter => {
-      if (shelter.actived && shelter.capacity !== null && shelter.capacity > 0) {
-          return (shelter.shelteredPeople ?? 0) < shelter.capacity;
+    const numSheltersAvailable = allShelters.filter((shelter) => {
+      if (
+        shelter.actived &&
+        shelter.capacity !== null &&
+        shelter.capacity > 0
+      ) {
+        return (shelter.shelteredPeople ?? 0) < shelter.capacity;
       }
-      return false; 
-    }).length;     
+      return false;
+    }).length;
 
     const numSheltersFull = allShelters.reduce((count, shelter) => {
-      if (shelter.actived && shelter.capacity !== null && shelter.capacity > 0) {
-          if ((shelter.shelteredPeople ?? 0) >= shelter.capacity) {
-              return count + 1;
-          }
+      if (
+        shelter.actived &&
+        shelter.capacity !== null &&
+        shelter.capacity > 0
+      ) {
+        if ((shelter.shelteredPeople ?? 0) >= shelter.capacity) {
+          return count + 1;
+        }
       }
       return count;
     }, 0);
 
     const shelterWithoutInformation = allShelters.reduce((count, shelter) => {
-      if (shelter.shelteredPeople === null || shelter.shelteredPeople === undefined) {
-          return count + 1;
+      if (
+        shelter.shelteredPeople === null ||
+        shelter.shelteredPeople === undefined
+      ) {
+        return count + 1;
       }
       return count;
     }, 0);
-    
-  
+
     return {
       allShelters: allShelters.length,
       allPeopleSheltered: allPeopleSheltered,

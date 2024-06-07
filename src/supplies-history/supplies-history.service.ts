@@ -36,6 +36,7 @@ export class SuppliesHistoryService {
         id: true,
         supply: {
           select: {
+            measure: true,
             name: true,
           },
         },

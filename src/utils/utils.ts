@@ -117,6 +117,13 @@ function removeEmptyStrings<T>(obj): T {
   ) as T;
 }
 
+function slugify(str:string | void):string {
+
+  const slugified = String(str).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
+  .replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-')
+  return slugified
+
+}
 export {
   ServerResponse,
   calculateGeolocationBounds,
@@ -125,4 +132,5 @@ export {
   getSessionData,
   removeNotNumbers,
   removeEmptyStrings,
+  slugify
 };

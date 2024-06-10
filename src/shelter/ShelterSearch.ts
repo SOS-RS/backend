@@ -12,9 +12,9 @@ import {
 } from './types/search.types';
 
 const defaultTagsData: ShelterTagInfo = {
-  NeedDonations: 10,
-  NeedVolunteers: 10,
-  RemainingSupplies: 10,
+  NeedDonations: true,
+  NeedVolunteers: true,
+  RemainingSupplies: true,
 };
 
 class ShelterSearch {
@@ -204,27 +204,17 @@ function parseTagResponse(
   };
 
   const parsed = results.map((result) => {
-    const qtd: Required<ShelterTagInfo> = {
-      NeedDonations: 0,
-      NeedVolunteers: 0,
-      RemainingSupplies: 0,
-    };
     return {
       ...result,
       shelterSupplies: result.shelterSupplies.reduce((prev, shelterSupply) => {
         const supplyTags: ShelterTagType[] = [];
-        let tagged: boolean = false;
         if (
           tags.NeedDonations &&
           [SupplyPriority.Needing, SupplyPriority.Urgent].includes(
             shelterSupply.priority,
           )
         ) {
-          if (qtd.NeedDonations < tags.NeedDonations) {
-            qtd.NeedDonations++;
-            tagged = true;
-            supplyTags.push('NeedDonations');
-          }
+          supplyTags.push('NeedDonations');
         }
         if (
           tags.NeedVolunteers &&
@@ -233,24 +223,15 @@ function parseTagResponse(
             shelterSupply.priority,
           )
         ) {
-          if (qtd.NeedVolunteers < tags.NeedVolunteers) {
-            qtd.NeedVolunteers++;
-            tagged = true;
-            supplyTags.push('NeedVolunteers');
-          }
+          supplyTags.push('NeedVolunteers');
         }
         if (
           tags.RemainingSupplies &&
           [SupplyPriority.Remaining].includes(shelterSupply.priority)
         ) {
-          if (qtd.RemainingSupplies < tags.RemainingSupplies) {
-            qtd.RemainingSupplies++;
-            tagged = true;
-            supplyTags.push('RemainingSupplies');
-          }
+          supplyTags.push('RemainingSupplies');
         }
-        if (tagged) return [...prev, { ...shelterSupply, tags: supplyTags }];
-        else return prev;
+        return [...prev, { ...shelterSupply, tags: supplyTags }];
       }, [] as any),
     };
   });

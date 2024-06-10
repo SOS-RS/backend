@@ -4,14 +4,12 @@ import { Logger } from '@nestjs/common';
 
 import {
   CreateShelterSupplySchema,
-  UpdateManyShelterSupplySchema,
   UpdateShelterSupplySchema,
 } from '../../../shelter-supply/types';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateSupplyHistorySchema } from '../../../supplies-history/types';
-import { SupplyPriority } from '../../../supply/types';
 import { ShelterSupplyHistoryAction, UserIdentity } from './types';
-import { getSessionData } from '@/utils/utils';
+import { getSessionData } from '@/utils';
 
 function registerSupplyLog(
   body: z.infer<typeof CreateSupplyHistorySchema>,
@@ -80,25 +78,6 @@ function registerUpdateSupplyLog(
   );
 }
 
-function registerUpdateManySupplyLog(
-  body: z.infer<typeof UpdateManyShelterSupplySchema>,
-  user: UserIdentity,
-) {
-  const { ids, shelterId } = UpdateManyShelterSupplySchema.parse(body);
-
-  ids.forEach((id) =>
-    registerSupplyLog(
-      {
-        shelterId,
-        supplyId: id,
-        priority: SupplyPriority.UnderControl,
-        quantity: 0,
-      },
-      user,
-    ),
-  );
-}
-
 function handler(
   prismaService: PrismaService,
   action: ShelterSupplyHistoryAction,
@@ -125,15 +104,6 @@ function handler(
         {
           data: request.body as any,
           where: request.params as any,
-        },
-        user,
-      );
-      break;
-    case ShelterSupplyHistoryAction.UpdateMany:
-      registerUpdateManySupplyLog(
-        {
-          shelterId: (request.params as any).shelterId,
-          ids: (request.body as any).ids,
         },
         user,
       );

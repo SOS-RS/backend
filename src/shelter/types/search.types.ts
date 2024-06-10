@@ -14,7 +14,7 @@ const ShelterTagTypeSchema = z.enum([
 
 const ShelterTagInfoSchema = z.record(
   ShelterTagTypeSchema,
-  z.number().optional(),
+  z.boolean().optional(),
 );
 
 export type ShelterTagType = z.infer<typeof ShelterTagTypeSchema>;

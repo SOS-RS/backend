@@ -93,7 +93,7 @@ INSERT INTO public.partners VALUES ('33fc6b9c-e9dd-446d-b0a1-f66dd8a45cda', 'Pai
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: doadmin
 --
 
-INSERT INTO public.users VALUES ('e0306bc0-8c29-429a-bbd2-384f48d4f993', 'Dinho', '31996675945', '$2b$10$V4hFTbT7MrskROc4TI2lNe6gAd0g7U1niziAPycFueLhPJRFIfoGm', '31996675945', '2024-05-05T22:04:59.468Z', '2024-05-09T17:56:55.037Z', 'Admin', 'Duarte');
+INSERT INTO public.users VALUES ('e0306bc0-8c29-429a-bbd2-384f48d4f993', 'Administrador', '31999999999', '$2b$10$V4hFTbT7MrskROc4TI2lNe6gAd0g7U1niziAPycFueLhPJRFIfoGm', '31999999999', '2024-05-05T22:04:59.468Z', '2024-05-09T17:56:55.037Z', 'Admin', 'Web');
 INSERT INTO public.users VALUES ('e82f476a-1574-4dd2-a4c4-1c1f0117db12', 'Rhuam', '51992047974', '$2b$10$V4hFTbT7MrskROc4TI2lNe6gAd0g7U1niziAPycFueLhPJRFIfoGm', '51992047974', '2024-05-05T22:06:11.390Z', '2024-05-16T18:52:36.650Z', 'Admin', 'Estevam');
 
 

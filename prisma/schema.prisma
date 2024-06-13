@@ -41,8 +41,8 @@ model User {
   password    String
   phone       String      @unique
   accessLevel AccessLevel @default(value: User)
-  createdAt   String      @map("created_at") @db.VarChar(32)
-  updatedAt   String?     @map("updated_at") @db.VarChar(32)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime?   @updatedAt @map("updated_at") @db.Timestamptz()
 
   sessions        Session[]
   shelterManagers ShelterManagers[]
@@ -54,13 +54,13 @@ model User {
 }
 
 model Session {
-  id        String  @id @default(uuid())
-  userId    String  @map("user_id")
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
   ip        String?
-  userAgent String? @map("user_agent")
-  active    Boolean @default(value: true)
-  createdAt String  @map("created_at") @db.VarChar(32)
-  updatedAt String? @map("updated_at") @db.VarChar(32)
+  userAgent String?   @map("user_agent")
+  active    Boolean   @default(value: true)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
 
   user User @relation(fields: [userId], references: [id])
 
@@ -68,10 +68,10 @@ model Session {
 }
 
 model SupplyCategory {
-  id        String  @id @default(uuid())
-  name      String  @unique
-  createdAt String  @map("created_at") @db.VarChar(32)
-  updatedAt String? @map("updated_at") @db.VarChar(32)
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
 
   supplies Supply[]
 
@@ -79,12 +79,12 @@ model SupplyCategory {
 }
 
 model ShelterSupply {
-  shelterId String  @map("shelter_id")
-  supplyId  String  @map("supply_id")
-  priority  Int     @default(value: 0)
+  shelterId String    @map("shelter_id")
+  supplyId  String    @map("supply_id")
+  priority  Int       @default(value: 0)
   quantity  Int?
-  createdAt String  @map("created_at") @db.VarChar(32)
-  updatedAt String? @map("updated_at") @db.VarChar(32)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
 
   shelter Shelter @relation(fields: [shelterId], references: [id])
   supply  Supply  @relation(fields: [supplyId], references: [id])
@@ -129,8 +129,8 @@ model Shelter {
   verified        Boolean         @default(value: false)
   category        ShelterCategory @default(value: Shelter)
   actived         Boolean         @default(value: true)
-  createdAt       String          @map("created_at") @db.VarChar(32)
-  updatedAt       String?         @map("updated_at") @db.VarChar(32)
+  createdAt       DateTime        @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime?       @updatedAt @map("updated_at") @db.Timestamptz()
 
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]
@@ -142,10 +142,10 @@ model Shelter {
 }
 
 model ShelterManagers {
-  shelterId String  @map("shelter_id")
-  userId    String  @map("user_id")
-  createdAt String  @map("created_at") @db.VarChar(32)
-  updatedAt String? @map("updated_at") @db.VarChar(32)
+  shelterId String    @map("shelter_id")
+  userId    String    @map("user_id")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
 
   user    User    @relation(fields: [userId], references: [id])
   shelter Shelter @relation(fields: [shelterId], references: [id])
@@ -155,22 +155,22 @@ model ShelterManagers {
 }
 
 model Partners {
-  id        String  @id @default(uuid())
-  name      String  @unique
+  id        String    @id @default(uuid())
+  name      String    @unique
   link      String
-  createdAt String  @map("created_at") @db.VarChar(32)
-  updatedAt String? @map("updated_at") @db.VarChar(32)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("partners")
 }
 
 model Supporters {
-  id        String  @id @default(uuid())
-  name      String  @unique
-  imageUrl  String  @map("image_url")
+  id        String    @id @default(uuid())
+  name      String    @unique
+  imageUrl  String    @map("image_url")
   link      String
-  createdAt String  @map("created_at") @db.VarChar(32)
-  updatedAt String? @map("updated_at") @db.VarChar(32)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz()
 
   @@map("supporters")
 }

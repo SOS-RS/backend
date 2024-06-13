@@ -18,9 +18,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest.e2e.config.ts",
-    "migrations:run": "npx prisma migrate deploy",
-    "migrations:dev": "npx prisma migrate dev",
+    "pretest:e2e": "dotenvx run --overload -f .env.local -f .env.test -- prisma migrate deploy",
+    "test:e2e": "dotenvx run --overload -f .env.local -f .env.test -- jest --config ./test/jest.e2e.config.ts",
+    "migrations:run": "prisma migrate deploy",
+    "migrations:dev": "prisma migrate dev",
     "docker:compose": "docker-compose -f docker-compose.dev.yml up"
   },
   "dependencies": {
@@ -42,6 +43,7 @@
     "zod": "^3.23.6"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^0.44.0",
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",

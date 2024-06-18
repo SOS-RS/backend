@@ -39,9 +39,14 @@ export class DonationOrderController {
 
   @Put(':orderId')
   @UseGuards(UserGuard)
-  async update(@Param('orderId') orderId: string, @Body() body) {
+  async update(
+    @Request() req,
+    @Param('orderId') orderId: string,
+    @Body() body,
+  ) {
     try {
-      await this.donationOrderService.update(orderId, body);
+      const { userId } = req.user;
+      await this.donationOrderService.update(orderId, userId, body);
       return new ServerResponse(200, 'Successfully updated donation order');
     } catch (err: any) {
       this.logger.error(`Failed to update donation order: ${err}`);

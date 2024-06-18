@@ -120,6 +120,8 @@ model Shelter {
   streetNumber    String?         @map("street_number")
   zipCode         String?         @map("zip_code")
   petFriendly     Boolean?        @map("pet_friendly")
+  shelteredPets   Int?            @map("sheltered_pets")
+  petsCapacity    Int?            @map("pets_capacity")
   shelteredPeople Int?            @map("sheltered_people")
   capacity        Int?
   contact         String?

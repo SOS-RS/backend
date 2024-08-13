@@ -110,27 +110,28 @@ model Supply {
 }
 
 model Shelter {
-  id              String          @id @default(uuid())
-  name            String          @unique
-  pix             String?         @unique
-  address         String
-  street          String?
-  neighbourhood   String?
-  city            String?
-  streetNumber    String?         @map("street_number")
-  zipCode         String?         @map("zip_code")
-  petFriendly     Boolean?        @map("pet_friendly")
-  shelteredPeople Int?            @map("sheltered_people")
-  capacity        Int?
-  contact         String?
-  prioritySum     Int             @default(value: 0) @map("priority_sum")
-  latitude        Float?
-  longitude       Float?
-  verified        Boolean         @default(value: false)
-  category        ShelterCategory @default(value: Shelter)
-  actived         Boolean         @default(value: true)
-  createdAt       String          @map("created_at") @db.VarChar(32)
-  updatedAt       String?         @map("updated_at") @db.VarChar(32)
+  id                 String          @id @default(uuid())
+  name               String          @unique
+  pix                String?         @unique
+  address            String
+  street             String?
+  neighbourhood      String?
+  city               String?
+  streetNumber       String?         @map("street_number")
+  zipCode            String?         @map("zip_code")
+  petFriendly        Boolean?        @map("pet_friendly")
+  shelteredPeople    Int?            @map("sheltered_people")
+  authorizedContact Boolean?        @default(value: false)
+  capacity           Int?
+  contact            String?
+  prioritySum        Int             @default(value: 0) @map("priority_sum")
+  latitude           Float?
+  longitude          Float?
+  verified           Boolean         @default(value: false)
+  category           ShelterCategory @default(value: Shelter)
+  actived            Boolean         @default(value: true)
+  createdAt          String          @map("created_at") @db.VarChar(32)
+  updatedAt          String?         @map("updated_at") @db.VarChar(32)
 
   shelterManagers ShelterManagers[]
   shelterSupplies ShelterSupply[]

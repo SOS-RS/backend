@@ -84,13 +84,14 @@ export class ShelterService implements OnModuleInit {
         pix: true,
         shelteredPeople: true,
         capacity: true,
-        contact: shouldShowContact,
+        contact: true,
         petFriendly: true,
         prioritySum: true,
         latitude: true,
         longitude: true,
         verified: true,
         actived: true,
+        authorizedContact: true,
         category: true,
         shelterSupplies: {
           select: {
@@ -122,7 +123,15 @@ export class ShelterService implements OnModuleInit {
       },
     });
 
-    if (data) this.decayShelterSupply(data.shelterSupplies);
+    if (data) {
+      this.decayShelterSupply(data.shelterSupplies);
+
+      if (!shouldShowContact && !data.authorizedContact) {
+        data.contact = 'Não autorizado informar';
+      } else if (shouldShowContact && !data.authorizedContact) {
+        return data;
+      }
+    }
 
     return data;
   }
@@ -150,7 +159,6 @@ export class ShelterService implements OnModuleInit {
       orderBy: { [orderBy]: order },
       where,
     };
-
     const results = await this.prismaService.shelter.findMany({
       ...whereData,
       select: {
@@ -174,6 +182,8 @@ export class ShelterService implements OnModuleInit {
         category: true,
         createdAt: true,
         updatedAt: true,
+        contact: true,
+        authorizedContact: true,
         shelterSupplies: {
           where: {
             priority: {

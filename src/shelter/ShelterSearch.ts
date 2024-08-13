@@ -204,6 +204,9 @@ function parseTagResponse(
   };
 
   const parsed = results.map((result) => {
+    if (!result.authorizedContact) {
+      result.contact = 'Não autorizado informar';
+    }
     return {
       ...result,
       shelterSupplies: result.shelterSupplies.reduce((prev, shelterSupply) => {

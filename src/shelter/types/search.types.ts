@@ -48,7 +48,7 @@ export const ShelterSearchPropsSchema = z.object({
 
 export type ShelterSearchProps = z.infer<typeof ShelterSearchPropsSchema>;
 
-type AllowedShelterFields = Omit<Shelter, 'contact'>;
+type AllowedShelterFields = Shelter;
 
 export type SearchShelterTagResponse = AllowedShelterFields & {
   shelterSupplies: (ShelterSupply & { supply: Supply })[];

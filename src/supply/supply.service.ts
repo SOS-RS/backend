@@ -4,12 +4,15 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateSupplySchema, UpdateSupplySchema } from './types';
 
+import { slugify } from '@/utils/utils';
+
 @Injectable()
 export class SupplyService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async store(body: z.infer<typeof CreateSupplySchema>) {
     const payload = CreateSupplySchema.parse(body);
+
     return await this.prismaService.supply.create({
       data: {
         ...payload,
@@ -53,4 +56,33 @@ export class SupplyService {
 
     return data;
   }
+
+  async isDuplicate(body: z.infer<typeof CreateSupplySchema>):Promise<boolean> {
+
+    const payload = CreateSupplySchema.parse(body);
+    const payloadName = slugify(payload.name)
+
+    const existingData = await this.prismaService.supply.findFirst({
+      where: {
+        name: payload.name
+      },
+      select: {
+        name: true,
+        supplyCategory: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    const existingDataName = slugify(existingData?.name)
+
+    if (existingDataName === payloadName
+      && payload.supplyCategoryId === existingData?.supplyCategory.id) {
+      return true
+    }
+
+    return false;
+  }
+
 }

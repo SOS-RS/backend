@@ -33,9 +33,17 @@ export class SupplyController {
 
   @Post('')
   async store(@Body() body) {
-    try {
+    try { 
+      
+      const isDuplicate = await this.supplyServices.isDuplicate(body);
+
+      if (isDuplicate) {
+        return new ServerResponse(400, 'This supply already exists')
+      }
+
       const data = await this.supplyServices.store(body);
       return new ServerResponse(200, 'Successfully created supply', data);
+
     } catch (err: any) {
       this.logger.error(`Failed to create supply: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);

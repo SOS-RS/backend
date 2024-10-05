@@ -43,12 +43,19 @@ export class SupplyCategoriesController {
   @UseGuards(AdminGuard)
   async store(@Body() body) {
     try {
+      const isDuplicate = await this.supplyCategoryServices.isDuplicate(body);
+
+      if (isDuplicate) {
+        return new ServerResponse(400, 'This category already exists')
+      }
+
       const data = await this.supplyCategoryServices.store(body);
       return new ServerResponse(
         200,
         'Successfully created supply category',
         data,
       );
+      
     } catch (err: any) {
       this.logger.error(`Failed to create supply category: ${err}`);
       throw new HttpException(err?.code ?? err?.name ?? `${err}`, 400);

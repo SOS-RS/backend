@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { GeolocationFilter } from 'src/shelter/types/search.types';
+import * as crypto from 'crypto';
 
 class ServerResponse<T> {
   readonly message: string;
@@ -117,6 +118,18 @@ function removeEmptyStrings<T>(obj): T {
   ) as T;
 }
 
+function generateRandomPassword(length: number): string {
+  const charset =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+[]{}|;:,.<>?';
+  let password = '';
+  const values = new Uint32Array(length);
+  crypto.randomFillSync(values);
+  for (let i = 0; i < length; i++) {
+    password += charset[values[i] % charset.length];
+  }
+  return password;
+}
+
 export {
   ServerResponse,
   calculateGeolocationBounds,
@@ -125,4 +138,5 @@ export {
   getSessionData,
   removeNotNumbers,
   removeEmptyStrings,
+  generateRandomPassword,
 };

@@ -16,6 +16,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { SupportersModule } from './supporters/supporters.module';
 import { SuppliesHistoryModule } from './supplies-history/supplies-history.module';
 import { DonationOrderModule } from './donation-order/donation-order.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DonationOrderModule } from './donation-order/donation-order.module';
     SupportersModule,
     SuppliesHistoryModule,
     DonationOrderModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [

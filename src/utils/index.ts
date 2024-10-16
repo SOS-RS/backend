@@ -4,6 +4,7 @@ import {
   getSessionData,
   deepMerge,
   capitalize,
+  generateRandomPassword,
 } from './utils';
 
 export {
@@ -12,4 +13,5 @@ export {
   removeNotNumbers,
   getSessionData,
   deepMerge,
+  generateRandomPassword,
 };

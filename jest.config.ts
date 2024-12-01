@@ -13,6 +13,11 @@ const config: Config = {
     '^src/(.*)$': '<rootDir>/$1',
     '^@/(.*)$': '<rootDir>/$1',
     '^test/(.*)$': '<rootDir>/../$1',
+    "^@/decorators/(.*)$": "<rootDir>/decorators/$1",
+    "^@/interceptors/(.*)$": "<rootDir>/interceptors/$1",
+    "^@/middlewares/(.*)$": "<rootDir>/middlewares/$1",
+    "^@/utils/(.*)$": "<rootDir>/utils/$1",
+    "^@/guards/(.*)$": "<rootDir>/guards/$1"
   },
   testEnvironment: 'node',
 };

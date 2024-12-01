@@ -3,23 +3,65 @@ import { UsersService } from './users.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('UsersService', () => {
-  let service: UsersService;
+  let userService: UsersService;
+
+  const mockPrismaService = {
+    user: {
+      create: jest.fn(),
+      update: jest.fn(),
+    },
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService],
+      providers: [UsersService, PrismaService],
     })
-      .useMocker((token) => {
-        if (token === PrismaService) {
-          return {};
-        }
-      })
+      .overrideProvider(PrismaService)
+      .useValue(mockPrismaService)
       .compile();
 
-    service = module.get<UsersService>(UsersService);
+    userService = module.get<UsersService>(UsersService);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(userService).toBeDefined();
+  });
+
+  describe('store function', () => {
+    const userPayload = {
+      name: 'matheus',
+      lastName: 'silva',
+      phone: '44999998311',
+    };
+
+    it('shold call the store function 1 time', async () => {
+      userService.store(userPayload);
+      expect(mockPrismaService.user.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('shold call the store function with the parameters', async () => {
+      userService.store(userPayload);
+      const data = {
+        ...userPayload,
+        password: userPayload.phone,
+        login: userPayload.phone,
+        createdAt: new Date().toISOString(),
+      };
+      expect(mockPrismaService.user.create).toHaveBeenCalledWith({ data });
+    });
+  });
+
+  describe('update function', () => {
+    const id = 'user_id_test';
+    const body = {
+      name: 'Matheus',
+      lastName: 'Silva',
+      phone: '44999998311',
+    };
+
+    it('shuld call the store function 1 time', async () => {
+      userService.update(id, body);
+      expect(mockPrismaService.user.update).toHaveBeenCalledTimes(1);
+    });
   });
 });
